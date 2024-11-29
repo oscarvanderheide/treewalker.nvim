@@ -6,8 +6,8 @@ local assert = require("luassert")
 
 describe("util", function()
   describe("contains_line", function()
-    assert(util.contains_line({ "has", "also" }, "has"))
-    assert.False(util.contains_line({ "doesnt" }, "has"))
+    assert(util.contains_string({ "has", "also" }, "has"))
+    assert.False(util.contains_string({ "doesnt" }, "has"))
   end)
 
   describe("guid", function()
