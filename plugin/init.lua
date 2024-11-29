@@ -5,19 +5,19 @@
 local util = require('treewalker.util')
 
 function Up()
-  util.R('treewalker.main').up()
+  util.R('treewalker').up()
 end
 
 function Down()
-  util.R('treewalker.main').down()
+  util.R('treewalker').down()
 end
 
 function Left()
-  util.R('treewalker.main').left()
+  util.R('treewalker').left()
 end
 
 function Right()
-  util.R('treewalker.main').right()
+  util.R('treewalker').right()
 end
 
 vim.api.nvim_create_user_command(

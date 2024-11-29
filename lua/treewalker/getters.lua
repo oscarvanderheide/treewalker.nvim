@@ -38,23 +38,7 @@ end
 --- get the first relevant descendant node
 --- @param node TSNode
 --- @return TSNode | nil
-local function get_first_relevant_descendant(node)
-  local queue = {node}
-
-  while #queue > 0 do
-    local current_node = table.remove(queue, 1)
-    local iter = current_node:iter_children()
-    local child = iter()
-
-    while child do
-      if is_relevant(child) and not have_same_range(node, child) then
-        return child
-      end
-      table.insert(queue, child)
-      child = iter()
-    end
-  end
-end
+local get_first
 
 ---@return TSNode | nil
 local function get_farthest_parent_with_same_range()
