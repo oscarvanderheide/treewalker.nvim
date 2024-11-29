@@ -4,28 +4,35 @@ require('treewalker.types')
 
 local M = {}
 
+---left/right
+---@param dir InOut
+---@param should_jump_to_next_sibling_after boolean?
+---@return nil
+local function move_level(dir, should_jump_to_next_sibling_after)
+  local node = get.get_node()
+  local target = get.get_relative(node, dir)
+  if target and should_jump_to_next_sibling_after then
+    target = get.get_sibling(target, "next")
+  end
+
+  if target then
+    op.jump(target)
+  end
+end
+
 ---up/down
----@param dir "prev" | "next"
+---@param dir PrevNext
 ---@return nil
 local function move_lateral(dir)
   local node = get.get_node()
 
-  local sibling = get.get_sibling(node, dir)
-  if sibling then
-    op.jump(sibling)
-  end
-end
-
----left/right
----@param dir InOut
----@return nil
-local function move_level(dir)
-  local node = get.get_node()
-  local relative = get.get_relative(node, dir)
-
-  if relative then
-    op.jump(relative)
-    return
+  local target = get.get_sibling(node, dir)
+  if target then
+    op.jump(target)
+  elseif dir == "next" then
+    move_level("out", true)
+  elseif dir == "prev" then
+    move_level("out", false)
   end
 end
 

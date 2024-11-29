@@ -57,7 +57,7 @@ end
 
 ---@param lines string[]
 ---@param string string
-M.contains_string = function(lines, string)
+M.contains = function(lines, string)
   local found_line = false
   for _, line in ipairs(lines) do
     if line == string then

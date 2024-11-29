@@ -2,10 +2,11 @@ local util = require('treewalker.util')
 
 local M = {}
 
-local IRRELEVANT_NODE_TYPES = { "comment", "chunk" }
+local IRRELEVANT_NODE_TYPES = { "comment", "chunk", "block", "body" }
+local VALID_DESCENDANT_TYPES = { "body", "block" }
 
 local function is_relevant(node)
-  return not util.contains_string(IRRELEVANT_NODE_TYPES, node:type())
+  return not util.contains(IRRELEVANT_NODE_TYPES, node:type())
 end
 
 ---@param node1 TSNode
@@ -22,11 +23,11 @@ end
 ---we only ever really need to go into the body of something
 --- @param node TSNode
 --- @return TSNode | nil
-local function get_descendant_body(node)
+local function get_descendant(node)
   local iter = node:iter_children()
   local child = iter()
   while child do
-    if child:type() == "body" or child:type() == "block" then
+    if util.contains(VALID_DESCENDANT_TYPES, child:type()) then
       return child
     end
     child = iter()
@@ -34,11 +35,6 @@ local function get_descendant_body(node)
 
   return nil
 end
-
---- get the first relevant descendant node
---- @param node TSNode
---- @return TSNode | nil
-local get_first
 
 ---@return TSNode | nil
 local function get_farthest_parent_with_same_range()
@@ -65,7 +61,7 @@ end
 ---Get the nearest ancestral node _which has different coordinates than the passed in node_
 ---@param node TSNode
 ---@return TSNode | nil
-local function get_nearest_ancestor(node)
+local function get_ancestor(node)
   local iter_ancestor = node:parent()
   while iter_ancestor do
     if have_same_range(node, iter_ancestor) or not is_relevant(iter_ancestor) then
@@ -82,7 +78,7 @@ end
 local function get_raw_sibling(node, dir)
   if dir == "prev" then
     return node:prev_sibling()
-  else
+  elseif dir == "next" then
     return node:next_sibling()
   end
 end
@@ -110,9 +106,9 @@ end
 ---@return TSNode | nil
 function M.get_relative(node, dir)
   if dir == "in" then
-    return get_descendant_body(node)
-  else
-    return get_nearest_ancestor(node)
+    return get_descendant(node)
+  elseif dir == "out" then
+    return get_ancestor(node)
   end
 end
 
