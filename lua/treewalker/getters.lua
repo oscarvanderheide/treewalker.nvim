@@ -2,11 +2,21 @@ local util = require('treewalker.util')
 
 local M = {}
 
-local IRRELEVANT_NODE_TYPES = { "comment", "chunk", "block", "body" }
-local VALID_DESCENDANT_TYPES = { "body", "block" }
+local VALID_NODE_TYPES = {
+  -- "block",
+  "variable_declaration",
+  "function_declaration",
+  "return_statement",
+  "while_statement",
+  "for_statement",
+  "function_call",
+  "function_definition",
+}
 
-local function is_relevant(node)
-  return not util.contains(IRRELEVANT_NODE_TYPES, node:type())
+local VALID_DESCENDANT_TYPES = { "body", "block", "function_definition" }
+
+local function is_jump_target(node)
+  return util.contains(VALID_NODE_TYPES, node:type())
 end
 
 ---@param node1 TSNode
@@ -32,30 +42,7 @@ local function get_descendant(node)
     end
     child = iter()
   end
-
   return nil
-end
-
----@return TSNode | nil
-local function get_farthest_parent_with_same_range()
-  local node = vim.treesitter.get_node()
-  if not node then return nil end
-
-  local node_col, node_row = vim.treesitter.get_node_range(node)
-  local parent = node:parent()
-
-  local farthest_parent = node
-
-  while parent do
-    local parent_col, parent_row = vim.treesitter.get_node_range(parent)
-    if parent_col ~= node_col or parent_row ~= node_row then
-      break
-    end
-    farthest_parent = parent
-    parent = parent:parent()
-  end
-
-  return farthest_parent
 end
 
 ---Get the nearest ancestral node _which has different coordinates than the passed in node_
@@ -64,7 +51,7 @@ end
 local function get_ancestor(node)
   local iter_ancestor = node:parent()
   while iter_ancestor do
-    if have_same_range(node, iter_ancestor) or not is_relevant(iter_ancestor) then
+    if have_same_range(node, iter_ancestor) or not is_jump_target(iter_ancestor) then
       iter_ancestor = iter_ancestor:parent()
     else
       return iter_ancestor
@@ -90,7 +77,7 @@ function M.get_sibling(node, dir)
   local iter_sibling = get_raw_sibling(node, dir)
 
   while iter_sibling do
-    if is_relevant(iter_sibling) then
+    if is_jump_target(iter_sibling) then
       return iter_sibling
     end
 
