@@ -2,7 +2,7 @@ local util = require('treewalker.util')
 
 local M = {}
 
-local IRRELEVANT_NODE_TYPES = { "comment", "body", "chunk" }
+local IRRELEVANT_NODE_TYPES = { "comment", "chunk" }
 
 local function is_relevant(node)
   return not util.contains_string(IRRELEVANT_NODE_TYPES, node:type())
@@ -22,11 +22,10 @@ end
 ---we only ever really need to go into the body of something
 --- @param node TSNode
 --- @return TSNode | nil
-local function get_body(node)
+local function get_descendant_body(node)
   local iter = node:iter_children()
   local child = iter()
   while child do
-    util.log("child:", child)
     if child:type() == "body" or child:type() == "block" then
       return child
     end
@@ -127,7 +126,7 @@ end
 ---@return TSNode | nil
 function M.get_relative(node, dir)
   if dir == "in" then
-    return get_body(node)
+    return get_descendant_body(node)
   else
     return get_nearest_ancestor(node)
   end
