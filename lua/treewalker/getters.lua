@@ -3,6 +3,12 @@ local util = require('treewalker.util')
 local M = {}
 
 local VALID_NODE_TYPES = {
+  "assignment",
+  "if",
+  "else",
+  "class",
+  "method",
+  "call",
   "variable_declaration",
   "function_declaration",
   "function_definition",
@@ -18,6 +24,9 @@ local VALID_NODE_TYPES = {
 }
 
 local VALID_DESCENDANT_TYPES = {
+  -- "then", -- helps ruby, hurts lua
+  "body_statement",
+  "do_block",
   "block",
   "statement_block",
 }
@@ -33,31 +42,31 @@ local function have_same_range(node1, node2)
   local srow1, scol1 = node1:range()
   local srow2, scol2 = node2:range()
   return
-    srow1 == srow2 and
-    scol1 == scol2
+      srow1 == srow2 and
+      scol1 == scol2
 end
 
 ---we only ever really need to go into the body of something
 --- @param node TSNode
 --- @return TSNode | nil
 local function get_descendant(node)
-    local queue = {node}
+  local queue = { node }
 
-    while #queue > 0 do
-        local current_node = table.remove(queue, 1)
-        if util.contains(VALID_DESCENDANT_TYPES, current_node:type()) then
-            return current_node
-        end
-
-        local iter = current_node:iter_children()
-        local child = iter()
-        while child do
-            table.insert(queue, child)
-            child = iter()
-        end
+  while #queue > 0 do
+    local current_node = table.remove(queue, 1)
+    if util.contains(VALID_DESCENDANT_TYPES, current_node:type()) then
+      return current_node
     end
 
-    return nil
+    local iter = current_node:iter_children()
+    local child = iter()
+    while child do
+      table.insert(queue, child)
+      child = iter()
+    end
+  end
+
+  return nil
 end
 
 ---Get the nearest ancestral node _which has different coordinates than the passed in node_
@@ -127,6 +136,27 @@ function M.get_relative(node, dir)
   end
 end
 
+---Otherwise returns the original node
+---@param node TSNode
+---@return TSNode
+local function get_farthest_valid_ancestor_with_same_range(node)
+  local node_row, node_col = vim.treesitter.get_node_range(node)
+  local parent = node:parent()
+
+  local farthest_parent = node
+
+  while parent do
+    local parent_col, parent_row = vim.treesitter.get_node_range(parent)
+    if parent_row ~= node_row or parent_col ~= node_col then
+      break
+    end
+    farthest_parent = parent
+    parent = parent:parent()
+  end
+
+  return farthest_parent
+end
+
 ---Get current node under cursor
 ---@return TSNode
 function M.get_node()
@@ -136,16 +166,18 @@ function M.get_node()
   -- node = get_nearest_valid_ancestor(node)
   -- assert(node)
 
-  -- special dispensation for identifier nodes, if we don't do this,
-  -- identifiers in particular get stuck on themselves, ex lua's
-  -- assert(node) above becomes a sink
-  if node:type() == "identifier" then
-    -- node = get_farthest_parent_with_same_range()
-    local ancestor = get_nearest_valid_ancestor(node)
-    if ancestor then
-      node = ancestor
-    end
-  end
+  -- -- special dispensation for identifier nodes, if we don't do this,
+  -- -- identifiers in particular get stuck on themselves, ex lua's
+  -- -- assert(node) above becomes a sink
+  -- if node:type() == "identifier" then
+  --   -- node = get_farthest_parent_with_same_range()
+  --   local ancestor = get_nearest_valid_ancestor(node)
+  --   if ancestor then
+  --     node = ancestor
+  --   end
+  -- end
+
+  node = get_farthest_valid_ancestor_with_same_range(node)
 
   return node
 end
