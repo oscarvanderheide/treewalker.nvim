@@ -2,7 +2,7 @@ local util = require('treewalker.util')
 
 local M = {}
 
-local IRRELEVANT_NODE_TYPES = { "comment", "body" }
+local IRRELEVANT_NODE_TYPES = { "comment", "body", "chunk" }
 
 local function is_relevant(node)
   return not util.contains_string(IRRELEVANT_NODE_TYPES, node:type())
@@ -85,7 +85,7 @@ end
 local function get_nearest_ancestor(node)
   local iter_ancestor = node:parent()
   while iter_ancestor do
-    if have_same_range(node, iter_ancestor) then
+    if have_same_range(node, iter_ancestor) or not is_relevant(iter_ancestor) then
       iter_ancestor = iter_ancestor:parent()
     else
       return iter_ancestor
