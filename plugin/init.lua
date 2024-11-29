@@ -4,19 +4,19 @@
 
 local util = require('treewalker.util')
 
-function Up(opts, preview_ns, preview_buffer)
+function Up()
   util.R('treewalker.main').up()
 end
 
-function Down(opts, preview_ns, preview_buffer)
+function Down()
   util.R('treewalker.main').down()
 end
 
-function Left(opts, preview_ns, preview_buffer)
+function Left()
   util.R('treewalker.main').left()
 end
 
-function Right(opts, preview_ns, preview_buffer)
+function Right()
   util.R('treewalker.main').right()
 end
 

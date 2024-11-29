@@ -93,17 +93,6 @@ describe("util", function()
     end)
   end)
 
-  describe("get_visual_selection", function()
-    it("returns the correctly shaped object", function()
-      local res = util.get_visual_selection()
-      assert.is_true(res.start_line ~= nil)
-      assert.is_true(res.end_line ~= nil)
-      assert.is_true(res.start_column ~= nil)
-      assert.is_true(res.end_column ~= nil)
-      assert.is_true(res.lines ~= nil)
-    end)
-  end)
-
   describe("ensure_env_var", function()
     it("returns true", function()
       -- always set

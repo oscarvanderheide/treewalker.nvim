@@ -4,63 +4,88 @@ local M = {}
 
 local IRRELEVANT_NODE_TYPES = { "comment" }
 
+local function is_relevant(node)
+  return not util.contains_string(IRRELEVANT_NODE_TYPES, node:type())
+end
+
 ---Special helper to get a desired child node, skipping undesired node types like comments
 ---@param node TSNode
 ---@return TSNode | nil
-function M.get_relevant_child_node(node)
-  for child in node:iter_children() do
-    if util.contains_string(IRRELEVANT_NODE_TYPES, child:type()) then
+local function get_first_relevant_child_node(node)
+  local iter = node:iter_children()
+  local child = iter()
+  while child do
+    if is_relevant(child) then
       return child
     end
-  end
 
-  return nil
+    child = iter()
+  end
 end
 
----Special helper to get a desired sibling, skipping undesired node types like comments
+---@param node1 TSNode
+---@param node2 TSNode
+---@return boolean
+local function have_same_range(node1, node2)
+  local srow1, scol1 = node1:range()
+  local srow2, scol2 = node2:range()
+  return
+    srow1 == srow2 and
+    scol1 == scol2
+end
+
+---Get the nearest ancestral node _which has different coordinates than the passed in node_
 ---@param node TSNode
 ---@return TSNode | nil
-function M.get_relevant_prev_sibling(node)
-  local iter_sibling = node:prev_sibling()
-  while iter_sibling do
-    if util.contains_string(IRRELEVANT_NODE_TYPES, iter_sibling:type()) then
-      return iter_sibling
+local function get_nearest_ancestor(node)
+  local iter_ancestor = node:parent()
+  while iter_ancestor do
+    if have_same_range(node, iter_ancestor) then
+      iter_ancestor = iter_ancestor:parent()
+    else
+      return iter_ancestor
     end
-
-    iter_sibling = iter_sibling:prev_sibling()
   end
-
-  return nil
 end
 
----@param node TSNode
----@return TSNode | nil
-function M.get_relevant_next_sibling(node)
-  local iter_sibling = node:next_sibling()
-  while iter_sibling do
-    if iter_sibling:type() ~= "comment" then
-      return iter_sibling
-    end
-
-    iter_sibling = iter_sibling:next_sibling()
-  end
-
-  return nil
-end
-
----TODO Fold this into get_relevant_{prev, next}_sibling to avoid duplication there
 ---@param node TSNode
 ---@param dir PrevNext
 ---@return TSNode | nil
-function M.get_sibling(node, dir)
-  local sibling
+local function get_sibling(node, dir)
   if dir == "prev" then
-    sibling = M.get_relevant_prev_sibling(node)
-  elseif dir == "next" then
-    sibling = M.get_relevant_next_sibling(node)
+    return node:prev_sibling()
+  else
+    return node:next_sibling()
+  end
+end
+
+---@param node TSNode
+---@param dir PrevNext
+---@return TSNode | nil
+function M.get_relevant_sibling(node, dir)
+  local iter_sibling = get_sibling(node, dir)
+
+  while iter_sibling do
+    if is_relevant(iter_sibling) then
+      return iter_sibling
+    end
+
+    iter_sibling = get_sibling(iter_sibling, dir)
   end
 
-  return sibling
+  return nil
+end
+
+---Get either the child (in) or parent (out) of the given node
+---@param node TSNode
+---@param dir InOut
+---@return TSNode | nil
+function M.get_relative(node, dir)
+  if dir == "in" then
+    return get_first_relevant_child_node(node)
+  else
+    return get_nearest_ancestor(node)
+  end
 end
 
 ---Get current node under cursor
@@ -70,22 +95,6 @@ function M.get_node()
   local node = vim.treesitter.get_node()
   assert(node)
   return node
-end
-
----@param node TSNode
----@param dir InOut
----@return TSNode | nil
-function M.get_relative(node, dir)
-  --- @type TSNode | nil
-  local relative
-
-  if dir == "in" then
-    relative = M.get_relevant_child_node(node)
-  elseif dir == "out" then
-    relative = node:parent()
-  end
-
-  return relative
 end
 
 return M

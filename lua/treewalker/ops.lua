@@ -14,7 +14,10 @@ end
 function M.highlight(range)
   local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
   local ns_id = vim.api.nvim_create_namespace("")
-  local hl_group = "DiffText"
+  -- local hl_group = "DiffAdd"
+  -- local hl_group = "MatchParen"
+  local hl_group = "Search"
+
   for row = start_row, end_row do
     if row == start_row and row == end_row then
       -- Highlight within the same line
@@ -39,7 +42,7 @@ end
 ---@param node TSNode
 function M.jump(node)
   local start_row, start_col, end_row, end_col = vim.treesitter.get_node_range(node)
-  util.log(string.format("%s %d %d %d %d", tostring(node:type()), start_row, start_col, end_row, end_col))
+  util.log(string.format("dest: %s %d %d %d %d", tostring(node:type()), start_row, start_col, end_row, end_col))
   M.safe_set_cursor(start_row + 1, start_col)
   M.highlight({ start_row + 1, start_col, end_row + 1, end_col })
 end

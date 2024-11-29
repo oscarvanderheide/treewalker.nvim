@@ -98,31 +98,6 @@ M.guid = function()
   end)
 end
 
----Get useful data about the current visual selection
----@return Selection
-M.get_visual_selection = function()
-  local start_line = vim.fn.getpos("'<")[2] - 1
-  local end_line = vim.fn.getpos("'>")[2] - 1
-  local start_column = vim.fn.getpos("'<")[3] - 1
-  local end_column = vim.fn.getpos("'>")[3]
-
-  local end_col = math.min(end_column, 2147483646)
-  local lines = vim.api.nvim_buf_get_text(
-    0, start_line, start_column, end_line, end_col, {}
-  )
-
-  ---@type Selection
-  local selection = {
-    start_line = start_line,
-    end_line = end_line,
-    start_column = start_column,
-    end_column = end_column,
-    lines = lines
-  }
-
-  return selection
-end
-
 ---@param env_key string
 ---@return boolean
 M.has_env_var = function(env_key)

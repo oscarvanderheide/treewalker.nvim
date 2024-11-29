@@ -1,12 +1,4 @@
--- This file soas to get access to whether in visual mode or not
---
--- via https://www.petergundel.de/neovim/lua/hack/2023/12/17/get-neovim-mode-when-executing-a-command.html
-
--- DESIGN:
--- * If there are no j's, back out (h) and try j again, until a j happens
-
-local util = require('treewalker.util')
-local get = require('treewalker.get')
+local get = require('treewalker.getters')
 local op = require('treewalker.ops')
 require('treewalker.types')
 
@@ -16,10 +8,9 @@ local M = {}
 ---@param dir "prev" | "next"
 ---@return nil
 local function move_lateral(dir)
-  util.log('move lateral')
   local node = get.get_node()
 
-  local sibling = get.get_sibling(node, dir)
+  local sibling = get.get_relevant_sibling(node, dir)
   if sibling then
     op.jump(sibling)
   end
@@ -29,16 +20,13 @@ end
 ---@param dir InOut
 ---@return nil
 local function move_level(dir)
-  util.log('move level')
   local node = get.get_node()
   local relative = get.get_relative(node, dir)
 
-  if not relative then
-    util.log("no relative")
+  if relative then
+    op.jump(relative)
     return
   end
-
-  op.jump(relative)
 end
 
 function M.up() move_lateral("prev") end

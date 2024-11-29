@@ -1,7 +1,7 @@
 <span><img alt="Static Badge" src="https://img.shields.io/badge/100%25_lua-purple"></span>
 <a href="https://neovim.io/"><img src="https://img.shields.io/badge/NeoVim-%2357A143.svg?&amp;style=for-the-badge&amp;logo=neovim&amp;logoColor=white" alt="Neovim"></a>
 
-# Treewalker.nvim
+# treewalker.nvim
 
 ### A simple plugin that allows easy navigation around the abstract syntax tree
 
@@ -12,18 +12,18 @@
 ##### Lazy:
 ```lua
 {
-  "aaronik/Treewalker.nvim"
+  "aaronik/treewalker.nvim"
 }
 ```
 
 ##### Plug:
 ```vim
-Plug "aaronik/Treewalker.nvim"
+Plug "aaronik/treewalker.nvim"
 ```
 
 _(Contributions to this readme for how to do other package managers are welcome)_
 
-#### Mapping
+#### Mapping - TODO
 
 Here are some examples of how to map these -- this is what I use, `<leader>a` for the code window and `<leader>c` for the chat
 
