@@ -119,9 +119,11 @@ function M.get_node()
   assert(node)
 
   -- special dispensation for identifier nodes, if we don't do this,
-  -- identifiers in particular get stuck on themselves
+  -- identifiers in particular get stuck on themselves, ex lua's
+  -- assert(node) above becomes a sink
   if node:type() == "identifier" then
-    node = get_farthest_parent_with_same_range()
+    -- node = get_farthest_parent_with_same_range()
+    node = node:parent()
     assert(node)
   end
 

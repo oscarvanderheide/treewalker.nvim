@@ -11,6 +11,7 @@ local M = {}
 local function move_level(dir, should_jump_to_next_sibling_after)
   local node = get.get_node()
   local target = get.get_relative(node, dir)
+
   if target and should_jump_to_next_sibling_after then
     target = get.get_sibling(target, "next")
   end
