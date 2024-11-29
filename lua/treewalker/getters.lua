@@ -96,7 +96,7 @@ end
 ---@param node TSNode
 ---@param dir PrevNext
 ---@return TSNode | nil
-local function get_sibling(node, dir)
+local function get_raw_sibling(node, dir)
   if dir == "prev" then
     return node:prev_sibling()
   else
@@ -107,15 +107,15 @@ end
 ---@param node TSNode
 ---@param dir PrevNext
 ---@return TSNode | nil
-function M.get_relevant_sibling(node, dir)
-  local iter_sibling = get_sibling(node, dir)
+function M.get_sibling(node, dir)
+  local iter_sibling = get_raw_sibling(node, dir)
 
   while iter_sibling do
     if is_relevant(iter_sibling) then
       return iter_sibling
     end
 
-    iter_sibling = get_sibling(iter_sibling, dir)
+    iter_sibling = get_raw_sibling(iter_sibling, dir)
   end
 
   return nil
@@ -127,7 +127,6 @@ end
 ---@return TSNode | nil
 function M.get_relative(node, dir)
   if dir == "in" then
-    -- return get_first_relevant_descendant(node)
     return get_body(node)
   else
     return get_nearest_ancestor(node)
@@ -137,10 +136,16 @@ end
 ---Get current node under cursor
 ---@return TSNode
 function M.get_node()
-  -- local node = get_farthest_parent_with_same_range()
   local node = vim.treesitter.get_node()
   assert(node)
-  util.log('original node type:', node:type())
+
+  -- special dispensation for identifier nodes, if we don't do this,
+  -- identifiers in particular get stuck on themselves
+  if node:type() == "identifier" then
+    node = get_farthest_parent_with_same_range()
+    assert(node)
+  end
+
   return node
 end
 

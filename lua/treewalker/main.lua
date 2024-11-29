@@ -10,7 +10,7 @@ local M = {}
 local function move_lateral(dir)
   local node = get.get_node()
 
-  local sibling = get.get_relevant_sibling(node, dir)
+  local sibling = get.get_sibling(node, dir)
   if sibling then
     op.jump(sibling)
   end
