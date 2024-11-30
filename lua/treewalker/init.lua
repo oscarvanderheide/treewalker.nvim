@@ -7,7 +7,7 @@ local M = {}
 ---@return nil
 local function move_out()
   local node = get.get_node()
-  local target = get.get_ancestor(node)
+  local target = get.get_direct_ancestor(node)
 
   if target then
     op.jump(target)

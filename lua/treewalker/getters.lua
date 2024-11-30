@@ -31,6 +31,7 @@ local function is_descendant_jump_target(node)
   return util.contains(TARGET_DESCENDANT_TYPES, node:type())
 end
 
+---Do the nodes have the same starting point
 ---@param node1 TSNode
 ---@param node2 TSNode
 ---@return boolean
@@ -42,6 +43,7 @@ local function have_same_range(node1, node2)
       scol1 == scol2
 end
 
+---Strictly sibling, no fancy business
 ---@param node TSNode
 ---@return TSNode | nil
 local function get_prev_sibling(node)
@@ -56,6 +58,7 @@ local function get_prev_sibling(node)
   end
 end
 
+---Strictly sibling, no fancy business
 ---@param node TSNode
 ---@return TSNode | nil
 local function get_next_sibling(node)
@@ -82,7 +85,7 @@ function M.get_next(node)
 
   -- No next sibling jump target is found
   -- Travel up the tree to find the next parent's sibling
-  local ancestor = M.get_ancestor(node)
+  local ancestor = M.get_direct_ancestor(node)
   if ancestor then
     return M.get_next(ancestor)
   end
@@ -95,25 +98,18 @@ end
 ---@return TSNode | nil
 function M.get_prev(node)
   local prev_sibling = get_prev_sibling(node)
-
   if prev_sibling then
     return prev_sibling
   end
 
-  -- If we reach a dead end, find an auntie and try their children
-  local ancestor = M.get_ancestor(node)
-  if ancestor then
-    -- return M.get_prev(ancestor)
-    return ancestor
-  end
-
-  return nil
+  -- If we reach a dead end, climb up a level
+  return M.get_direct_ancestor(node)
 end
 
 ---Get the nearest ancestral node _which has different coordinates than the passed in node_
 ---@param node TSNode
 ---@return TSNode | nil
-function M.get_ancestor(node)
+function M.get_direct_ancestor(node)
   local iter_ancestor = node:parent()
   while iter_ancestor do
     -- Without have_same_range, this will get stuck, where it targets one node, but is then
@@ -126,12 +122,26 @@ function M.get_ancestor(node)
   end
 end
 
+---helper to get all the children from a node
+---@param node TSNode
+---@return TSNode[]
+local function get_children(node)
+  local children = {}
+  local iter = node:iter_children()
+  local child = iter()
+  while child do
+    table.insert(children, child)
+    child = iter()
+  end
+  return children
+end
+
 ---Get the next target descendent
 ---The idea here is it goes _in_ or _down and in_
 ---@param node TSNode
 ---@return TSNode | nil
 function M.get_descendant(node)
-  local queue = { node }
+  local queue = get_children(node)
 
   while #queue > 0 do
     local current_node = table.remove(queue, 1)
