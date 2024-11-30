@@ -27,7 +27,7 @@ local function is_jump_target(node)
   return true
 end
 
-local function is_target_descendant(node)
+local function is_descendant_jump_target(node)
   return util.contains(TARGET_DESCENDANT_TYPES, node:type())
 end
 
@@ -139,7 +139,7 @@ function M.get_descendant(node)
 
   while #queue > 0 do
     local current_node = table.remove(queue, 1)
-    if is_target_descendant(current_node) then
+    if is_descendant_jump_target(current_node) then
       return current_node
     end
 
@@ -151,7 +151,19 @@ function M.get_descendant(node)
     end
   end
 
-  return nil
+  -- If there was nothing below us, try below a sibling
+  local next_sibling = node:next_sibling()
+  if next_sibling then
+    return M.get_descendant(next_sibling)
+  end
+
+  -- If there were no nephews, try children of an uncle (final recursive step to get at the whole tree)
+  local parent = node:parent()
+  if not parent then return nil end
+  local uncle = parent:next_sibling()
+  if not uncle then return nil end
+
+  return M.get_descendant(uncle)
 end
 
 ---Get current node under cursor
