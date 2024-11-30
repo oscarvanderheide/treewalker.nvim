@@ -8,7 +8,7 @@ local NON_TARGET_NODE_MATCHERS = {
 }
 
 local TARGET_DESCENDANT_TYPES = {
-  "body_statement",  -- lua
+  "body_statement",  -- lua, rb
   "block",           -- lua
   "statement_block", -- lua
 
@@ -76,9 +76,7 @@ local function get_farthest_target_ancestor_with_same_range(node)
   return farthest_parent
 end
 
----Gets the next jump target down
----Starts by looking at siblings. If none are found, recurses back up the
----syntax tree looking for the next logical target
+---Get _next_ or _out and next_
 ---@param node TSNode
 ---@return TSNode | nil
 function M.get_next(node)
@@ -101,6 +99,7 @@ function M.get_next(node)
   return nil
 end
 
+---This one goes _prev_ or _out_
 ---@param node TSNode
 ---@return TSNode | nil
 function M.get_prev(node)
@@ -114,7 +113,7 @@ function M.get_prev(node)
     iter_sibling = iter_sibling:prev_sibling()
   end
 
-  return nil
+  return M.get_ancestor(node)
 end
 
 ---Get the nearest ancestral node _which has different coordinates than the passed in node_
@@ -132,6 +131,7 @@ function M.get_ancestor(node)
 end
 
 ---Get the next target descendent
+---The idea here is it goes _in_ or _down and in_
 ---@param node TSNode
 ---@return TSNode | nil
 function M.get_descendant(node)
@@ -172,10 +172,13 @@ function M.get_node()
   local node = vim.treesitter.get_node()
   assert(node)
 
+  -- Might help when starting from non target location?
   -- node = get_nearest_target_ancestor(node)
   -- assert(node)
 
-  node = get_farthest_target_ancestor_with_same_range(node)
+  -- Meant to help with up and down navigation, giving the highest likelihood of having a relevant sibling
+  -- Gives getting stuck at the top of the file
+  -- node = get_farthest_target_ancestor_with_same_range(node)
 
   return node
 end

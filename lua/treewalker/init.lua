@@ -31,8 +31,6 @@ local function move_up()
   local target = get.get_prev(node)
   if target then
     op.jump(target)
-  else
-    move_out()
   end
 end
 
