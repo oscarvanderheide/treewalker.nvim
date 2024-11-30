@@ -33,7 +33,7 @@ end
 local function move_up()
   local node = get.get_node()
 
-  local target = get.get_sibling(node, "prev")
+  local target = get.get_prev(node)
   if target then
     op.jump(target)
   else
@@ -45,14 +45,15 @@ end
 local function move_down()
   local node = get.get_node()
 
-  local target = get.get_sibling(node, "next")
+  local target = get.get_next(node)
   if target then
     op.jump(target)
   else
-    move_out(true)
+    -- move_out(true)
     -- move out to the bottom until there's something to go down to
     -- get next down target
     -- get.get_out_and_down(node)
+    -- get.get_deep_next(node)
   end
 end
 

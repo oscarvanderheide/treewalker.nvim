@@ -1,4 +1,3 @@
-
 local util = require('treewalker.util')
 
 local M = {}
@@ -89,18 +88,46 @@ local function get_farthest_target_ancestor_with_same_range(node)
   return farthest_parent
 end
 
+---Gets the next jump target down
+---Starts by looking at siblings. If none are found, recurses back up the
+---syntax tree looking for the next logical target
 ---@param node TSNode
----@param dir PrevNext
 ---@return TSNode | nil
-function M.get_sibling(node, dir)
-  local iter_sibling = get_raw_sibling(node, dir)
+function M.get_next(node)
+  local function find_next(node)
+    local iter_sibling = get_raw_sibling(node, "next")
+
+    while iter_sibling do
+      if is_jump_target(iter_sibling) then
+        return iter_sibling
+      end
+
+      iter_sibling = get_raw_sibling(iter_sibling, "next")
+    end
+
+    -- Travel up the tree to find the next parent's sibling if no next sibling jump target is found
+    local parent = get_nearest_target_ancestor(node)
+    if parent then
+      return find_next(parent)
+    end
+
+    return nil
+  end
+
+  return find_next(node)
+end
+
+---@param node TSNode
+---@return TSNode | nil
+function M.get_prev(node)
+  local iter_sibling = get_raw_sibling(node, "prev")
 
   while iter_sibling do
     if is_jump_target(iter_sibling) then
       return iter_sibling
     end
 
-    iter_sibling = get_raw_sibling(iter_sibling, dir)
+    iter_sibling = get_raw_sibling(iter_sibling, "prev")
   end
 
   return nil

@@ -16,7 +16,9 @@ function M.highlight(range)
   local ns_id = vim.api.nvim_create_namespace("")
   -- local hl_group = "DiffAdd"
   -- local hl_group = "MatchParen"
-  local hl_group = "Search"
+  -- local hl_group = "Search"
+  local hl_group = "ColorColumn"
+
 
   for row = start_row, end_row do
     if row == start_row and row == end_row then
