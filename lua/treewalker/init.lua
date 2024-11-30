@@ -4,13 +4,11 @@ require('treewalker.types')
 
 local M = {}
 
----left/right
----@param dir InOut
----@param should_jump_to_next_sibling_after boolean?
+---@param should_jump_to_next_sibling_after boolean
 ---@return nil
-local function move_level(dir, should_jump_to_next_sibling_after)
+local function move_out(should_jump_to_next_sibling_after)
   local node = get.get_node()
-  local target = get.get_relative(node, dir)
+  local target = get.get_ancestor(node)
 
   if target and should_jump_to_next_sibling_after then
     target = get.get_sibling(target, "next")
@@ -21,26 +19,51 @@ local function move_level(dir, should_jump_to_next_sibling_after)
   end
 end
 
----up/down
----@param dir PrevNext
 ---@return nil
-local function move_lateral(dir)
+local function move_in()
   local node = get.get_node()
+  local target = get.get_descendant(node)
 
-  local target = get.get_sibling(node, dir)
   if target then
     op.jump(target)
-  elseif dir == "next" then
-    move_level("out", true)
-  elseif dir == "prev" then
-    move_level("out", false)
   end
 end
 
-function M.up() move_lateral("prev") end
-function M.down() move_lateral("next") end
-function M.left() move_level("out") end
-function M.right() move_level("in") end
+---@return nil
+local function move_up()
+  local node = get.get_node()
+
+  local target = get.get_sibling(node, "prev")
+  if target then
+    op.jump(target)
+  else
+    move_out(false)
+  end
+end
+
+---@return nil
+local function move_down()
+  local node = get.get_node()
+
+  local target = get.get_sibling(node, "next")
+  if target then
+    op.jump(target)
+  else
+    move_out(true)
+    -- move out to the bottom until there's something to go down to
+    -- get next down target
+    -- get.get_out_and_down(node)
+  end
+end
+
+function M.up() move_up() end
+
+function M.down() move_down() end
+
+function M.left() move_out(false) end
+
+function M.right() move_in() end
+
 return M
 
 -- -- you can define your setup function here. Usually configurations can be merged, accepting outside params and
@@ -50,4 +73,3 @@ return M
 -- M.setup = function(args)
 --   M.config = vim.tbl_deep_extend("force", M.config, args or {})
 -- end
-

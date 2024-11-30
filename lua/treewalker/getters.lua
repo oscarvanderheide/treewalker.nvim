@@ -1,40 +1,11 @@
+
 local util = require('treewalker.util')
 
 local M = {}
 
 local NON_TARGET_NODE_MATCHERS = {
+  -- "chunk", -- lua
   "^.*comment.*$",
-  -- "dot_index_expression", -- lua
-  -- "arguments", -- lua
-}
-
-local TARGET_NODE_TYPES = {
-  "variable_declaration", -- lua
-  "function_declaration", -- lua
-  "function_call",        -- lua
-  "return_statement",     -- lua
-  "assignment_statement", -- lua
-  "while_statement",      -- lua
-  "if_statement",         -- lua
-  "for_statement",        -- lua
-
-  "assignment",           -- rb
-  "if",                   -- rb
-  "else",                 -- rb
-  "class",                -- rb
-  "method",               -- rb
-  "call",                 -- rb
-
-  "function_definition",  -- js
-  "statement_block",      -- js
-  "expression_statement", -- js
-  "lexical_declaration",  -- js
-
-  "use_declaration",      -- rs
-  "struct_item",          -- rs
-  "impl_item",            -- rs
-  "enum_item",            -- rs
-  "function_item",        -- rs
 }
 
 local TARGET_DESCENDANT_TYPES = {
@@ -73,43 +44,6 @@ local function have_same_range(node1, node2)
       scol1 == scol2
 end
 
----we only ever really need to go into the body of something
---- @param node TSNode
---- @return TSNode | nil
-local function get_descendant(node)
-  local queue = { node }
-
-  while #queue > 0 do
-    local current_node = table.remove(queue, 1)
-    if is_target_descendant(current_node) then
-      return current_node
-    end
-
-    local iter = current_node:iter_children()
-    local child = iter()
-    while child do
-      table.insert(queue, child)
-      child = iter()
-    end
-  end
-
-  return nil
-end
-
----Get the nearest ancestral node _which has different coordinates than the passed in node_
----@param node TSNode
----@return TSNode | nil
-local function get_ancestor(node)
-  local iter_ancestor = node:parent()
-  while iter_ancestor do
-    if have_same_range(node, iter_ancestor) or not is_jump_target(iter_ancestor) then
-      iter_ancestor = iter_ancestor:parent()
-    else
-      return iter_ancestor
-    end
-  end
-end
-
 ---@param node TSNode
 ---@param dir PrevNext
 ---@return TSNode | nil
@@ -134,35 +68,6 @@ local function get_nearest_target_ancestor(node)
   end
 end
 
----@param node TSNode
----@param dir PrevNext
----@return TSNode | nil
-function M.get_sibling(node, dir)
-  local iter_sibling = get_raw_sibling(node, dir)
-
-  while iter_sibling do
-    if is_jump_target(iter_sibling) then
-      return iter_sibling
-    end
-
-    iter_sibling = get_raw_sibling(iter_sibling, dir)
-  end
-
-  return nil
-end
-
----Get either the child (in) or parent (out) of the given node
----@param node TSNode
----@param dir InOut
----@return TSNode | nil
-function M.get_relative(node, dir)
-  if dir == "in" then
-    return get_descendant(node)
-  elseif dir == "out" then
-    return get_ancestor(node)
-  end
-end
-
 ---Otherwise returns the original node
 ---@param node TSNode
 ---@return TSNode
@@ -182,6 +87,60 @@ local function get_farthest_target_ancestor_with_same_range(node)
   end
 
   return farthest_parent
+end
+
+---@param node TSNode
+---@param dir PrevNext
+---@return TSNode | nil
+function M.get_sibling(node, dir)
+  local iter_sibling = get_raw_sibling(node, dir)
+
+  while iter_sibling do
+    if is_jump_target(iter_sibling) then
+      return iter_sibling
+    end
+
+    iter_sibling = get_raw_sibling(iter_sibling, dir)
+  end
+
+  return nil
+end
+
+---Get the nearest ancestral node _which has different coordinates than the passed in node_
+---@param node TSNode
+---@return TSNode | nil
+function M.get_ancestor(node)
+  local iter_ancestor = node:parent()
+  while iter_ancestor do
+    if have_same_range(node, iter_ancestor) or not is_jump_target(iter_ancestor) then
+      iter_ancestor = iter_ancestor:parent()
+    else
+      return iter_ancestor
+    end
+  end
+end
+
+---Get the next target descendent
+---@param node TSNode
+---@return TSNode | nil
+function M.get_descendant(node)
+  local queue = { node }
+
+  while #queue > 0 do
+    local current_node = table.remove(queue, 1)
+    if is_target_descendant(current_node) then
+      return current_node
+    end
+
+    local iter = current_node:iter_children()
+    local child = iter()
+    while child do
+      table.insert(queue, child)
+      child = iter()
+    end
+  end
+
+  return nil
 end
 
 ---Get current node under cursor
