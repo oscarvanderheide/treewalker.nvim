@@ -4,15 +4,10 @@ require('treewalker.types')
 
 local M = {}
 
----@param should_jump_to_next_sibling_after boolean
 ---@return nil
-local function move_out(should_jump_to_next_sibling_after)
+local function move_out()
   local node = get.get_node()
   local target = get.get_ancestor(node)
-
-  if target and should_jump_to_next_sibling_after then
-    target = get.get_sibling(target, "next")
-  end
 
   if target then
     op.jump(target)
@@ -37,23 +32,17 @@ local function move_up()
   if target then
     op.jump(target)
   else
-    move_out(false)
+    move_out()
   end
 end
 
 ---@return nil
 local function move_down()
   local node = get.get_node()
-
   local target = get.get_next(node)
+
   if target then
     op.jump(target)
-  else
-    -- move_out(true)
-    -- move out to the bottom until there's something to go down to
-    -- get next down target
-    -- get.get_out_and_down(node)
-    -- get.get_deep_next(node)
   end
 end
 
@@ -61,7 +50,7 @@ function M.up() move_up() end
 
 function M.down() move_down() end
 
-function M.left() move_out(false) end
+function M.left() move_out() end
 
 function M.right() move_in() end
 

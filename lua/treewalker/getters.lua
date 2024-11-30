@@ -19,7 +19,6 @@ local TARGET_DESCENDANT_TYPES = {
 ---@param node TSNode
 ---@return boolean
 local function is_jump_target(node)
-  -- return not util.contains(NON_TARGET_NODE_MATCHERS, node:type())
   for _, matcher in ipairs(NON_TARGET_NODE_MATCHERS) do
     if node:type():match(matcher) then
       return false
@@ -41,17 +40,6 @@ local function have_same_range(node1, node2)
   return
       srow1 == srow2 and
       scol1 == scol2
-end
-
----@param node TSNode
----@param dir PrevNext
----@return TSNode | nil
-local function get_raw_sibling(node, dir)
-  if dir == "prev" then
-    return node:prev_sibling()
-  elseif dir == "next" then
-    return node:next_sibling()
-  end
 end
 
 ---@param node TSNode
@@ -94,40 +82,36 @@ end
 ---@param node TSNode
 ---@return TSNode | nil
 function M.get_next(node)
-  local function find_next(node)
-    local iter_sibling = get_raw_sibling(node, "next")
-
-    while iter_sibling do
-      if is_jump_target(iter_sibling) then
-        return iter_sibling
-      end
-
-      iter_sibling = get_raw_sibling(iter_sibling, "next")
-    end
-
-    -- Travel up the tree to find the next parent's sibling if no next sibling jump target is found
-    local parent = get_nearest_target_ancestor(node)
-    if parent then
-      return find_next(parent)
-    end
-
-    return nil
-  end
-
-  return find_next(node)
-end
-
----@param node TSNode
----@return TSNode | nil
-function M.get_prev(node)
-  local iter_sibling = get_raw_sibling(node, "prev")
+  local iter_sibling = node:next_sibling()
 
   while iter_sibling do
     if is_jump_target(iter_sibling) then
       return iter_sibling
     end
 
-    iter_sibling = get_raw_sibling(iter_sibling, "prev")
+    iter_sibling = iter_sibling:next_sibling()
+  end
+
+  -- Travel up the tree to find the next parent's sibling if no next sibling jump target is found
+  local parent = get_nearest_target_ancestor(node)
+  if parent then
+    return M.get_next(parent)
+  end
+
+  return nil
+end
+
+---@param node TSNode
+---@return TSNode | nil
+function M.get_prev(node)
+  local iter_sibling = node:prev_sibling()
+
+  while iter_sibling do
+    if is_jump_target(iter_sibling) then
+      return iter_sibling
+    end
+
+    iter_sibling = iter_sibling:prev_sibling()
   end
 
   return nil
