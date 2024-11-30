@@ -44,65 +44,7 @@ end
 
 ---@param node TSNode
 ---@return TSNode | nil
-local function get_nearest_target_ancestor(node)
-  local iter_ancestor = node:parent()
-  while iter_ancestor do
-    if is_jump_target(iter_ancestor) then
-      return iter_ancestor
-    end
-
-    iter_ancestor = iter_ancestor:parent()
-  end
-end
-
----Otherwise returns the original node
----@param node TSNode
----@return TSNode
-local function get_farthest_target_ancestor_with_same_range(node)
-  local node_row, node_col = vim.treesitter.get_node_range(node)
-  local parent = node:parent()
-
-  local farthest_parent = node
-
-  while parent do
-    local parent_col, parent_row = vim.treesitter.get_node_range(parent)
-    if parent_row ~= node_row or parent_col ~= node_col then
-      break
-    end
-    farthest_parent = parent
-    parent = parent:parent()
-  end
-
-  return farthest_parent
-end
-
----Get _next_ or _out and next_
----@param node TSNode
----@return TSNode | nil
-function M.get_next(node)
-  local iter_sibling = node:next_sibling()
-
-  while iter_sibling do
-    if is_jump_target(iter_sibling) then
-      return iter_sibling
-    end
-
-    iter_sibling = iter_sibling:next_sibling()
-  end
-
-  -- Travel up the tree to find the next parent's sibling if no next sibling jump target is found
-  local parent = get_nearest_target_ancestor(node)
-  if parent then
-    return M.get_next(parent)
-  end
-
-  return nil
-end
-
----This one goes _prev_ or _out_
----@param node TSNode
----@return TSNode | nil
-function M.get_prev(node)
+local function get_prev_sibling(node)
   local iter_sibling = node:prev_sibling()
 
   while iter_sibling do
@@ -112,8 +54,60 @@ function M.get_prev(node)
 
     iter_sibling = iter_sibling:prev_sibling()
   end
+end
 
-  return M.get_ancestor(node)
+---@param node TSNode
+---@return TSNode | nil
+local function get_next_sibling(node)
+  local iter_sibling = node:next_sibling()
+
+  while iter_sibling do
+    if is_jump_target(iter_sibling) then
+      return iter_sibling
+    end
+
+    iter_sibling = iter_sibling:next_sibling()
+  end
+end
+
+---Get _next_ or _out and next_
+---@param node TSNode
+---@return TSNode | nil
+function M.get_next(node)
+  local next_sibling = get_next_sibling(node)
+
+  if next_sibling then
+    return next_sibling
+  end
+
+  -- No next sibling jump target is found
+  -- Travel up the tree to find the next parent's sibling
+  local ancestor = M.get_ancestor(node)
+  if ancestor then
+    return M.get_next(ancestor)
+  end
+
+  return nil
+end
+
+---This one goes _prev_ or _out_
+---@param node TSNode
+---@return TSNode | nil
+function M.get_prev(node)
+  local prev_sibling = get_prev_sibling(node)
+
+  if prev_sibling then
+    return prev_sibling
+  end
+
+  -- If we reach a dead end, find an auntie and try their children
+  local ancestor = M.get_ancestor(node)
+  if ancestor then
+    -- return M.get_prev(ancestor)
+    return ancestor
+  end
+
+  return nil
 end
 
 ---Get the nearest ancestral node _which has different coordinates than the passed in node_
@@ -122,11 +116,13 @@ end
 function M.get_ancestor(node)
   local iter_ancestor = node:parent()
   while iter_ancestor do
-    if have_same_range(node, iter_ancestor) or not is_jump_target(iter_ancestor) then
-      iter_ancestor = iter_ancestor:parent()
-    else
+    -- Without have_same_range, this will get stuck, where it targets one node, but is then
+    -- interpreted by get_node() as another.
+    if is_jump_target(iter_ancestor) and not have_same_range(node, iter_ancestor) then
       return iter_ancestor
     end
+
+    iter_ancestor = iter_ancestor:parent()
   end
 end
 
