@@ -2,37 +2,64 @@ local util = require('treewalker.util')
 
 local M = {}
 
-local VALID_NODE_TYPES = {
-  "assignment",
-  "if",
-  "else",
-  "class",
-  "method",
-  "call",
-  "variable_declaration",
-  "function_declaration",
-  "function_definition",
-  "function_call",
-  "return_statement",
-  "assignment_statement",
-  "while_statement",
-  "if_statement",
-  "for_statement",
-  "statement_block",
-  "expression_statement",
-  "lexical_declaration",
+local NON_TARGET_NODE_MATCHERS = {
+  "^.*comment.*$",
+  -- "dot_index_expression", -- lua
+  -- "arguments", -- lua
 }
 
-local VALID_DESCENDANT_TYPES = {
-  -- "then", -- helps ruby, hurts lua
-  "body_statement",
-  "do_block",
-  "block",
-  "statement_block",
+local TARGET_NODE_TYPES = {
+  "variable_declaration", -- lua
+  "function_declaration", -- lua
+  "function_call",        -- lua
+  "return_statement",     -- lua
+  "assignment_statement", -- lua
+  "while_statement",      -- lua
+  "if_statement",         -- lua
+  "for_statement",        -- lua
+
+  "assignment",           -- rb
+  "if",                   -- rb
+  "else",                 -- rb
+  "class",                -- rb
+  "method",               -- rb
+  "call",                 -- rb
+
+  "function_definition",  -- js
+  "statement_block",      -- js
+  "expression_statement", -- js
+  "lexical_declaration",  -- js
+
+  "use_declaration",      -- rs
+  "struct_item",          -- rs
+  "impl_item",            -- rs
+  "enum_item",            -- rs
+  "function_item",        -- rs
 }
 
+local TARGET_DESCENDANT_TYPES = {
+  "body_statement",  -- lua
+  "block",           -- lua
+  "statement_block", -- lua
+
+  -- "then", -- helps rb, hurts lua
+  "do_block", -- rb
+}
+
+---@param node TSNode
+---@return boolean
 local function is_jump_target(node)
-  return util.contains(VALID_NODE_TYPES, node:type())
+  -- return not util.contains(NON_TARGET_NODE_MATCHERS, node:type())
+  for _, matcher in ipairs(NON_TARGET_NODE_MATCHERS) do
+    if node:type():match(matcher) then
+      return false
+    end
+  end
+  return true
+end
+
+local function is_target_descendant(node)
+  return util.contains(TARGET_DESCENDANT_TYPES, node:type())
 end
 
 ---@param node1 TSNode
@@ -54,7 +81,7 @@ local function get_descendant(node)
 
   while #queue > 0 do
     local current_node = table.remove(queue, 1)
-    if util.contains(VALID_DESCENDANT_TYPES, current_node:type()) then
+    if is_target_descendant(current_node) then
       return current_node
     end
 
@@ -96,7 +123,7 @@ end
 
 ---@param node TSNode
 ---@return TSNode | nil
-local function get_nearest_valid_ancestor(node)
+local function get_nearest_target_ancestor(node)
   local iter_ancestor = node:parent()
   while iter_ancestor do
     if is_jump_target(iter_ancestor) then
@@ -139,7 +166,7 @@ end
 ---Otherwise returns the original node
 ---@param node TSNode
 ---@return TSNode
-local function get_farthest_valid_ancestor_with_same_range(node)
+local function get_farthest_target_ancestor_with_same_range(node)
   local node_row, node_col = vim.treesitter.get_node_range(node)
   local parent = node:parent()
 
@@ -163,21 +190,10 @@ function M.get_node()
   local node = vim.treesitter.get_node()
   assert(node)
 
-  -- node = get_nearest_valid_ancestor(node)
+  -- node = get_nearest_target_ancestor(node)
   -- assert(node)
 
-  -- -- special dispensation for identifier nodes, if we don't do this,
-  -- -- identifiers in particular get stuck on themselves, ex lua's
-  -- -- assert(node) above becomes a sink
-  -- if node:type() == "identifier" then
-  --   -- node = get_farthest_parent_with_same_range()
-  --   local ancestor = get_nearest_valid_ancestor(node)
-  --   if ancestor then
-  --     node = ancestor
-  --   end
-  -- end
-
-  node = get_farthest_valid_ancestor_with_same_range(node)
+  node = get_farthest_target_ancestor_with_same_range(node)
 
   return node
 end
