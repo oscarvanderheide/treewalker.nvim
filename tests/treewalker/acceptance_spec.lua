@@ -28,16 +28,21 @@ local function load_buf(filename, lang)
 end
 
 -- Assert the cursor is in the expected position
-local function assert_cursor_at(line, column)
+---i
+---@param line integer
+---@param column integer
+---@param msg string?
+local function assert_cursor_at(line, column, msg)
   local cursor_pos = vim.fn.getpos('.')
   ---@type integer, integer
   local current_line, current_column
   current_line, current_column = cursor_pos[2], cursor_pos[3]
-  assert.are.same({ line, column }, { current_line, current_column })
+  msg = string.format("expected to be at [%s] but wasn't", msg)
+  assert.are.same({ line, column }, { current_line, current_column }, msg)
 end
 
 describe("Treewalker", function()
-  describe("regular lua file", function()
+  describe("regular lua file: ", function()
     load_buf(fixtures_dir .. "/lua.lua", "lua")
 
     it("moves up and down at the same pace", function()
@@ -70,20 +75,47 @@ describe("Treewalker", function()
       assert_cursor_at(149, 7)
     end)
 
-    -- TODO: failing
-    -- it("goes out of functions", function()
-    --   vim.fn.cursor(149, 7) -- In a bigger function
-    --   treewalker.left()
-    --   assert_cursor_at(148, 5)
-    --   treewalker.left()
-    --   assert_cursor_at(146, 3)
-    --   treewalker.left()
-    --   assert_cursor_at(143, 1)
-    -- end)
+    it("goes out of functions", function()
+      vim.fn.cursor(149, 7) -- In a bigger function
+      treewalker.left()
+      assert_cursor_at(148, 5)
+      treewalker.left()
+      assert_cursor_at(146, 3)
+      treewalker.left()
+      assert_cursor_at(143, 1)
+    end)
+  end)
 
+  describe("lua spec file: ", function()
+    load_buf(fixtures_dir .. "/lua-spec.lua", "lua")
 
+    local function go_to_describe()
+      vim.fn.cursor(1, 1)
+      for _ = 1, 6 do
+        treewalker.down()
+      end
+      assert_cursor_at(17, 1, "describe")
+    end
 
+    local function go_to_load_buf()
+      go_to_describe()
+      treewalker.right(); treewalker.right()
+      assert_cursor_at(19, 5, "load_buf")
+    end
 
+    it("moves up and down at the same pace", function()
+      go_to_load_buf()
+      treewalker.down(); treewalker.down()
+      assert_cursor_at(21, 5, "it")
+      treewalker.up(); treewalker.up()
+      assert_cursor_at(19, 5, "load_buf")
+    end)
+
+    it("down moves at least one line", function()
+      go_to_load_buf()
+      treewalker.down()
+      assert_cursor_at(21, 5, "it")
+    end)
 
   end)
 end)

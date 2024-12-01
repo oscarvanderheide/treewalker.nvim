@@ -35,3 +35,29 @@ local function get_farthest_target_ancestor_with_same_range(node)
   return farthest_parent
 end
 
+---Ignores the node tree, traverses the node list linearly, getting the next node that starts on the same column, but a different row
+---TODO Good idea but I can't get it working. Breaking from this to explore using ts.get_next_node directly.
+---@param node TSNode
+---@return TSNode | nil
+local function get_next_sibling_by_start(node)
+  local row, col = node:start()
+  local iter = ts.get_next_node(node, true, true)
+
+  while iter do
+    local iter_row, iter_col = iter:start()
+    local has_same_indent = iter_col == col and iter_row ~= row
+    if has_same_indent and is_jump_target(iter) then
+      return iter
+    end
+    iter = ts.get_next_node(iter)
+  end
+end
+
+---Is the node the top module of the file, the root node
+---@param node TSNode
+---@return boolean
+local function is_root(node)
+  local srow, scol = node:range()
+  return srow == 0 and scol == 0
+end
+

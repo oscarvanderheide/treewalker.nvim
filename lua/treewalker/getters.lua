@@ -1,4 +1,5 @@
 local util = require('treewalker.util')
+local ts = require("nvim-treesitter.ts_utils")
 
 local M = {}
 
@@ -43,37 +44,102 @@ local function have_same_range(node1, node2)
       scol1 == scol2
 end
 
----Strictly sibling, no fancy business
+---Do the nodes have the same starting line
+---@param node1 TSNode
+---@param node2 TSNode
+---@return boolean
+local function is_on_same_line(node1, node2)
+  local srow1 = node1:start()
+  local srow2 = node2:start()
+  return srow1 == srow2
+end
+
+---helper to get all the children from a node
 ---@param node TSNode
----@return TSNode | nil
-local function get_prev_sibling(node)
-  local iter_sibling = node:prev_sibling()
+---@return TSNode[]
+local function get_children(node)
+  local children = {}
+  local iter = node:iter_children()
+  local child = iter()
+  while child do
+    table.insert(children, child)
+    child = iter()
+  end
+  return children
+end
 
-  while iter_sibling do
-    if is_jump_target(iter_sibling) then
-      return iter_sibling
+---Ignores the node tree, traverses the node list linearly, getting the next node that starts on the same column, but a different row
+---@param node TSNode
+local function traverse_tree_linearly_forward(node)
+  return function()
+    local queue = get_children(node)
+    while #queue > 0 do
+        local current_node = table.remove(queue, 1)
+
+        -- yield the current node
+        coroutine.yield(current_node)
+
+        -- add children to queue
+        for _, child in ipairs(current_node.children) do
+            table.insert(queue, child)
+        end
     end
-
-    iter_sibling = iter_sibling:prev_sibling()
   end
 end
 
----Strictly sibling, no fancy business
+---@param node TSNode
+---@param dir "forward" | "backward"
+local function tree_of(node, dir)
+  if dir == "forward" then
+    return coroutine.wrap(traverse_tree_linearly_forward(node))
+  elseif dir == "backward" then
+    return coroutine.wrap(traverse_tree_linearly_forward(node))
+  end
+end
+
+---@param node TSNode
+---@return TSNode | nil
+local function get_prev_sibling(node)
+  ---@param n TSNode
+  local function get_iter(n)
+    return ts.get_previous_node(n, true, true)
+  end
+
+  local iter = get_iter(node)
+
+  while iter do
+    if is_jump_target(iter) then
+      return iter
+    end
+
+    iter = get_iter(iter)
+  end
+end
+
 ---@param node TSNode
 ---@return TSNode | nil
 local function get_next_sibling(node)
-  local iter_sibling = node:next_sibling()
+  ---@param n TSNode
+  local function get_iter(n)
+    return ts.get_next_node(n, true, true)
+  end
 
-  while iter_sibling do
-    if is_jump_target(iter_sibling) then
-      return iter_sibling
+  local iter = get_iter(node)
+
+  while iter do
+    if is_jump_target(iter) and not is_on_same_line(node, iter) then
+      return iter
     end
 
-    iter_sibling = iter_sibling:next_sibling()
+    iter = get_iter(iter)
   end
 end
 
 ---Get _next_ or _out and next_
+---TODO I think I might want this to operate by line numbers rather than
+---by nodes in the tree. The tree, as I see in vim.treesitter.inspect_tree(),
+---should be read linearly as a list as it appears vertically on my screen, ignoring
+---the indentation. Only if there're no more matches there should it go out and next.
 ---@param node TSNode
 ---@return TSNode | nil
 function M.get_next(node)
@@ -122,20 +188,6 @@ function M.get_direct_ancestor(node)
   end
 end
 
----helper to get all the children from a node
----@param node TSNode
----@return TSNode[]
-local function get_children(node)
-  local children = {}
-  local iter = node:iter_children()
-  local child = iter()
-  while child do
-    table.insert(children, child)
-    child = iter()
-  end
-  return children
-end
-
 ---Get the next target descendent
 ---The idea here is it goes _in_ or _down and in_
 ---@param node TSNode
@@ -163,7 +215,8 @@ function M.get_descendant(node)
     return M.get_descendant(next_sibling)
   end
 
-  -- If there were no nephews, try children of an uncle (final recursive step to get at the whole tree)
+  -- If there were no nephews, try children of an uncle (final recursive step
+  -- to get at the whole tree)
   local parent = node:parent()
   if not parent then return nil end
   local uncle = parent:next_sibling()
@@ -177,6 +230,14 @@ end
 function M.get_node()
   local node = vim.treesitter.get_node()
   assert(node)
+
+  -- -- I think many of the issues with stuckage are solved by retrieving the
+  -- -- original node as the node one level up
+  -- local parent = node:parent()
+  -- -- local parent = get_farthest_target_ancestor_with_same_range(node)
+  -- if parent and not is_root(parent) then
+  --   node = parent
+  -- end
 
   -- Might help when starting from non target location?
   -- node = get_nearest_target_ancestor(node)
