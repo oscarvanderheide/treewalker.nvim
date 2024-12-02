@@ -36,7 +36,7 @@ end
 ---@param node1 TSNode
 ---@param node2 TSNode
 ---@return boolean
-local function have_same_range(node1, node2)
+local function have_same_start(node1, node2)
   local srow1, scol1 = node1:range()
   local srow2, scol2 = node2:range()
   return
@@ -44,11 +44,21 @@ local function have_same_range(node1, node2)
       scol1 == scol2
 end
 
+---Do the nodes have the same level of indentation
+---@param node1 TSNode
+---@param node2 TSNode
+---@return boolean
+local function have_same_indent(node1, node2)
+  local _, scol1 = node1:range()
+  local _, scol2 = node2:range()
+  return scol1 == scol2
+end
+
 ---Do the nodes have the same starting line
 ---@param node1 TSNode
 ---@param node2 TSNode
 ---@return boolean
-local function is_on_same_line(node1, node2)
+local function on_same_line(node1, node2)
   local srow1 = node1:start()
   local srow2 = node2:start()
   return srow1 == srow2
@@ -68,71 +78,38 @@ local function get_children(node)
   return children
 end
 
----Ignores the node tree, traverses the node list linearly, getting the next node that starts on the same column, but a different row
+---iterable for all nodes after the passed in node in the entire syntax tree
+---for nod in forward_tree(node) do ... end
+---Does not return passed in node
 ---@param node TSNode
-local function traverse_tree_linearly_forward(node)
-  return function()
-    local queue = get_children(node)
-    while #queue > 0 do
-        local current_node = table.remove(queue, 1)
+---@param dir "before" | "after"
+local function nodes_surrounding(node, dir)
+  local tree = node:tree()
+  local root = tree:root()
+  local nodes = get_children(root)
 
-        -- yield the current node
-        coroutine.yield(current_node)
+  for i, nod in ipairs(nodes) do
+    util.log(i, nod:type(), nod:range())
+  end
 
-        -- add children to queue
-        for _, child in ipairs(current_node.children) do
-            table.insert(queue, child)
-        end
+
+  -- all the prior nodes, in order of closest first
+  if dir == "before" then
+    nodes = util.reverse(nodes)
+  end
+
+  return coroutine.wrap(function()
+    local is_past_node = false
+    for _, nod in ipairs(nodes) do
+      if is_past_node then
+        coroutine.yield(nod)
+      end
+
+      if nod:equal(node) then
+        is_past_node = true
+      end
     end
-  end
-end
-
----@param node TSNode
----@param dir "forward" | "backward"
-local function tree_of(node, dir)
-  if dir == "forward" then
-    return coroutine.wrap(traverse_tree_linearly_forward(node))
-  elseif dir == "backward" then
-    return coroutine.wrap(traverse_tree_linearly_forward(node))
-  end
-end
-
----@param node TSNode
----@return TSNode | nil
-local function get_prev_sibling(node)
-  ---@param n TSNode
-  local function get_iter(n)
-    return ts.get_previous_node(n, true, true)
-  end
-
-  local iter = get_iter(node)
-
-  while iter do
-    if is_jump_target(iter) then
-      return iter
-    end
-
-    iter = get_iter(iter)
-  end
-end
-
----@param node TSNode
----@return TSNode | nil
-local function get_next_sibling(node)
-  ---@param n TSNode
-  local function get_iter(n)
-    return ts.get_next_node(n, true, true)
-  end
-
-  local iter = get_iter(node)
-
-  while iter do
-    if is_jump_target(iter) and not is_on_same_line(node, iter) then
-      return iter
-    end
-
-    iter = get_iter(iter)
-  end
+  end)
 end
 
 ---Get _next_ or _out and next_
@@ -143,10 +120,26 @@ end
 ---@param node TSNode
 ---@return TSNode | nil
 function M.get_next(node)
-  local next_sibling = get_next_sibling(node)
+  --- Strategy: walking the tree intelligently
 
-  if next_sibling then
-    return next_sibling
+  ---@param n TSNode
+  local function get_iter(n)
+    return ts.get_next_node(n, true, true)
+  end
+
+  local iter = get_iter(node)
+  while iter do
+    if is_jump_target(iter) and not on_same_line(node, iter) then
+      return iter
+    end
+    iter = get_iter(iter)
+  end
+
+  -- Strategy: walking the tree linearly
+  for nod in nodes_surrounding(node, "after") do
+    if is_jump_target(nod) and have_same_indent(nod, node) and not have_same_start(nod, node) then
+      return nod
+    end
   end
 
   -- No next sibling jump target is found
@@ -163,12 +156,29 @@ end
 ---@param node TSNode
 ---@return TSNode | nil
 function M.get_prev(node)
-  local prev_sibling = get_prev_sibling(node)
-  if prev_sibling then
-    return prev_sibling
+  -- Strategy: walking the tree linearly
+  for nod in nodes_surrounding(node, "before") do
+    if is_jump_target(nod) and have_same_indent(nod, node) and not have_same_start(nod, node) then
+      util.log("found from walking linearly:", nod:type())
+      return nod
+    end
   end
 
-  -- If we reach a dead end, climb up a level
+  --- Strategy: walking the tree intelligently
+  ---@param n TSNode
+  local function get_iter(n)
+    return ts.get_previous_node(n, true, true)
+  end
+
+  local iter = get_iter(node)
+  while iter do
+    if is_jump_target(iter) then
+      return iter
+    end
+    iter = get_iter(iter)
+  end
+
+  -- Strategy: If we reach a dead end, climb up a level
   return M.get_direct_ancestor(node)
 end
 
@@ -180,7 +190,7 @@ function M.get_direct_ancestor(node)
   while iter_ancestor do
     -- Without have_same_range, this will get stuck, where it targets one node, but is then
     -- interpreted by get_node() as another.
-    if is_jump_target(iter_ancestor) and not have_same_range(node, iter_ancestor) then
+    if is_jump_target(iter_ancestor) and not have_same_start(node, iter_ancestor) then
       return iter_ancestor
     end
 

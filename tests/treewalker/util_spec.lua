@@ -105,4 +105,13 @@ describe("util", function()
       assert.is_false(res)
     end)
   end)
+
+  describe("reverse", function()
+    it("reverses an array table", function()
+      local t = { 1, 2, 3, 4, 5 }
+      local expected = { 5, 4, 3, 2, 1 }
+      local reversed = util.reverse(t)
+      assert.same(expected, reversed)
+    end)
+  end)
 end)

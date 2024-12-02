@@ -1,6 +1,5 @@
 local get = require('treewalker.getters')
 local op = require('treewalker.ops')
-require('treewalker.types')
 
 local M = {}
 

@@ -104,5 +104,14 @@ M.has_env_var = function(env_key)
   return type(os.getenv(env_key)) ~= type(nil)
 end
 
+---reverse an array table
+---@param t table
+M.reverse = function (t)
+  local reversed = {}
+  for _, el in ipairs(t) do
+    table.insert(reversed, 1, el)
+  end
+  return reversed
+end
 
 return M
