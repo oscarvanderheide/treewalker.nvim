@@ -158,10 +158,13 @@ function M.get_node()
   local root = M.get_root_node()
   local tree = walker_tree.from_root_node(root)
   local ts_node = vim.treesitter.get_node()
-  assert(ts_node)
+  assert(ts_node, "no TSNode found under cursor (highly unlikely)")
   local r = ts_node:range()
   local node = walker_tree.get_for_line(tree, r)
-  assert(node)
+  if not node then
+    walker_tree.print_tree(tree)
+    assert(node, string.format("no WalkerNode found for line %d", r))
+  end
   -- util.log(node.range, { ts_node:range() })
 
   -- local all_nodes = node_util.get_descendants(M.get_root_node())

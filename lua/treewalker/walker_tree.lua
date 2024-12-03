@@ -54,20 +54,28 @@ local function construct_walker_node(parent, current)
   }
 end
 
--- Helper function to perform depth-first search on TSNode
+-- Build a walker tree from a root TSNode
+-- TODO this isn't getting all the nodes. If a child doesn't qualify, like it's on the same line, we never see any of its children. But we do need to.
 ---@param current_ts_node TSNode
 ---@param parent_walker_node WalkerNode | nil
 ---@param seen_lines { [integer]: true }
 local function build_walker_tree(current_ts_node, parent_walker_node, seen_lines)
-  local current_walker_node = construct_walker_node(parent_walker_node, current_ts_node)
+  local current_walker_node = nil
 
   local ts_children = node_util.get_children(current_ts_node)
-  for _, child_ts_node in ipairs(ts_children) do
-    local srow = child_ts_node:range()
-    if not seen_lines[srow] and node_util.is_jump_target(child_ts_node) then
-      seen_lines[srow] = true
-      local child_walker_node = build_walker_tree(child_ts_node, current_walker_node, seen_lines)
-      current_walker_node:add_child(child_walker_node)
+  for _, ts_child in ipairs(ts_children) do
+    local ts_child_lnum = ts_child:range()
+    if not seen_lines[ts_child_lnum] and node_util.is_jump_target(ts_child) then
+      -- If the node is a valid jump target and hasn't been seen, create a walker node
+      current_walker_node = current_walker_node or construct_walker_node(parent_walker_node, current_ts_node)
+      local child_walker_node = build_walker_tree(ts_child, current_walker_node, seen_lines)
+      if child_walker_node then
+        current_walker_node:add_child(child_walker_node)
+      end
+      seen_lines[ts_child_lnum] = true
+    else
+      -- Recursively process children of non-qualifying nodes
+      build_walker_tree(ts_child, current_walker_node, seen_lines)
     end
   end
 
@@ -133,3 +141,4 @@ function M.get_for_line(node, lnum)
 end
 
 return M
+

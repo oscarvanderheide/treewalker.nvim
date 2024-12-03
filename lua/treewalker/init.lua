@@ -42,7 +42,7 @@ end
 local function move_down()
   local node = getters.get_node()
   util.log(string.format("current node: %s", node:print()))
-  -- walker_tree.print_tree(node)
+  walker_tree.print_tree(node)
   -- local target = getters.get_next(node)
   local target = node:next_sibling()
 
