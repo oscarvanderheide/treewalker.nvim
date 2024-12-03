@@ -1,4 +1,5 @@
 local util = require('treewalker.util')
+local node_util = require('treewalker.nodes')
 local ts = require("nvim-treesitter.ts_utils")
 
 local M = {}
@@ -32,52 +33,6 @@ local function is_descendant_jump_target(node)
   return util.contains(TARGET_DESCENDANT_TYPES, node:type())
 end
 
----Do the nodes have the same starting point
----@param node1 TSNode
----@param node2 TSNode
----@return boolean
-local function have_same_start(node1, node2)
-  local srow1, scol1 = node1:range()
-  local srow2, scol2 = node2:range()
-  return
-      srow1 == srow2 and
-      scol1 == scol2
-end
-
----Do the nodes have the same level of indentation
----@param node1 TSNode
----@param node2 TSNode
----@return boolean
-local function have_same_indent(node1, node2)
-  local _, scol1 = node1:range()
-  local _, scol2 = node2:range()
-  return scol1 == scol2
-end
-
----Do the nodes have the same starting line
----@param node1 TSNode
----@param node2 TSNode
----@return boolean
-local function on_same_line(node1, node2)
-  local srow1 = node1:start()
-  local srow2 = node2:start()
-  return srow1 == srow2
-end
-
----helper to get all the children from a node
----@param node TSNode
----@return TSNode[]
-local function get_children(node)
-  local children = {}
-  local iter = node:iter_children()
-  local child = iter()
-  while child do
-    table.insert(children, child)
-    child = iter()
-  end
-  return children
-end
-
 ---iterable for all nodes after the passed in node in the entire syntax tree
 ---for nod in forward_tree(node) do ... end
 ---Does not return passed in node
@@ -86,12 +41,7 @@ end
 local function nodes_surrounding(node, dir)
   local tree = node:tree()
   local root = tree:root()
-  local nodes = get_children(root)
-
-  for i, nod in ipairs(nodes) do
-    util.log(i, nod:type(), nod:range())
-  end
-
+  local nodes = node_util.get_children(root)
 
   -- all the prior nodes, in order of closest first
   if dir == "before" then
@@ -112,11 +62,6 @@ local function nodes_surrounding(node, dir)
   end)
 end
 
----Get _next_ or _out and next_
----TODO I think I might want this to operate by line numbers rather than
----by nodes in the tree. The tree, as I see in vim.treesitter.inspect_tree(),
----should be read linearly as a list as it appears vertically on my screen, ignoring
----the indentation. Only if there're no more matches there should it go out and next.
 ---@param node TSNode
 ---@return TSNode | nil
 function M.get_next(node)
@@ -129,7 +74,7 @@ function M.get_next(node)
 
   local iter = get_iter(node)
   while iter do
-    if is_jump_target(iter) and not on_same_line(node, iter) then
+    if is_jump_target(iter) and not node_util.on_same_line(node, iter) then
       return iter
     end
     iter = get_iter(iter)
@@ -137,7 +82,7 @@ function M.get_next(node)
 
   -- Strategy: walking the tree linearly
   for nod in nodes_surrounding(node, "after") do
-    if is_jump_target(nod) and have_same_indent(nod, node) and not have_same_start(nod, node) then
+    if is_jump_target(nod) and node_util.have_same_indent(nod, node) and not node_util.have_same_start(nod, node) then
       return nod
     end
   end
@@ -158,7 +103,7 @@ end
 function M.get_prev(node)
   -- Strategy: walking the tree linearly
   for nod in nodes_surrounding(node, "before") do
-    if is_jump_target(nod) and have_same_indent(nod, node) and not have_same_start(nod, node) then
+    if is_jump_target(nod) and node_util.have_same_indent(nod, node) and not node_util.have_same_start(nod, node) then
       util.log("found from walking linearly:", nod:type())
       return nod
     end
@@ -190,7 +135,7 @@ function M.get_direct_ancestor(node)
   while iter_ancestor do
     -- Without have_same_range, this will get stuck, where it targets one node, but is then
     -- interpreted by get_node() as another.
-    if is_jump_target(iter_ancestor) and not have_same_start(node, iter_ancestor) then
+    if is_jump_target(iter_ancestor) and not node_util.have_same_start(node, iter_ancestor) then
       return iter_ancestor
     end
 
@@ -203,7 +148,7 @@ end
 ---@param node TSNode
 ---@return TSNode | nil
 function M.get_descendant(node)
-  local queue = get_children(node)
+  local queue = node_util.get_children(node)
 
   while #queue > 0 do
     local current_node = table.remove(queue, 1)
@@ -240,6 +185,9 @@ end
 function M.get_node()
   local node = vim.treesitter.get_node()
   assert(node)
+  local all_nodes = node_util.get_descendants(M.get_root_node())
+  local unique_nodes = node_util.unique_per_line(all_nodes)
+  util.log(string.format("all_nodes length: %d, unique_nodes length: %d", #all_nodes, #unique_nodes))
 
   -- -- I think many of the issues with stuckage are solved by retrieving the
   -- -- original node as the node one level up
@@ -258,6 +206,12 @@ function M.get_node()
   -- node = get_farthest_target_ancestor_with_same_range(node)
 
   return node
+end
+
+function M.get_root_node()
+  local parser = vim.treesitter.get_parser()
+  local tree = parser:trees()[1]
+  return tree:root()
 end
 
 return M
