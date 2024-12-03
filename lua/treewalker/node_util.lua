@@ -1,6 +1,35 @@
 local util = require "treewalker.util"
 
+local NON_TARGET_NODE_MATCHERS = {
+  -- "chunk", -- lua
+  "^.*comment.*$",
+}
+
+local TARGET_DESCENDANT_TYPES = {
+  "body_statement",  -- lua, rb
+  "block",           -- lua
+  "statement_block", -- lua
+
+  -- "then", -- helps rb, hurts lua
+  "do_block", -- rb
+}
+
 local M = {}
+
+---@param node TSNode
+---@return boolean
+function M.is_jump_target(node)
+  for _, matcher in ipairs(NON_TARGET_NODE_MATCHERS) do
+    if node:type():match(matcher) then
+      return false
+    end
+  end
+  return true
+end
+
+function M.is_descendant_jump_target(node)
+  return util.contains(TARGET_DESCENDANT_TYPES, node:type())
+end
 
 ---Do the nodes have the same starting point
 ---@param node1 TSNode

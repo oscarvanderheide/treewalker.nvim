@@ -1,37 +1,9 @@
 local util = require('treewalker.util')
-local node_util = require('treewalker.nodes')
+local node_util = require('treewalker.node_util')
 local ts = require("nvim-treesitter.ts_utils")
+local walker_tree = require("treewalker.walker_tree")
 
 local M = {}
-
-local NON_TARGET_NODE_MATCHERS = {
-  -- "chunk", -- lua
-  "^.*comment.*$",
-}
-
-local TARGET_DESCENDANT_TYPES = {
-  "body_statement",  -- lua, rb
-  "block",           -- lua
-  "statement_block", -- lua
-
-  -- "then", -- helps rb, hurts lua
-  "do_block", -- rb
-}
-
----@param node TSNode
----@return boolean
-local function is_jump_target(node)
-  for _, matcher in ipairs(NON_TARGET_NODE_MATCHERS) do
-    if node:type():match(matcher) then
-      return false
-    end
-  end
-  return true
-end
-
-local function is_descendant_jump_target(node)
-  return util.contains(TARGET_DESCENDANT_TYPES, node:type())
-end
 
 ---iterable for all nodes after the passed in node in the entire syntax tree
 ---for nod in forward_tree(node) do ... end
@@ -74,18 +46,18 @@ function M.get_next(node)
 
   local iter = get_iter(node)
   while iter do
-    if is_jump_target(iter) and not node_util.on_same_line(node, iter) then
+    if node_util.is_jump_target(iter) and not node_util.on_same_line(node, iter) then
       return iter
     end
     iter = get_iter(iter)
   end
 
-  -- Strategy: walking the tree linearly
-  for nod in nodes_surrounding(node, "after") do
-    if is_jump_target(nod) and node_util.have_same_indent(nod, node) and not node_util.have_same_start(nod, node) then
-      return nod
-    end
-  end
+  -- -- Strategy: walking the tree linearly
+  -- for nod in nodes_surrounding(node, "after") do
+  --   if is_jump_target(nod) and node_util.have_same_indent(nod, node) and not node_util.have_same_start(nod, node) then
+  --     return nod
+  --   end
+  -- end
 
   -- No next sibling jump target is found
   -- Travel up the tree to find the next parent's sibling
@@ -101,13 +73,13 @@ end
 ---@param node TSNode
 ---@return TSNode | nil
 function M.get_prev(node)
-  -- Strategy: walking the tree linearly
-  for nod in nodes_surrounding(node, "before") do
-    if is_jump_target(nod) and node_util.have_same_indent(nod, node) and not node_util.have_same_start(nod, node) then
-      util.log("found from walking linearly:", nod:type())
-      return nod
-    end
-  end
+  -- -- Strategy: walking the tree linearly
+  -- for nod in nodes_surrounding(node, "before") do
+  --   if is_jump_target(nod) and node_util.have_same_indent(nod, node) and not node_util.have_same_start(nod, node) then
+  --     util.log("found from walking linearly:", nod:type())
+  --     return nod
+  --   end
+  -- end
 
   --- Strategy: walking the tree intelligently
   ---@param n TSNode
@@ -117,7 +89,7 @@ function M.get_prev(node)
 
   local iter = get_iter(node)
   while iter do
-    if is_jump_target(iter) then
+    if node_util.is_jump_target(iter) then
       return iter
     end
     iter = get_iter(iter)
@@ -135,7 +107,7 @@ function M.get_direct_ancestor(node)
   while iter_ancestor do
     -- Without have_same_range, this will get stuck, where it targets one node, but is then
     -- interpreted by get_node() as another.
-    if is_jump_target(iter_ancestor) and not node_util.have_same_start(node, iter_ancestor) then
+    if node_util.is_jump_target(iter_ancestor) and not node_util.have_same_start(node, iter_ancestor) then
       return iter_ancestor
     end
 
@@ -152,7 +124,7 @@ function M.get_descendant(node)
 
   while #queue > 0 do
     local current_node = table.remove(queue, 1)
-    if is_descendant_jump_target(current_node) then
+    if node_util.is_descendant_jump_target(current_node) then
       return current_node
     end
 
@@ -180,30 +152,21 @@ function M.get_descendant(node)
   return M.get_descendant(uncle)
 end
 
----Get current node under cursor
----@return TSNode
+---Get node under cursor
+---@return WalkerNode
 function M.get_node()
-  local node = vim.treesitter.get_node()
+  local root = M.get_root_node()
+  local tree = walker_tree.from_root_node(root)
+  local ts_node = vim.treesitter.get_node()
+  assert(ts_node)
+  local r = ts_node:range()
+  local node = walker_tree.get_for_line(tree, r)
   assert(node)
-  local all_nodes = node_util.get_descendants(M.get_root_node())
-  local unique_nodes = node_util.unique_per_line(all_nodes)
-  util.log(string.format("all_nodes length: %d, unique_nodes length: %d", #all_nodes, #unique_nodes))
+  -- util.log(node.range, { ts_node:range() })
 
-  -- -- I think many of the issues with stuckage are solved by retrieving the
-  -- -- original node as the node one level up
-  -- local parent = node:parent()
-  -- -- local parent = get_farthest_target_ancestor_with_same_range(node)
-  -- if parent and not is_root(parent) then
-  --   node = parent
-  -- end
-
-  -- Might help when starting from non target location?
-  -- node = get_nearest_target_ancestor(node)
-  -- assert(node)
-
-  -- Meant to help with up and down navigation, giving the highest likelihood of having a relevant sibling
-  -- Gives getting stuck at the top of the file
-  -- node = get_farthest_target_ancestor_with_same_range(node)
+  -- local all_nodes = node_util.get_descendants(M.get_root_node())
+  -- local unique_nodes = node_util.unique_per_line(all_nodes)
+  -- util.log(string.format("all_nodes length: %d, unique_nodes length: %d", #all_nodes, #unique_nodes))
 
   return node
 end

@@ -1,45 +1,53 @@
-local get = require('treewalker.getters')
-local op = require('treewalker.ops')
+local getters = require('treewalker.getters')
+local util = require('treewalker.util')
+local ops = require('treewalker.ops')
+local walker_tree = require('treewalker.walker_tree')
 
 local M = {}
 
 ---@return nil
 local function move_out()
-  local node = get.get_node()
-  local target = get.get_direct_ancestor(node)
+  local node = getters.get_node()
+  -- local target = getters.get_direct_ancestor(node)
+  local target = node:parent()
 
   if target then
-    op.jump(target)
+    ops.jump(target)
   end
 end
 
 ---@return nil
 local function move_in()
-  local node = get.get_node()
-  local target = get.get_descendant(node)
+  local node = getters.get_node()
+  -- local target = getters.get_descendant(node)
+  local target = node.children[1]
 
   if target then
-    op.jump(target)
+    ops.jump(target)
   end
 end
 
 ---@return nil
 local function move_up()
-  local node = get.get_node()
+  local node = getters.get_node()
+  -- local target = getters.get_prev(node)
+  local target = node:prev_sibling()
 
-  local target = get.get_prev(node)
   if target then
-    op.jump(target)
+    ops.jump(target)
   end
 end
 
 ---@return nil
 local function move_down()
-  local node = get.get_node()
-  local target = get.get_next(node)
+  local node = getters.get_node()
+  util.log(string.format("current node: %s", node:print()))
+  -- walker_tree.print_tree(node)
+  -- local target = getters.get_next(node)
+  local target = node:next_sibling()
 
   if target then
-    op.jump(target)
+    ops.jump(target)
   end
 end
 

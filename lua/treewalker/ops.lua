@@ -41,10 +41,10 @@ function M.highlight(range)
   end, 250)
 end
 
----@param node TSNode
+---@param node WalkerNode
 function M.jump(node)
-  local start_row, start_col, end_row, end_col = vim.treesitter.get_node_range(node)
-  util.log(string.format("dest: %s %d %d %d %d", tostring(node:type()), start_row, start_col, end_row, end_col))
+  local start_row, start_col, end_row, end_col = node.range[1], node.range[2], node.range[3], node.range[4]
+  util.log(string.format("dest: %s", node:print()))
   M.safe_set_cursor(start_row + 1, start_col)
   M.highlight({ start_row + 1, start_col, end_row + 1, end_col })
 end
