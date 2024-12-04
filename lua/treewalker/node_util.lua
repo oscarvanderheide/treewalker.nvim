@@ -118,4 +118,12 @@ function M.unique_per_line(nodes)
     return unique_nodes
 end
 
+-- Easy conversion to table
+---@param node TSNode
+---@return [ integer, integer, integer, integer ]
+function M.range(node)
+  local r1, r2, r3, r4 = node:range()
+  return { r1, r2, r3, r4 }
+end
+
 return M
