@@ -39,7 +39,8 @@ end
 ---@return nil
 local function move_up()
   local current_lnum = vim.fn.line(".")
-  local current_indent = lines.get_indent(lines.get_line(current_lnum))
+  local current_line = lines.get_line(current_lnum)
+  local current_indent = lines.get_indent(current_line)
 
   --- Get next target, if one is found
   local candidate_lnum, candidate_line, candidate =
@@ -47,17 +48,18 @@ local function move_up()
 
   -- Ultimate failure
   if not candidate_lnum or not candidate_line or not candidate then
-    return util.log("no next candidate")
+    return util.log("no up candidate")
   end
 
   log(candidate_lnum, candidate_line, candidate, "move_up dest")
-  ops.jump(candidate_lnum + 1, candidate)
+  ops.jump(candidate_lnum, candidate)
 end
 
 ---@return nil
 local function move_down()
   local current_lnum = vim.fn.line(".")
-  local current_indent = lines.get_indent(lines.get_line(current_lnum))
+  local current_line = lines.get_line(current_lnum)
+  local current_indent = lines.get_indent(current_line)
 
   --- Get next target, if one is found
   local candidate_lnum, candidate_line, candidate =
@@ -65,11 +67,11 @@ local function move_down()
 
   -- Ultimate failure
   if not candidate_lnum or not candidate_line or not candidate then
-    return util.log("no next candidate")
+    return util.log("no down candidate")
   end
 
   log(candidate_lnum, candidate_line, candidate, "move_down dest")
-  ops.jump(candidate_lnum - 1, candidate)
+  ops.jump(candidate_lnum, candidate)
 end
 
 function M.up() move_up() end
