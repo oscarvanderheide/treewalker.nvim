@@ -7,7 +7,7 @@ end
 
 ---@param line string
 ---@return integer
-function M.get_indent(line)
+function M.get_start_col(line)
   local tabwidth = vim.opt.tabstop:get()
   local count = 1 -- 1 indexed
   for i = 1, #line do

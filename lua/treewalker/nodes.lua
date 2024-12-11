@@ -20,6 +20,7 @@ local M = {}
 ---@return boolean
 function M.is_jump_target(node)
   for _, matcher in ipairs(NON_TARGET_NODE_MATCHERS) do
+    -- If it's a banned type
     if node:type():match(matcher) then
       return false
     end
