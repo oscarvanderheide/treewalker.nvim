@@ -40,7 +40,7 @@ function M.get_next_vertical_target_at_same_col(dir, row, col)
         nodes.is_jump_target(candidate) -- only node types we consider jump targets
         and candidate_line ~= "" -- no empty lines
         and candidate_col == col -- stay at current indent level
-        -- and candidate_lnum == srow + 1 -- top of block; no end's or else's etc.
+        and candidate_lnum == srow + 1 -- top of block; no end's or else's etc.
     then
       break -- use most recent assignment below
     else
