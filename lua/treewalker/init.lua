@@ -1,10 +1,53 @@
-local node_util = require('treewalker.node_util')
+local nodes = require('treewalker.nodes')
 local getters = require('treewalker.getters')
 local util = require('treewalker.util')
 local ops = require('treewalker.ops')
-local walker_tree = require('treewalker.walker_tree')
 
 local M = {}
+
+---@alias Dir "up" | "down"
+
+---@param lnum integer
+local function get_line(lnum)
+  return vim.api.nvim_buf_get_lines(0, lnum - 1, lnum, false)[1]
+end
+
+---@param line string
+---@return integer
+local function get_indent(line)
+  local tabwidth = vim.opt.tabstop:get()
+  local count = 1 -- 1 indexed
+  for i = 1, #line do
+    local c = line:sub(i, i)
+    if c == "\t" then
+      count = math.floor((count + tabwidth) / tabwidth) * tabwidth
+    elseif c == " " then
+      count = count + 1
+    else
+      break
+    end
+  end
+  return count
+end
+
+-- Take lnum, give next lnum / node with same indentation
+---@param current_lnum integer
+---@param dir Dir
+---@return integer | nil, TSNode | nil
+local function get_next_jump_candidate(current_lnum, dir)
+  local next_lnum
+  if dir == "up" then
+    next_lnum = current_lnum - 1
+  else
+    next_lnum = current_lnum + 1
+  end
+  local max_lnum = vim.api.nvim_buf_line_count(0)
+  if next_lnum > max_lnum or next_lnum <= 0 then return end
+  local current_line = get_line(current_lnum)
+  local current_indentation = get_indent(current_line)
+  local node_candidate = vim.treesitter.get_node({ pos = { next_lnum - 1, current_indentation } })
+  return next_lnum, node_candidate
+end
 
 ---@return nil
 local function move_out()
@@ -28,109 +71,78 @@ local function move_in()
   end
 end
 
+---@param lnum integer
 ---@param line string
----@return integer
-local function get_indent(line)
-  local tabwidth = vim.opt.tabstop:get()
-  local count = 1 -- 1 indexed
-  for i = 1, #line do
-    local c = line:sub(i, i)
-    if c == "\t" then
-      count = math.floor((count + tabwidth) / tabwidth) * tabwidth
-    elseif c == " " then
-      count = count + 1
+---@param candidate TSNode
+---@param prefix string
+---@return nil
+local function log(lnum, line, candidate, prefix)
+  util.log(
+    prefix .. ": [L " .. lnum .. "] |" .. line .. "| [" .. candidate:type() .. "]" ..vim.inspect(nodes.range(candidate))
+  )
+
+end
+
+-- Skip unwanted nodes
+-- TODO this should not jump to other functions
+---@param dir Dir
+---@param lnum integer
+---@param indent integer
+---@return integer | nil, string | nil, TSNode | nil
+local function get_next_vertical_target_at_same_indent(dir, lnum, indent)
+  local candidate_lnum, candidate = get_next_jump_candidate(lnum, dir)
+  local candidate_line = ""
+  local candidate_indent = get_indent(candidate_line)
+
+  while candidate_lnum and candidate do
+    if
+        nodes.is_jump_target(candidate) -- only node types we consider jump targets
+        and candidate_line ~= "" -- no empty lines
+        and candidate_indent == indent -- stay at current indent level
+    then
+      break -- use most recent assignment below
     else
-      break
+      candidate_line = get_line(candidate_lnum)
+      candidate_lnum, candidate = get_next_jump_candidate(candidate_lnum, dir)
+      candidate_indent = get_indent(candidate_line)
     end
   end
-  return count
+
+  return candidate_lnum, candidate_line, candidate
 end
 
 ---@return nil
 local function move_up()
   local current_lnum = vim.fn.line(".")
-  local current_line = vim.api.nvim_buf_get_lines(0, current_lnum - 1, current_lnum, false)[1]
-  util.log(current_line .. " indentation: " .. get_indent(current_line))
+  local current_indent = get_indent(get_line(current_lnum))
 
-  -- local node = getters.get_node()
-  -- -- local target = getters.get_prev(node)
-  -- local target = node:prev_sibling()
+  --- Get next target, if one is found
+  local candidate_lnum, candidate_line, candidate = get_next_vertical_target_at_same_indent("up", current_lnum, current_indent)
 
-  -- if target then
-  --   ops.jump(target)
-  -- end
-end
-
----@param line string
----@return string
-local function get_indentation_str(line)
-  -- Find the first non-whitespace character in the line
-  local i = 1
-  while i <= #line do
-    if line:sub(i, i) ~= " " and line:sub(i, i) ~= "\t" then break end
-    i = i + 1
+  -- Ultimate failure
+  if not candidate_lnum or not candidate_line or not candidate then
+    return util.log("no next candidate")
   end
 
-  -- If no non-whitespace characters were found, return an empty string
-  if i == #line + 1 then return "" end
-
-  -- Return the substring from the beginning to the first non-whitespace character
-  return line:sub(1, i - 1)
-end
-
----@param lnum integer
-local function get_line(lnum)
-  return vim.api.nvim_buf_get_lines(0, lnum - 1, lnum, false)[1]
+  log(candidate_lnum, candidate_line, candidate, "move_up dest")
+  ops.jump(candidate_lnum + 1, candidate)
 end
 
 ---@return nil
 local function move_down()
-  -- Take lnum, give next lnum / node with same indentation
-  ---@param current_lnum integer
-  ---@return integer | nil, TSNode | nil
-  local function get_next_jump_candidate(current_lnum)
-    local current_line = get_line(current_lnum)
-    local current_indentation = get_indent(current_line)
-    local next_lnum = current_lnum + 1
-    local max_lnum = vim.api.nvim_buf_line_count(0)
-    if next_lnum > max_lnum then return end
-    local node_candidate = vim.treesitter.get_node({ pos = { next_lnum - 2, current_indentation } })
-    return next_lnum, node_candidate
-  end
-
   local current_lnum = vim.fn.line(".")
   local current_indent = get_indent(get_line(current_lnum))
 
-  local candidate_lnum, candidate = get_next_jump_candidate(current_lnum)
-  local candidate_line = ""
-  local candidate_indent = get_indent(candidate_line)
-
-  -- Skip unwanted nodes
-  while candidate_lnum and candidate do
-    if
-        node_util.is_jump_target(candidate)
-        and candidate_line ~= ""
-        and candidate_indent == current_indent
-    then
-      break
-    else
-      candidate_line = get_line(candidate_lnum)
-      candidate_lnum, candidate = get_next_jump_candidate(candidate_lnum)
-      candidate_indent = get_indent(candidate_line)
-    end
-  end
+  --- Get next target, if one is found
+  local candidate_lnum, candidate_line, candidate = get_next_vertical_target_at_same_indent("down", current_lnum, current_indent)
 
   -- Ultimate failure
-  if not candidate_lnum or not candidate then
+  if not candidate_lnum or not candidate_line or not candidate then
     return util.log("no next candidate")
   end
 
-  util.log("dest: [L " ..
-  candidate_lnum .. "]: |" .. candidate_line .. "| [" .. vim.inspect(node_util.range(candidate)) .. "]")
-
-  vim.api.nvim_win_set_cursor(0, { candidate_lnum - 1, 0 })
-  vim.cmd('normal! ^')
-  ops.highlight(node_util.range(candidate))
+  log(candidate_lnum, candidate_line, candidate, "move_down dest")
+  ops.jump(candidate_lnum - 1, candidate)
 end
 
 function M.up() move_up() end

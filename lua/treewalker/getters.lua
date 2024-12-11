@@ -1,5 +1,5 @@
 local util = require('treewalker.util')
-local node_util = require('treewalker.node_util')
+local nodes = require('treewalker.nodes')
 local ts = require("nvim-treesitter.ts_utils")
 local walker_tree = require("treewalker.walker_tree")
 
@@ -13,7 +13,7 @@ local M = {}
 local function nodes_surrounding(node, dir)
   local tree = node:tree()
   local root = tree:root()
-  local nodes = node_util.get_children(root)
+  local nodes = nodes.get_children(root)
 
   -- all the prior nodes, in order of closest first
   if dir == "before" then
@@ -46,7 +46,7 @@ function M.get_next(node)
 
   local iter = get_iter(node)
   while iter do
-    if M.is_jump_target(iter) and not node_util.on_same_line(node, iter) then
+    if M.is_jump_target(iter) and not nodes.on_same_line(node, iter) then
       return iter
     end
     iter = get_iter(iter)
@@ -54,7 +54,7 @@ function M.get_next(node)
 
   -- Strategy: walking the tree linearly
   for nod in nodes_surrounding(node, "after") do
-    if M.is_jump_target(nod) and node_util.have_same_indent(nod, node) and not node_util.have_same_start(nod, node) then
+    if M.is_jump_target(nod) and nodes.have_same_indent(nod, node) and not nodes.have_same_start(nod, node) then
       return nod
     end
   end
@@ -75,7 +75,7 @@ end
 function M.get_prev(node)
   -- Strategy: walking the tree linearly
   for nod in nodes_surrounding(node, "before") do
-    if M.is_jump_target(nod) and node_util.have_same_indent(nod, node) and not node_util.have_same_start(nod, node) then
+    if M.is_jump_target(nod) and nodes.have_same_indent(nod, node) and not nodes.have_same_start(nod, node) then
       util.log("found from walking linearly:", nod:type())
       return nod
     end
@@ -107,7 +107,7 @@ function M.get_direct_ancestor(node)
   while iter_ancestor do
     -- Without have_same_range, this will get stuck, where it targets one node, but is then
     -- interpreted by get_node() as another.
-    if M.is_jump_target(iter_ancestor) and not node_util.have_same_start(node, iter_ancestor) then
+    if M.is_jump_target(iter_ancestor) and not nodes.have_same_start(node, iter_ancestor) then
       return iter_ancestor
     end
 
@@ -120,7 +120,7 @@ end
 ---@param node TSNode
 ---@return TSNode | nil
 function M.get_descendant(node)
-  local queue = node_util.get_children(node)
+  local queue = nodes.get_children(node)
 
   while #queue > 0 do
     local current_node = table.remove(queue, 1)

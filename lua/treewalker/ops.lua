@@ -1,4 +1,5 @@
 local util = require('treewalker.util')
+local nodes= require('treewalker.nodes')
 
 local M = {}
 
@@ -41,12 +42,21 @@ function M.highlight(range)
   end, 250)
 end
 
+-----@param node TSNode
+--function M.jump(node)
+--  local start_row, start_col, end_row, end_col = vim.treesitter.get_node_range(node)
+--  util.log(string.format("dest: %s %s", node:type(), tostring(nodes.range(node))))
+--  M.safe_set_cursor(start_row + 1, start_col)
+--  M.highlight({ start_row + 1, start_col, end_row, end_col })
+--end
+
+---@param lnum integer
 ---@param node TSNode
-function M.jump(node)
-  local start_row, start_col, end_row, end_col = vim.treesitter.get_node_range(node)
-  util.log(string.format("dest: %s %d %d %d %d", tostring(node:type()), start_row, start_col, end_row, end_col))
-  M.safe_set_cursor(start_row + 1, start_col)
-  M.highlight({ start_row + 1, start_col, end_row, end_col })
+function M.jump(lnum, node)
+  -- util.log(string.format("dest: %s %s", node:type(), vim.inspect(nodes.range(node))))
+  vim.api.nvim_win_set_cursor(0, { lnum, 0 })
+  vim.cmd('normal! ^')
+  M.highlight(nodes.range(node))
 end
 
 return M

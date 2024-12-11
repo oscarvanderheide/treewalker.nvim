@@ -1,5 +1,5 @@
 local util = require "treewalker.util"
-local node_util = require "treewalker.node_util"
+local nodes = require "treewalker.nodes"
 
 ---@class WalkerNode
 ---@field type string
@@ -62,10 +62,10 @@ end
 local function build_walker_tree(current_ts_node, parent_walker_node, seen_lines)
   local current_walker_node = nil
 
-  local ts_children = node_util.get_children(current_ts_node)
+  local ts_children = nodes.get_children(current_ts_node)
   for _, ts_child in ipairs(ts_children) do
     local ts_child_lnum = ts_child:range()
-    if not seen_lines[ts_child_lnum] and node_util.is_jump_target(ts_child) then
+    if not seen_lines[ts_child_lnum] and nodes.is_jump_target(ts_child) then
       -- If the node is a valid jump target and hasn't been seen, create a walker node
       current_walker_node = current_walker_node or construct_walker_node(parent_walker_node, current_ts_node)
       local child_walker_node = build_walker_tree(ts_child, current_walker_node, seen_lines)
