@@ -1,5 +1,3 @@
----@diagnostic disable: undefined-global
-
 local util = require("treewalker.util")
 local stub = require('luassert.stub')
 local assert = require("luassert")

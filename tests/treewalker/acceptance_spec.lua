@@ -1,34 +1,10 @@
-local util = require("treewalker.util")
-local stub = require('luassert.stub')
-local assert = require("luassert")
-local treewalker = require('treewalker')
-
-local fixtures_dir = vim.fn.expand 'tests/fixtures'
-
----@param filename string
----@param lang string
----@return nil
-local function load_buf(filename, lang)
-  local buf = vim.api.nvim_create_buf(false, true) -- Create a new buffer (listed) to enable interaction with it
-  local lines = {}
-
-  -- Read the file contents line by line and insert into the buffer
-  for line in io.lines(filename) do
-    table.insert(lines, line)
-  end
-
-  -- Set the lines into the created buffer
-  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-
-  -- Focus on the buffer
-  vim.api.nvim_set_current_buf(buf)
-
-  -- create and attach the Tree-sitter parser for the specified language
-  vim.treesitter.get_parser(buf, lang)
-end
+local util = require "treewalker.util"
+local load_fixture = require "tests.load_fixture"
+local stub = require 'luassert.stub'
+local assert = require "luassert"
+local treewalker = require 'treewalker'
 
 -- Assert the cursor is in the expected position
----i
 ---@param line integer
 ---@param column integer
 ---@param msg string?
@@ -43,7 +19,7 @@ end
 
 describe("Treewalker", function()
   describe("regular lua file: ", function()
-    load_buf(fixtures_dir .. "/lua.lua", "lua")
+    load_fixture("/lua.lua", "lua")
 
     it("moves up and down at the same pace", function()
       vim.fn.cursor(1, 1) -- Reset cursor
@@ -87,7 +63,7 @@ describe("Treewalker", function()
   end)
 
   describe("lua spec file: ", function()
-    load_buf(fixtures_dir .. "/lua-spec.lua", "lua")
+    load_fixture("/lua-spec.lua", "lua")
 
     local function go_to_describe()
       vim.fn.cursor(1, 1)
