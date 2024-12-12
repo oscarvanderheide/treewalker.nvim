@@ -81,6 +81,7 @@ describe("Treewalker", function()
   describe("lua spec file: ", function()
     load_fixture("/lua-spec.lua", "lua")
 
+    -- go to first describe
     local function go_to_describe()
       vim.fn.cursor(1, 1)
       for _ = 1, 6 do
@@ -89,6 +90,7 @@ describe("Treewalker", function()
       assert_cursor_at(17, 1, "describe")
     end
 
+    -- go to first load_buf
     local function go_to_load_buf()
       go_to_describe()
       treewalker.right(); treewalker.right()
@@ -98,7 +100,7 @@ describe("Treewalker", function()
     it("moves up and down at the same pace", function()
       go_to_load_buf()
       treewalker.down(); treewalker.down()
-      assert_cursor_at(21, 5, "it")
+      assert_cursor_at(41, 5, "it")
       treewalker.up(); treewalker.up()
       assert_cursor_at(19, 5, "load_buf")
     end)
@@ -108,6 +110,5 @@ describe("Treewalker", function()
       treewalker.down()
       assert_cursor_at(21, 5, "it")
     end)
-
   end)
 end)
