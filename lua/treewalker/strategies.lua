@@ -26,7 +26,6 @@ end
 local M = {}
 
 -- Gets the next target in the up/down directions
--- TODO this should not jump to other functions
 ---@param dir Dir
 ---@param starting_row integer
 ---@param starting_col integer
@@ -38,12 +37,12 @@ function M.get_next_vertical_target_at_same_col(dir, starting_row, starting_col)
     local candidate_col = lines.get_start_col(candidate_line)
     local srow = candidate:range()
     if
-        nodes.is_jump_target(candidate) -- only node types we consider jump targets
-        and candidate_line ~= "" -- no empty lines
+        nodes.is_jump_target(candidate)   -- only node types we consider jump targets
+        and candidate_line ~= ""          -- no empty lines
         and candidate_col == starting_col -- stay at current indent level
-        and candidate_row == srow + 1 -- top of block; no end's or else's etc.
+        and candidate_row == srow + 1     -- top of block; no end's or else's etc.
     then
-      break -- use most recent assignment below
+      break                               -- use most recent assignment below
     else
       candidate, candidate_row, candidate_line = get_node_from_neighboring_line(candidate_row, dir)
     end
@@ -61,16 +60,17 @@ function M.get_down_and_in(starting_row, starting_col)
 
   if last_row == starting_row then return end
 
-  for current_row = starting_row + 1, last_row, 1 do
-    local current_line = lines.get_line(current_row)
-    local current_col = lines.get_start_col(current_line)
-    local is_empty = current_line == ""
+  for candidate_row = starting_row + 1, last_row, 1 do
+    local candidate_line = lines.get_line(candidate_row)
+    local candidate_col = lines.get_start_col(candidate_line)
+    local candidate_node = nodes.get_at_row(candidate_row)
+    local is_empty = candidate_line == ""
 
-    if current_col == starting_col then
+    if candidate_col == starting_col or not candidate_node then
       goto continue
-    elseif current_col > starting_col then
-      return nodes.get_at_row(current_row), current_row, current_line
-    elseif current_col < starting_col and not is_empty then
+    elseif candidate_col > starting_col and nodes.is_jump_target(candidate_node) then
+      return candidate_node, candidate_row, candidate_line
+    elseif candidate_col < starting_col and not is_empty then
       break
     end
 
@@ -84,9 +84,11 @@ end
 function M.get_first_ancestor_with_diff_scol(node)
   local iter_ancestor = node:parent()
   while iter_ancestor do
-    -- Without have_same_range, this will get stuck, where it targets one node, but is then
-    -- interpreted by get_node() as another.
-    if nodes.is_jump_target(iter_ancestor) and not nodes.have_same_start(node, iter_ancestor) then
+    if
+        true
+        and nodes.is_jump_target(iter_ancestor)
+        and not nodes.have_same_start(node, iter_ancestor)
+    then
       return iter_ancestor
     end
 
