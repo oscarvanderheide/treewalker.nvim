@@ -1,65 +1,65 @@
-class ProductsController < ApplicationController
-  # before_action :authenticate_user!
+class VehiclesController < ApplicationController
+  # Vehicles allow for the transport of things
 
   def create
-    @product = Product.create(product_params)
-    render json: @product.to_json
+    @vehicle = Vehicle.create(vehicle_params)
+    render json: @vehicle.to_json
   end
 
   def index
-    @products = Product.all
-    render json: @products.to_json
+    @vehicles = Vehicle.all
+    render json: @vehicles.to_json
   end
 
   def show
-    @product = Product.find(params[:id])
-    render json: @product.to_json
+    @vehicle = Vehicle.find(params[:id])
+    render json: @vehicle.to_json
   end
 
   def update
-    @product = Product.find(params[:id])
+    @vehicle = Vehicle.find(params[:id])
 
-    if @product.update(product_params)
-      render json: @product.to_json
+    if @vehicle.update(vehicle_params)
+      render json: @vehicle.to_json
     end
   end
 
   private
-  def product_params
-    params.require(:product).permit(:name, :description, :price)
+  def vehicle_params
+    params.require(:vehicle).permit(:name, :description, :price)
   end
 
 end
 
-class ProductsControllerrrrr < ApplicationController
-  # before_action :authenticate_user!
+class VehiclesControllerrrrr < ApplicationController
+  # Vehicles tend to have wheeeeeeeeeeeeeeeeeels
 
   def create
-    @product = Product.create(product_params)
-    render json: @product.to_json
+    @vehicle = Vehicle.create(vehicle_params)
+    render json: @vehicle.to_json
   end
 
   def index
-    @products = Product.all
-    render json: @products.to_json
+    @vehicles = Vehicle.all
+    render json: @vehicles.to_json
   end
 
   def show
-    @product = Product.find(params[:id])
-    render json: @product.to_json
+    @vehicle = Vehicle.find(params[:id])
+    render json: @vehicle.to_json
   end
 
   def update
-    @product = Product.find(params[:id])
+    @vehicle = Vehicle.find(params[:id])
 
-    if @product.update(product_params)
-      render json: @product.to_json
+    if @vehicle.update(vehicle_params)
+      render json: @vehicle.to_json
     end
   end
 
   private
-  def product_params
-    params.require(:product).permit(:name, :description, :price)
+  def vehicle_params
+    params.require(:vehicle).permit(:name, :description, :price)
   end
 
 end

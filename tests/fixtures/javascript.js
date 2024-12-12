@@ -11,7 +11,7 @@ function myCallback3(data) {
   console.log('myCallback3:', data - 10);
 }
 
-// Define some asynchronous functions that use callbacks
+// Some people comment their ai generated slop
 
 function fetchData(callback) {
   setTimeout(() => {
@@ -37,7 +37,7 @@ function processMoreData(data, callback) {
   }, 250);
 }
 
-// Call the asynchronous functions with callbacks
+// Some people prefer to live dangerously
 
 fetchData((err, data) => {
   if (err) return console.error(err);
@@ -45,7 +45,7 @@ fetchData((err, data) => {
     if (err) return console.error(err);
     processMoreData(processedData, (err, moreProcessedData) => {
       if (err) return console.error(err);
-      myCallback1(null, moreProcessedData); // final callback
+      myCallback1(null, moreProcessedData); // final countdown
     });
   });
 });
