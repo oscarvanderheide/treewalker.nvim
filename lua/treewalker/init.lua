@@ -7,24 +7,6 @@ local strategies = require('treewalker.strategies')
 
 local M = {}
 
----@return nil
-local function move_out()
-  local node = getters.get_node()
-  local target = getters.get_direct_ancestor(node)
-  if not target then return end
-  local row = target:range()
-  ops.jump(row, target)
-end
-
----@return nil
-local function move_in()
-  local node = getters.get_node()
-  local target = getters.get_descendant(node)
-  if not target then return end
-  local row = target:range()
-  ops.jump(row, target)
-end
-
 ---@param row integer
 ---@param line string
 ---@param candidate TSNode
@@ -38,13 +20,42 @@ local function log(row, line, candidate, prefix)
 end
 
 ---@return nil
+local function move_out()
+  local node = nodes.get_current()
+  local target = getters.get_direct_ancestor(node)
+  if not target then return end
+  local row = target:range()
+  row = row + 1
+  ops.jump(row, target)
+end
+
+---@return nil
+local function move_in()
+  local current_row = vim.fn.line(".")
+  local current_line = lines.get_line(current_row)
+  local current_col = lines.get_start_col(current_line)
+
+  --- Go down and in
+  local candidate, candidate_row, candidate_line =
+      strategies.get_down_and_in(current_row, current_col)
+
+  -- Ultimate failure
+  if not candidate_row or not candidate_line or not candidate then
+    return util.log("no in candidate")
+  end
+
+  log(candidate_row, candidate_line, candidate, "move_in dest")
+  ops.jump(candidate_row, candidate)
+end
+
+---@return nil
 local function move_up()
   local current_row = vim.fn.line(".")
   local current_line = lines.get_line(current_row)
   local current_col = lines.get_start_col(current_line)
 
   --- Get next target, if one is found
-  local candidate_row, candidate_line, candidate =
+  local candidate, candidate_row, candidate_line =
       strategies.get_next_vertical_target_at_same_col("up", current_row, current_col)
 
   -- Ultimate failure
@@ -63,7 +74,7 @@ local function move_down()
   local current_col = lines.get_start_col(current_line)
 
   --- Get next target, if one is found
-  local candidate_row, candidate_line, candidate =
+  local candidate, candidate_row, candidate_line =
       strategies.get_next_vertical_target_at_same_col("down", current_row, current_col)
 
   -- Ultimate failure

@@ -127,4 +127,12 @@ function M.range(node)
   return { r1, r2, r3, r4 }
 end
 
+---Get current node under cursor
+---@return TSNode
+function M.get_current()
+  local node = vim.treesitter.get_node()
+  assert(node)
+  return node
+end
+
 return M
