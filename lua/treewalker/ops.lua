@@ -28,10 +28,10 @@ end
 function M.highlight(range)
   local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
   local ns_id = vim.api.nvim_create_namespace("")
-  local hl_group = "DiffAdd"
+  -- local hl_group = "DiffAdd"
   -- local hl_group = "MatchParen"
   -- local hl_group = "Search"
-  -- local hl_group = "ColorColumn"
+  local hl_group = "ColorColumn"
 
 
   for row = start_row, end_row do

@@ -87,7 +87,7 @@ function M.get_first_ancestor_with_diff_scol(node)
     if
         true
         and nodes.is_jump_target(iter_ancestor)
-        and not nodes.have_same_start(node, iter_ancestor)
+        and not nodes.have_same_scol(node, iter_ancestor)
     then
       return iter_ancestor
     end

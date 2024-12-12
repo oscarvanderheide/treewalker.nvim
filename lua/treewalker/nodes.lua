@@ -49,7 +49,7 @@ end
 ---@param node1 TSNode
 ---@param node2 TSNode
 ---@return boolean
-function M.have_same_indent(node1, node2)
+function M.have_same_scol(node1, node2)
   local _, scol1 = node1:range()
   local _, scol2 = node2:range()
   return scol1 == scol2
