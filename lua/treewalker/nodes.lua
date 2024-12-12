@@ -1,4 +1,5 @@
 local util = require "treewalker.util"
+local lines= require "treewalker.lines"
 
 local NON_TARGET_NODE_MATCHERS = {
   -- "chunk", -- lua
@@ -127,12 +128,35 @@ function M.range(node)
   return { r1, r2, r3, r4 }
 end
 
+function M.get_root()
+  local parser = vim.treesitter.get_parser()
+  local tree = parser:trees()[1]
+  return tree:root()
+end
+
 ---Get current node under cursor
 ---@return TSNode
 function M.get_current()
   local node = vim.treesitter.get_node()
   assert(node)
   return node
+end
+
+---Get node at row/col
+---@param row integer
+---@param col integer
+---@return TSNode|nil
+function M.get_at_rowcol(row, col)
+  return vim.treesitter.get_node({ pos = { row - 1, col } })
+end
+
+---Get node at row (after having pressed ^)
+---@param row integer
+---@return TSNode|nil
+function M.get_at_row(row)
+  local line = lines.get_line(row)
+  local col = lines.get_start_col(line)
+  return vim.treesitter.get_node({ pos = { row - 1, col } })
 end
 
 return M

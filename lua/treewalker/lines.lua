@@ -1,8 +1,8 @@
 local M = {}
 
----@param lnum integer
-function M.get_line(lnum)
-  return vim.api.nvim_buf_get_lines(0, lnum - 1, lnum, false)[1]
+---@param row integer
+function M.get_line(row)
+  return vim.api.nvim_buf_get_lines(0, row - 1, row, false)[1]
 end
 
 ---@param line string

@@ -4,23 +4,23 @@ local util  = require('treewalker.util')
 
 ---@alias Dir "up" | "down"
 
--- Take lnum, give next lnum / node with same indentation
----@param current_lnum integer
+-- Take row, give next row / node with same indentation
+---@param current_row integer
 ---@param dir Dir
 ---@return TSNode | nil, integer | nil, string | nil
-local function get_node_from_neighboring_line(current_lnum, dir)
-  local candidate_lnum
+local function get_node_from_neighboring_line(current_row, dir)
+  local candidate_row
   if dir == "up" then
-    candidate_lnum = current_lnum - 1
+    candidate_row = current_row - 1
   else
-    candidate_lnum = current_lnum + 1
+    candidate_row = current_row + 1
   end
-  local max_lnum = vim.api.nvim_buf_line_count(0)
-  if candidate_lnum > max_lnum or candidate_lnum <= 0 then return end
-  local candidate_line = lines.get_line(candidate_lnum)
+  local max_row = vim.api.nvim_buf_line_count(0)
+  if candidate_row > max_row or candidate_row <= 0 then return end
+  local candidate_line = lines.get_line(candidate_row)
   local candidate_col = lines.get_start_col(candidate_line)
-  local candidate = vim.treesitter.get_node({ pos = { candidate_lnum - 1, candidate_col } })
-  return candidate, candidate_lnum, candidate_line
+  local candidate = nodes.get_at_rowcol(candidate_row, candidate_col)
+  return candidate, candidate_row, candidate_line
 end
 
 local M = {}
@@ -32,93 +32,66 @@ local M = {}
 ---@param starting_col integer
 ---@return TSNode | nil, integer | nil, string | nil
 function M.get_next_vertical_target_at_same_col(dir, starting_row, starting_col)
-  local candidate, candidate_lnum, candidate_line = get_node_from_neighboring_line(starting_row, dir)
+  local candidate, candidate_row, candidate_line = get_node_from_neighboring_line(starting_row, dir)
 
-  while candidate_lnum and candidate_line and candidate do
+  while candidate_row and candidate_line and candidate do
     local candidate_col = lines.get_start_col(candidate_line)
     local srow = candidate:range()
     if
         nodes.is_jump_target(candidate) -- only node types we consider jump targets
         and candidate_line ~= "" -- no empty lines
         and candidate_col == starting_col -- stay at current indent level
-        and candidate_lnum == srow + 1 -- top of block; no end's or else's etc.
+        and candidate_row == srow + 1 -- top of block; no end's or else's etc.
     then
       break -- use most recent assignment below
     else
-      candidate, candidate_lnum, candidate_line = get_node_from_neighboring_line(candidate_lnum, dir)
+      candidate, candidate_row, candidate_line = get_node_from_neighboring_line(candidate_row, dir)
     end
   end
 
-  return candidate, candidate_lnum, candidate_line
+  return candidate, candidate_row, candidate_line
 end
 
+-- Go down until there is a valid jump target to the right
 ---@param starting_row integer
 ---@param starting_col integer
 ---@return TSNode | nil, integer | nil, string | nil
 function M.get_down_and_in(starting_row, starting_col)
-  local node = get_node_from_neighboring_line(starting_row, "down")
-  assert(node)
-  local queue = nodes.get_children(node)
+  local last_row = vim.api.nvim_buf_line_count(0)
 
-  while #queue > 0 do
-    local current_node = table.remove(queue, 1)
-    local current_srow, current_scol = current_node:range()
-    current_srow = current_srow + 1
+  if last_row == starting_row then return end
 
-    local is_on_same_line = current_srow == starting_row
-    local is_above = current_srow < starting_row
-    local has_same_col = current_scol == starting_col
+  for current_row = starting_row + 1, last_row, 1 do
+    local current_line = lines.get_line(current_row)
+    local current_col = lines.get_start_col(current_line)
+    local is_empty = current_line == ""
 
-    if
-      true -- just so they can be individually commented out
-
-      -- always changing a line number
-      and not is_on_same_line
-
-      -- no jumping to outer nodes. There may be a better way to do this.
-      and not is_above
-
-      -- only going in, not just down one
-      and not has_same_col
-    then
-      return current_node, current_srow, lines.get_line(current_srow)
+    if current_col == starting_col then
+      goto continue
+    elseif current_col > starting_col then
+      return nodes.get_at_row(current_row), current_row, current_line
+    elseif current_col < starting_col and not is_empty then
+      break
     end
 
-    queue = util.merge_tables(queue, nodes.get_children(current_node))
+    ::continue:: -- gross
   end
 end
 
----Get the next target descendent
----The idea here is it goes _in_ or _down and in_
+---Get the nearest ancestral node _which has different coordinates than the passed in node_
 ---@param node TSNode
 ---@return TSNode | nil
-function M.get_descendant(node)
-  local queue = nodes.get_children(node)
-
-  while #queue > 0 do
-    local current_node = table.remove(queue, 1)
-
-    if nodes.is_descendant_jump_target(current_node) then
-      return current_node
+function M.get_first_ancestor_with_diff_scol(node)
+  local iter_ancestor = node:parent()
+  while iter_ancestor do
+    -- Without have_same_range, this will get stuck, where it targets one node, but is then
+    -- interpreted by get_node() as another.
+    if nodes.is_jump_target(iter_ancestor) and not nodes.have_same_start(node, iter_ancestor) then
+      return iter_ancestor
     end
 
-    queue = util.merge_tables(queue, nodes.get_children(current_node))
+    iter_ancestor = iter_ancestor:parent()
   end
-
-  -- If there was nothing below us, try below a sibling
-  local next_sibling = node:next_sibling()
-  if next_sibling then
-    return M.get_descendant(next_sibling)
-  end
-
-  -- If there were no nephews, try children of an uncle (final recursive step
-  -- to get at the whole tree)
-  local parent = node:parent()
-  if not parent then return nil end
-  local uncle = parent:next_sibling()
-  if not uncle then return nil end
-
-  return M.get_descendant(uncle)
 end
 
 return M

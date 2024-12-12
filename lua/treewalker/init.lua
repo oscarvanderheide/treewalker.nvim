@@ -1,5 +1,4 @@
 local nodes = require('treewalker.nodes')
-local getters = require('treewalker.getters')
 local util = require('treewalker.util')
 local ops = require('treewalker.ops')
 local lines = require('treewalker.lines')
@@ -22,8 +21,9 @@ end
 ---@return nil
 local function move_out()
   local node = nodes.get_current()
-  local target = getters.get_direct_ancestor(node)
+  local target = strategies.get_first_ancestor_with_diff_scol(node)
   if not target then return end
+  -- if target:range() == 0 then return end -- no top level
   local row = target:range()
   row = row + 1
   ops.jump(row, target)
