@@ -175,7 +175,7 @@ end
 ---Get current node under cursor
 ---@return TSNode
 function M.get_node()
-  --TODO Test that this line isn't landed on in a move right
+  --This comment to test that this line isn't landed on in a move right
   local node = vim.treesitter.get_node()
   assert(node)
 

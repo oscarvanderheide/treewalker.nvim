@@ -1,46 +1,43 @@
 local util = require('treewalker.util')
 
-function Up()
-  -- util.R('treewalker').move_up()
-  require('treewalker').move_up()
+local subcommands = {
+  Up = function()
+    -- util.R('treewalker').move_up()
+    require('treewalker').move_up()
+  end,
+
+  Down = function()
+    -- util.R('treewalker').move_down()
+    require('treewalker').move_down()
+  end,
+
+  Left = function()
+    -- util.R('treewalker').move_out()
+    require('treewalker').move_out()
+  end,
+
+  Right = function()
+    -- util.R('treewalker').move_in()
+    require('treewalker').move_in()
+  end,
+}
+
+local command_opts = {
+  nargs = 1,
+  complete = function(ArgLead, CmdLine, CursorPos)
+    return vim.tbl_filter(function(cmd)
+      return cmd:match("^" .. ArgLead)
+    end, vim.tbl_keys(subcommands))
+  end
+}
+
+function Treewalker(opts)
+  local subcommand = opts.fargs[1]
+  if subcommands[subcommand] then
+    subcommands[subcommand](vim.list_slice(opts.fargs, 2))
+  else
+    print("Unknown subcommand: " .. subcommand)
+  end
 end
 
-function Down()
-  -- util.R('treewalker').move_down()
-  require('treewalker').move_down()
-end
-
-function Left()
-  -- util.R('treewalker').move_out()
-  require('treewalker').move_out()
-end
-
-function Right()
-  -- util.R('treewalker').move_in()
-  require('treewalker').move_in()
-end
-
-vim.api.nvim_create_user_command(
-  "TreewalkerUp",
-  Up,
-  { nargs = "?", range = "%", addr = "lines" }
-)
-
-vim.api.nvim_create_user_command(
-  "TreewalkerDown",
-  Down,
-  { nargs = "?", range = "%", addr = "lines" }
-)
-
-vim.api.nvim_create_user_command(
-  "TreewalkerLeft",
-  Left,
-  { nargs = "?", range = "%", addr = "lines" }
-)
-
-vim.api.nvim_create_user_command(
-  "TreewalkerRight",
-  Right,
-  { nargs = "?", range = "%", addr = "lines" }
-)
-
+vim.api.nvim_create_user_command("Treewalker", Treewalker, command_opts)

@@ -23,7 +23,7 @@ Plug "aaronik/treewalker.nvim"
 
 _(Contributions to this readme for how to do other package managers are welcome)_
 
-#### Mapping - TODO
+#### Mapping
 
 Here are some examples of how to map these -- this is what I use, `<leader>a` for the code window and `<leader>c` for the chat
 

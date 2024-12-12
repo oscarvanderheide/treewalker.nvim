@@ -49,7 +49,7 @@ describe("Treewalker", function()
       assert_cursor_at(149, 7)
     end)
 
-    -- TODO: failing
+    -- woohoooo randomly commented out code
     -- it("goes out of functions", function()
     --   vim.fn.cursor(149, 7) -- In a bigger function
     --   treewalker.left()
