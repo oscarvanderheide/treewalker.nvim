@@ -1,23 +1,23 @@
--- This file soas to get access to whether in visual mode or not
---
--- via https://www.petergundel.de/neovim/lua/hack/2023/12/17/get-neovim-mode-when-executing-a-command.html
-
 local util = require('treewalker.util')
 
 function Up()
-  util.R('treewalker').up()
+  -- util.R('treewalker').move_up()
+  require('treewalker').move_up()
 end
 
 function Down()
-  util.R('treewalker').down()
+  -- util.R('treewalker').move_down()
+  require('treewalker').move_down()
 end
 
 function Left()
-  util.R('treewalker').left()
+  -- util.R('treewalker').move_out()
+  require('treewalker').move_out()
 end
 
 function Right()
-  util.R('treewalker').right()
+  -- util.R('treewalker').move_in()
+  require('treewalker').move_in()
 end
 
 vim.api.nvim_create_user_command(

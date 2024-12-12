@@ -7,18 +7,17 @@ local strategies = require('treewalker.strategies')
 local M = {}
 
 ---@return nil
-local function move_out()
+function M.move_out()
   local node = nodes.get_current()
   local target = strategies.get_first_ancestor_with_diff_scol(node)
   if not target then return end
-  -- if target:range() == 0 then return end -- no top level
   local row = target:range()
   row = row + 1
   ops.jump(row, target)
 end
 
 ---@return nil
-local function move_in()
+function M.move_in()
   local current_row = vim.fn.line(".")
   local current_line = lines.get_line(current_row)
   local current_col = lines.get_start_col(current_line)
@@ -29,14 +28,14 @@ local function move_in()
 
   -- Ultimate failure
   if not candidate_row or not candidate_line or not candidate then
-    return util.log("no in candidate")
+    return --util.log("no in candidate")
   end
 
   ops.jump(candidate_row, candidate)
 end
 
 ---@return nil
-local function move_up()
+function M.move_up()
   local current_row = vim.fn.line(".")
   local current_line = lines.get_line(current_row)
   local current_col = lines.get_start_col(current_line)
@@ -58,11 +57,11 @@ local function move_up()
   end
 
   -- Ultimate failure
-  return util.log("no up candidate")
+  return --util.log("no up candidate")
 end
 
 ---@return nil
-local function move_down()
+function M.move_down()
   local current_row = vim.fn.line(".")
   local current_line = lines.get_line(current_row)
   local current_col = lines.get_start_col(current_line)
@@ -84,16 +83,8 @@ local function move_down()
   end
 
   -- Ultimate failure
-  return util.log("no down candidate")
+  return --util.log("no down candidate")
 end
-
-function M.up() move_up() end
-
-function M.down() move_down() end
-
-function M.left() move_out() end
-
-function M.right() move_in() end
 
 return M
 

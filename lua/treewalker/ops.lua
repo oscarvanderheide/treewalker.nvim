@@ -58,8 +58,8 @@ end
 ---@param row integer
 ---@param node TSNode
 function M.jump(row, node)
-  local line = lines.get_line(row)
-  log(row, line, node)
+  -- local line = lines.get_line(row)
+  -- log(row, line, node)
   vim.api.nvim_win_set_cursor(0, { row, 0 })
   vim.cmd('normal! ^')
   M.highlight(nodes.range(node))
