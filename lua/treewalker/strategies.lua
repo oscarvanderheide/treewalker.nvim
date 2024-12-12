@@ -30,7 +30,7 @@ local M = {}
 ---@param starting_row integer
 ---@param starting_col integer
 ---@return TSNode | nil, integer | nil, string | nil
-function M.get_next_vertical_target_at_same_col(dir, starting_row, starting_col)
+function M.get_neighbor_at_same_col(dir, starting_row, starting_col)
   local candidate, candidate_row, candidate_line = get_node_from_neighboring_line(starting_row, dir)
 
   while candidate_row and candidate_line and candidate do
@@ -94,6 +94,63 @@ function M.get_first_ancestor_with_diff_scol(node)
 
     iter_ancestor = iter_ancestor:parent()
   end
+end
+
+-- Special case for when starting on empty line. In that case, find the next
+-- line with stuff on it, and go to that.
+---@param start_row integer
+---@param start_line string
+---@return TSNode | nil, integer | nil, string | nil
+function M.get_next_if_on_empty_line(start_row, start_line)
+  if start_line ~= "" then return end
+
+  local max_row = vim.api.nvim_buf_line_count(0)
+  local current_row = start_row
+  local current_line = start_line
+  local current_node = nodes.get_at_row(current_row)
+
+  while
+    true
+    and current_line == ""
+    or current_node and not nodes.is_jump_target(current_node)
+    and current_row <= max_row
+  do
+    current_row = current_row + 1
+    current_line = lines.get_line(current_row)
+    current_node = nodes.get_at_row(current_row)
+  end
+
+  if current_row > max_row then return end
+
+  return current_node, current_row, current_line
+end
+
+-- Special case for when starting on empty line. In that case, find the prev
+-- line with stuff on it, and go to that.
+---@param start_row integer
+---@param start_line string
+---@return TSNode | nil, integer | nil, string | nil
+function M.get_prev_if_on_empty_line(start_row, start_line)
+  if start_line ~= "" then return end
+
+  local current_row = start_row
+  local current_line = start_line
+  local current_node = nodes.get_at_row(current_row)
+
+  while
+    true
+    and current_line == ""
+    or current_node and not nodes.is_jump_target(current_node)
+    and current_row >= 0
+  do
+    current_row = current_row - 1
+    current_line = lines.get_line(current_row)
+    current_node = nodes.get_at_row(current_row)
+  end
+
+  if current_row < 0 then return end
+
+  return current_node, current_row, current_line
 end
 
 return M

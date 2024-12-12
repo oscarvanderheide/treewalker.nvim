@@ -41,6 +41,16 @@ describe("Treewalker", function()
       assert_cursor_at(1, 1)
     end)
 
+    it("doesn't consider empty lines to be outer scopes", function()
+      vim.fn.cursor(85, 1)
+      treewalker.down()
+      assert_cursor_at(88, 3, "local")
+
+      vim.fn.cursor(85, 1)
+      treewalker.up()
+      assert_cursor_at(84, 3, "end")
+    end)
+
     it("goes into functions eagerly", function()
       vim.fn.cursor(143, 1) -- In a bigger function
       treewalker.right()
@@ -49,6 +59,12 @@ describe("Treewalker", function()
       assert_cursor_at(147, 5)
       treewalker.right()
       assert_cursor_at(149, 7)
+    end)
+
+    it("doesn't jump into a comment", function()
+      vim.fn.cursor(177, 1) -- In a bigger function
+      treewalker.right()
+      assert_cursor_at(179, 3, "local")
     end)
 
     it("goes out of functions", function()
@@ -95,9 +111,3 @@ describe("Treewalker", function()
 
   end)
 end)
-
--- Try one of these test files
--- Try rs
--- Try rb class
--- Try rb config
--- Try rb jsx

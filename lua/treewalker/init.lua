@@ -6,18 +6,6 @@ local strategies = require('treewalker.strategies')
 
 local M = {}
 
----@param row integer
----@param line string
----@param candidate TSNode
----@param prefix string
----@return nil
-local function log(row, line, candidate, prefix)
-  local col = lines.get_start_col(line)
-  util.log(
-    prefix .. ": [L " .. row .. ", I " .. col .. "] |" .. line .. "| [" .. candidate:type() .. "]" .. vim.inspect(nodes.range(candidate))
-  )
-end
-
 ---@return nil
 local function move_out()
   local node = nodes.get_current()
@@ -44,7 +32,6 @@ local function move_in()
     return util.log("no in candidate")
   end
 
-  log(candidate_row, candidate_line, candidate, "move_in dest")
   ops.jump(candidate_row, candidate)
 end
 
@@ -54,17 +41,24 @@ local function move_up()
   local current_line = lines.get_line(current_row)
   local current_col = lines.get_start_col(current_line)
 
-  --- Get next target, if one is found
+  -- Get next target if we're on an empty line
   local candidate, candidate_row, candidate_line =
-      strategies.get_next_vertical_target_at_same_col("up", current_row, current_col)
+      strategies.get_prev_if_on_empty_line(current_row, current_line)
 
-  -- Ultimate failure
-  if not candidate_row or not candidate_line or not candidate then
-    return util.log("no up candidate")
+  if candidate_row and candidate_line and candidate then
+    return ops.jump(candidate_row, candidate)
   end
 
-  log(candidate_row, candidate_line, candidate, "move_up dest")
-  ops.jump(candidate_row, candidate)
+  --- Get next target at the same column
+  candidate, candidate_row, candidate_line =
+      strategies.get_neighbor_at_same_col("up", current_row, current_col)
+
+  if candidate_row and candidate_line and candidate then
+    return ops.jump(candidate_row, candidate)
+  end
+
+  -- Ultimate failure
+  return util.log("no up candidate")
 end
 
 ---@return nil
@@ -73,17 +67,24 @@ local function move_down()
   local current_line = lines.get_line(current_row)
   local current_col = lines.get_start_col(current_line)
 
-  --- Get next target, if one is found
+  -- Get next target if we're on an empty line
   local candidate, candidate_row, candidate_line =
-      strategies.get_next_vertical_target_at_same_col("down", current_row, current_col)
+      strategies.get_next_if_on_empty_line(current_row, current_line)
 
-  -- Ultimate failure
-  if not candidate_row or not candidate_line or not candidate then
-    return util.log("no down candidate")
+  if candidate_row and candidate_line and candidate then
+    return ops.jump(candidate_row, candidate)
   end
 
-  log(candidate_row, candidate_line, candidate, "move_down dest")
-  ops.jump(candidate_row, candidate)
+  --- Get next target, if one is found
+  candidate, candidate_row, candidate_line =
+      strategies.get_neighbor_at_same_col("down", current_row, current_col)
+
+  if candidate_row and candidate_line and candidate then
+    return ops.jump(candidate_row, candidate)
+  end
+
+  -- Ultimate failure
+  return util.log("no down candidate")
 end
 
 function M.up() move_up() end
