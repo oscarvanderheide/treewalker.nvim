@@ -4,10 +4,22 @@ local ops = require('treewalker.ops')
 local lines = require('treewalker.lines')
 local strategies = require('treewalker.strategies')
 
-local M = {}
+local Treewalker = {}
+
+---@alias Opts { highlight: boolean }
+
+---@type Opts
+Treewalker.opts = {}
+
+---@param opts Opts | nil
+function Treewalker.setup(opts)
+  if opts then
+    Treewalker.opts = opts
+  end
+end
 
 ---@return nil
-function M.move_out()
+function Treewalker.move_out()
   local node = nodes.get_current()
   local target = strategies.get_first_ancestor_with_diff_scol(node)
   if not target then return end
@@ -17,7 +29,7 @@ function M.move_out()
 end
 
 ---@return nil
-function M.move_in()
+function Treewalker.move_in()
   local current_row = vim.fn.line(".")
   local current_line = lines.get_line(current_row)
   local current_col = lines.get_start_col(current_line)
@@ -35,7 +47,7 @@ function M.move_in()
 end
 
 ---@return nil
-function M.move_up()
+function Treewalker.move_up()
   local current_row = vim.fn.line(".")
   local current_line = lines.get_line(current_row)
   local current_col = lines.get_start_col(current_line)
@@ -61,7 +73,7 @@ function M.move_up()
 end
 
 ---@return nil
-function M.move_down()
+function Treewalker.move_down()
   local current_row = vim.fn.line(".")
   local current_line = lines.get_line(current_row)
   local current_col = lines.get_start_col(current_line)
@@ -86,7 +98,7 @@ function M.move_down()
   return --util.log("no down candidate")
 end
 
-return M
+return Treewalker
 
 -- -- you can define your setup function here. Usually configurations can be merged, accepting outside params and
 -- -- you can also put some validation here for those.

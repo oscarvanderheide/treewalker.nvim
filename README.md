@@ -22,13 +22,11 @@ This plugin stumbled twice before working smoothly in a variety of languages. At
 ##### Lazy:
 ```lua
 {
-  "aaronik/treewalker.nvim"
+  "aaronik/treewalker.nvim",
+  config = {
+    highlight = true -- default is false
+  }
 }
-```
-
-##### Plug:
-```vim
-Plug "aaronik/treewalker.nvim"
 ```
 
 #### Mapping

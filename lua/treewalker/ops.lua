@@ -62,7 +62,9 @@ function M.jump(row, node)
   -- log(row, line, node)
   vim.api.nvim_win_set_cursor(0, { row, 0 })
   vim.cmd('normal! ^')
-  M.highlight(nodes.range(node))
+  if require("treewalker").opts.highlight then
+    M.highlight(nodes.range(node))
+  end
 end
 
 return M
