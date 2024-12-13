@@ -128,6 +128,13 @@ function M.range(node)
   return { r1, r2, r3, r4 }
 end
 
+---@param node TSNode
+---@return integer
+function M.get_row(node)
+  local row = node:range()
+  return row + 1
+end
+
 function M.get_root()
   local parser = vim.treesitter.get_parser()
   local tree = parser:trees()[1]
