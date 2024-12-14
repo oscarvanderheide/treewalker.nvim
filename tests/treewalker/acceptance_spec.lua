@@ -81,7 +81,7 @@ describe("Treewalker", function()
     it("respects highlight config option", function()
       local highlight_stub = stub(ops, "highlight")
 
-      treewalker.opts = {}
+      treewalker.setup()
       vim.fn.cursor(23, 5)
       treewalker.move_out()
       treewalker.move_down()
@@ -89,7 +89,7 @@ describe("Treewalker", function()
       treewalker.move_in()
       assert.equal(0, #highlight_stub.calls)
 
-      treewalker.opts.highlight = false
+      treewalker.setup({ highlight = false })
       vim.fn.cursor(23, 5)
       treewalker.move_out()
       treewalker.move_down()
@@ -97,7 +97,7 @@ describe("Treewalker", function()
       treewalker.move_in()
       assert.equal(0, #highlight_stub.calls)
 
-      treewalker.opts.highlight = true
+      treewalker.setup({ highlight = true })
       vim.fn.cursor(23, 5)
       treewalker.move_out()
       treewalker.move_down()
