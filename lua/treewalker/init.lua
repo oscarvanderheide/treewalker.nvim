@@ -6,12 +6,13 @@ local strategies = require('treewalker.strategies')
 
 local Treewalker = {}
 
----@alias Opts { highlight: boolean }
+---@alias Opts { highlight: boolean, highlight_duration: integer }
 
 -- Default setup() options
 ---@type Opts
 Treewalker.opts = {
-  highlight = true
+  highlight = true,
+  highlight_duration = 250,
 }
 
 ---@param opts Opts | nil

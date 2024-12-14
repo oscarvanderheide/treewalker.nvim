@@ -18,7 +18,8 @@ local M = {}
 
 ---Flash a highlight over the given range
 ---@param range Range4
-function M.highlight(range)
+---@param duration integer
+function M.highlight(range, duration)
   local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
   local ns_id = vim.api.nvim_create_namespace("")
   -- local hl_group = "DiffAdd"
@@ -45,20 +46,20 @@ function M.highlight(range)
 
   vim.defer_fn(function()
     vim.api.nvim_buf_clear_namespace(0, ns_id, 0, -1)
-  end, 250)
+  end, duration)
 end
 
 ---@param row integer
 ---@param node TSNode
 function M.jump(row, node)
-  -- local line = lines.get_line(row)
-  -- log(row, line, node)
   vim.cmd("normal! m'") -- Add originating node to jump list
   vim.api.nvim_win_set_cursor(0, { row, 0 })
   vim.cmd("normal! ^") -- Jump to start of line
   if require("treewalker").opts.highlight then
     node = nodes.get_highest_coincident(node)
-    M.highlight(nodes.range(node))
+    local range = nodes.range(node)
+    local duration = require("treewalker").opts.highlight_duration
+    M.highlight(range, duration)
   end
 end
 
