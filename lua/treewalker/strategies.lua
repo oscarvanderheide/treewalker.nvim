@@ -20,6 +20,16 @@ local function get_node_from_neighboring_line(current_row, dir)
   local candidate_line = lines.get_line(candidate_row)
   local candidate_col = lines.get_start_col(candidate_line)
   local candidate = nodes.get_at_rowcol(candidate_row, candidate_col)
+
+  -- Get farthest ancestor _which starts at the same coordinates as the candidate_
+  if candidate then
+    local next = candidate:parent()
+    while next and nodes.have_same_start(candidate, next) do
+      if nodes.is_jump_target(next) then candidate = next end
+      next = next:parent()
+    end
+  end
+
   return candidate, candidate_row, candidate_line
 end
 
