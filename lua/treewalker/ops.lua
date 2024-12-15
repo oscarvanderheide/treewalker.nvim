@@ -1,20 +1,11 @@
-local util = require('treewalker.util')
 local nodes = require('treewalker.nodes')
 local lines = require('treewalker.lines')
 
----@param row integer
----@param line string
----@param candidate TSNode
----@return nil
-local function log(row, line, candidate)
-  local col = lines.get_start_col(line)
-  util.log(
-    "dest: [L " ..
-    row .. ", I " .. col .. "] |" .. line .. "| [" .. candidate:type() .. "]" .. vim.inspect(nodes.range(candidate))
-  )
-end
-
 local M = {}
+
+-- For a potentially more nvim-y way to do it, see how treesitter-utils does it:
+-- https://github.com/nvim-treesitter/nvim-treesitter/blob/981ca7e353da6ea69eaafe4348fda5e800f9e1d8/lua/nvim-treesitter/ts_utils.lua#L388
+-- (ts_utils.swap_nodes)
 
 ---Flash a highlight over the given range
 ---@param range Range4
@@ -22,11 +13,7 @@ local M = {}
 function M.highlight(range, duration)
   local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
   local ns_id = vim.api.nvim_create_namespace("")
-  -- local hl_group = "DiffAdd"
-  -- local hl_group = "MatchParen"
-  -- local hl_group = "Search"
   local hl_group = "ColorColumn"
-
 
   for row = start_row, end_row do
     if row == start_row and row == end_row then
@@ -44,6 +31,7 @@ function M.highlight(range, duration)
     end
   end
 
+  -- Remove the highlight after delay
   vim.defer_fn(function()
     vim.api.nvim_buf_clear_namespace(0, ns_id, 0, -1)
   end, duration)
@@ -54,13 +42,34 @@ end
 function M.jump(row, node)
   vim.cmd("normal! m'") -- Add originating node to jump list
   vim.api.nvim_win_set_cursor(0, { row, 0 })
-  vim.cmd("normal! ^") -- Jump to start of line
+  vim.cmd("normal! ^")  -- Jump to start of line
   if require("treewalker").opts.highlight then
-    node = nodes.get_highest_coincident(node)
     local range = nodes.range(node)
     local duration = require("treewalker").opts.highlight_duration
     M.highlight(range, duration)
   end
 end
 
+---@param earlier_rows [integer, integer] -- [start row, end row]
+---@param later_rows [integer, integer] -- [start row, end row]
+function M.swap(earlier_rows, later_rows)
+  local earlier_start, earlier_end = earlier_rows[1], earlier_rows[2]
+  local earlier_lines = lines.get_lines(earlier_start + 1, earlier_end + 1)
+  local later_start, later_end = later_rows[1], later_rows[2]
+  local later_lines = lines.get_lines(later_start + 1, later_end + 1)
+
+  -- Collapse the later node
+  lines.delete_lines(later_start + 1, later_end + 1) -- two plus ones works for deleting single and multiple lines
+
+  -- Add earlier node to later slot
+  lines.insert_lines(later_start, earlier_lines)
+
+  -- Now collapse the earlier node
+  lines.delete_lines(earlier_start + 1, earlier_end + 1)
+
+  -- And add the later node to the earlier slot
+  lines.insert_lines(earlier_start, later_lines)
+end
+
 return M
+

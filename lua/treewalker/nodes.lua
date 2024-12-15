@@ -1,10 +1,13 @@
-local util = require "treewalker.util"
 local lines = require "treewalker.lines"
+local util = require "treewalker.util"
 
 -- These are regexes but just happen to be real simple so far
 local TARGET_BLACKLIST_TYPE_MATCHERS = {
   "comment",
-  "attribute_item", -- rust decorators
+  "attribute_item", -- decorators (rust)
+  "decorat",        -- decorators (py)
+  "else",           -- else/elseif statements (lua)
+  "elif",           -- else/elseif statements (py)
 }
 
 local HIGHLIGHT_BLACKLIST_TYPE_MATCHERS = {
@@ -12,6 +15,11 @@ local HIGHLIGHT_BLACKLIST_TYPE_MATCHERS = {
   "block",
 }
 
+local AUGMENT_TARGET_TYPE_MATCHERS = {
+  "comment",
+  "attribute_item", -- decorators (rust)
+  "decorat",        -- decorators (py)
+}
 
 local M = {}
 
@@ -51,16 +59,11 @@ function M.is_highlight_target(node)
       and not is_root_node(node)
 end
 
----Do the nodes have the same starting point
----@param node1 TSNode
----@param node2 TSNode
----@return boolean
-function M.have_same_start(node1, node2)
-  local srow1, scol1 = node1:range()
-  local srow2, scol2 = node2:range()
+function M.is_augment_target(node)
   return
-      srow1 == srow2 and
-      scol1 == scol2
+      true
+      and is_matched_in(node, AUGMENT_TARGET_TYPE_MATCHERS)
+      and not is_root_node(node)
 end
 
 ---Do the nodes have the same starting row
@@ -79,16 +82,6 @@ function M.have_same_scol(node1, node2)
   local _, scol1 = node1:range()
   local _, scol2 = node2:range()
   return scol1 == scol2
-end
-
----Do the nodes have the same starting line
----@param node1 TSNode
----@param node2 TSNode
----@return boolean
-function M.on_same_line(node1, node2)
-  local srow1 = node1:start()
-  local srow2 = node2:start()
-  return srow1 == srow2
 end
 
 ---helper to get all the children from a node
@@ -128,6 +121,35 @@ function M.get_descendants(node)
   return descendants
 end
 
+-- Take row, give next row / node with same indentation
+---@param current_row integer
+---@param dir "up" | "down"
+---@return TSNode | nil, integer | nil, string | nil
+function M.get_from_neighboring_line(current_row, dir)
+  local candidate_row
+  if dir == "up" then
+    candidate_row = current_row - 1
+  else
+    candidate_row = current_row + 1
+  end
+  local max_row = vim.api.nvim_buf_line_count(0)
+  if candidate_row > max_row or candidate_row <= 0 then return end
+  local candidate_line = lines.get_line(candidate_row)
+  local candidate_col = lines.get_start_col(candidate_line)
+  local candidate = M.get_at_rowcol(candidate_row, candidate_col)
+
+  -- For py decorators, when we examine the target-ness of a node, we
+  -- want to be checking the highest coincident, rather than checking
+  -- an inner node, then going up to highest coincident. Check the ultimate
+  -- node kinda thing, rather than checking a child and then assuming
+  -- its highest node will be good.
+  if candidate then
+    candidate = M.get_highest_coincident(candidate)
+  end
+
+  return candidate, candidate_row, candidate_line
+end
+
 -- Get farthest ancestor (or self) at the same starting row
 ---@param node TSNode
 ---@return TSNode
@@ -149,6 +171,23 @@ function M.range(node)
   return { r1, r2, r3, r4 }
 end
 
+-- gets the smallest line number range that contains all given nodes
+---@param nodes TSNode[]
+---@return [ integer, integer ]
+function M.row_range(nodes)
+  local min_row = math.huge
+  local max_row = -math.huge
+
+  for _, node in ipairs(nodes) do
+    local srow, _, erow = node:range()
+    if srow < min_row then min_row = srow end
+    if erow > max_row then max_row = erow end
+    if srow > max_row then max_row = srow end
+  end
+
+  return { min_row, max_row }
+end
+
 ---@param node TSNode
 ---@return integer
 function M.get_row(node)
@@ -161,7 +200,7 @@ end
 function M.get_current()
   local node = vim.treesitter.get_node()
   assert(node)
-  return node
+  return M.get_highest_coincident(node)
 end
 
 ---Get node at row/col
@@ -169,7 +208,10 @@ end
 ---@param col integer
 ---@return TSNode|nil
 function M.get_at_rowcol(row, col)
-  return vim.treesitter.get_node({ pos = { row - 1, col } })
+  local node = vim.treesitter.get_node({ pos = { row - 1, col } })
+  if node then
+    return M.get_highest_coincident(node)
+  end
 end
 
 ---Get node at row (after having pressed ^)
@@ -178,7 +220,24 @@ end
 function M.get_at_row(row)
   local line = lines.get_line(row)
   local col = lines.get_start_col(line)
-  return vim.treesitter.get_node({ pos = { row - 1, col } })
+  local node = vim.treesitter.get_node({ pos = { row - 1, col } })
+  if node then
+    return M.get_highest_coincident(node)
+  end
+end
+
+---@param node TSNode
+---@return nil
+function M.log(node)
+  local row = M.range(node)[1] + 1
+  local line = lines.get_line(row)
+  local col = lines.get_start_col(line)
+  local log_string = ""
+  log_string = log_string .. string.format(" [%s/%s]", row, col)
+  log_string = log_string .. string.format(" (%s)", node:type())
+  log_string = log_string .. string.format(" |%s|", line)
+  log_string = log_string .. string.format(" {%s}", vim.inspect(M.range(node)))
+  util.log(log_string)
 end
 
 return M

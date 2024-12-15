@@ -1,3 +1,4 @@
+; this is a scheme comment apparently
 (define (print-odd-numbers up-to)
   (let ((count 1))
     (lambda ()
@@ -25,6 +26,7 @@
             (set! divisors (+ divisors 1))
             (is-prime? num)))))
 
+; honestly who even uses scheme, northeastern?
 (define (greet name)
   (display "Hello, ")
   (display name)

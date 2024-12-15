@@ -1,37 +1,15 @@
 local lines = require('treewalker.lines')
 local nodes = require('treewalker.nodes')
-local util  = require('treewalker.util')
-
----@alias Dir "up" | "down"
-
--- Take row, give next row / node with same indentation
----@param current_row integer
----@param dir Dir
----@return TSNode | nil, integer | nil, string | nil
-local function get_node_from_neighboring_line(current_row, dir)
-  local candidate_row
-  if dir == "up" then
-    candidate_row = current_row - 1
-  else
-    candidate_row = current_row + 1
-  end
-  local max_row = vim.api.nvim_buf_line_count(0)
-  if candidate_row > max_row or candidate_row <= 0 then return end
-  local candidate_line = lines.get_line(candidate_row)
-  local candidate_col = lines.get_start_col(candidate_line)
-  local candidate = nodes.get_at_rowcol(candidate_row, candidate_col)
-  return candidate, candidate_row, candidate_line
-end
 
 local M = {}
 
 -- Gets the next target in the up/down directions
----@param dir Dir
+---@param dir "up" | "down"
 ---@param starting_row integer
 ---@param starting_col integer
 ---@return TSNode | nil, integer | nil, string | nil
 function M.get_neighbor_at_same_col(dir, starting_row, starting_col)
-  local candidate, candidate_row, candidate_line = get_node_from_neighboring_line(starting_row, dir)
+  local candidate, candidate_row, candidate_line = nodes.get_from_neighboring_line(starting_row, dir)
 
   while candidate_row and candidate_line and candidate do
     local candidate_col = lines.get_start_col(candidate_line)
@@ -44,7 +22,7 @@ function M.get_neighbor_at_same_col(dir, starting_row, starting_col)
     then
       break                               -- use most recent assignment below
     else
-      candidate, candidate_row, candidate_line = get_node_from_neighboring_line(candidate_row, dir)
+      candidate, candidate_row, candidate_line = nodes.get_from_neighboring_line(candidate_row, dir)
     end
   end
 
@@ -63,13 +41,13 @@ function M.get_down_and_in(starting_row, starting_col)
   for candidate_row = starting_row + 1, last_row, 1 do
     local candidate_line = lines.get_line(candidate_row)
     local candidate_col = lines.get_start_col(candidate_line)
-    local candidate_node = nodes.get_at_row(candidate_row)
+    local candidate = nodes.get_at_row(candidate_row)
     local is_empty = candidate_line == ""
 
-    if candidate_col == starting_col or not candidate_node then
+    if candidate_col == starting_col or not candidate then
       goto continue
-    elseif candidate_col > starting_col and nodes.is_jump_target(candidate_node) then
-      return candidate_node, candidate_row, candidate_line
+    elseif candidate_col > starting_col and nodes.is_jump_target(candidate) then
+      return candidate, candidate_row, candidate_line
     elseif candidate_col < starting_col and not is_empty then
       break
     end
