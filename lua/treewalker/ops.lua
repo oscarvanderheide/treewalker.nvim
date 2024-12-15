@@ -63,6 +63,12 @@ function M.jump(row, node)
   vim.api.nvim_win_set_cursor(0, { row, 0 })
   vim.cmd('normal! ^')
   if require("treewalker").opts.highlight then
+    -- Get farthest ancestor (or self) at the same starting coordinates
+    local parent = node:parent()
+    while parent and nodes.have_same_start(node, parent) do
+      if nodes.is_jump_target(parent) then node = parent end
+      parent = parent:parent()
+    end
     M.highlight(nodes.range(node))
   end
 end
