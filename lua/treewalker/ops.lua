@@ -66,7 +66,7 @@ function M.jump(row, node)
     -- Get farthest ancestor (or self) at the same starting coordinates
     local parent = node:parent()
     while parent and nodes.have_same_start(node, parent) do
-      if nodes.is_jump_target(parent) then node = parent end
+      if nodes.is_highlight_target(parent) then node = parent end
       parent = parent:parent()
     end
     M.highlight(nodes.range(node))

@@ -15,6 +15,13 @@ local TARGET_DESCENDANT_TYPES = {
   "do_block", -- rb
 }
 
+local HIGHLIGHT_BLACKLIST_TYPES = {
+  "body_statement",  -- lua, rb
+  "block",           -- lua
+  "statement_block", -- lua
+  "program",         -- rb
+}
+
 local M = {}
 
 ---@param node TSNode
@@ -31,6 +38,10 @@ end
 
 function M.is_descendant_jump_target(node)
   return util.contains(TARGET_DESCENDANT_TYPES, node:type())
+end
+
+function M.is_highlight_target(node)
+  return util.contains(HIGHLIGHT_BLACKLIST_TYPES, node:type())
 end
 
 ---Do the nodes have the same starting point
