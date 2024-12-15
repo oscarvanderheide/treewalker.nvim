@@ -102,6 +102,27 @@ function M.get_descendants(node)
     return descendants
 end
 
+---@param node TSNode
+---@return TSNode
+function M.get_farthest_ancestor_with_same_srow(node)
+  local node_row = node:range()
+  local farthest_ancestor = node
+  local iter_row = node:range()
+  local iter = node:parent()
+
+
+  while iter do
+    iter_row = iter:range()
+    if iter_row ~= node_row then
+      break
+    end
+    farthest_ancestor = iter
+    iter = iter:parent()
+  end
+
+  return farthest_ancestor
+end
+
 --- Take a list of nodes and unique them based on line start
 ---@param nodes TSNode[]
 ---@return TSNode[]
