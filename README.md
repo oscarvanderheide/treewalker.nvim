@@ -1,3 +1,4 @@
+![build status](https://github.com/aaronik/treewalker.nvim/actions/workflows/test.yml/badge.svg)
 <span style="height: 20px;">
   <img alt="Static Badge" src="https://img.shields.io/badge/100%25_lua-purple" style="height: 20px;">
 </span>

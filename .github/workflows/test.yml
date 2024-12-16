@@ -30,7 +30,7 @@ jobs:
         mkdir -p .local/share/nvim/lazy/
         mv plenary.nvim .local/share/nvim/lazy/
 
-    - name: Run Tests
+    - name: Tests
       env:
         XDG_CONFIG_HOME: ${{ github.workspace }}/.config
         XDG_DATA_HOME: ${{ github.workspace }}/.local/share
