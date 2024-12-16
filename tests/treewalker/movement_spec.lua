@@ -18,7 +18,7 @@ local function assert_cursor_at(line, column, msg)
   assert.are.same({ line, column }, { current_line, current_column }, msg)
 end
 
-describe("Treewalker", function()
+describe("Treewalker movement", function()
   describe("regular lua file: ", function()
     load_fixture("/lua.lua", "lua")
 
@@ -63,48 +63,19 @@ describe("Treewalker", function()
     end)
 
     it("doesn't jump into a comment", function()
-      vim.fn.cursor(177, 1) -- In a bigger function
+      vim.fn.cursor(177, 1)
       treewalker.move_in()
       assert_cursor_at(179, 3, "local")
     end)
 
     it("goes out of functions", function()
-      vim.fn.cursor(149, 7) -- In a bigger function
+      vim.fn.cursor(149, 7)
       treewalker.move_out()
       assert_cursor_at(148, 5, "if")
       treewalker.move_out()
       assert_cursor_at(146, 3, "while")
       treewalker.move_out()
       assert_cursor_at(143, 1, "function")
-    end)
-
-    it("respects highlight config option", function()
-      local highlight_stub = stub(ops, "highlight")
-      treewalker.setup() -- highlight defaults to true, doesn't blow up with empty setup
-      vim.fn.cursor(23, 5)
-      treewalker.move_out()
-      treewalker.move_down()
-      treewalker.move_up()
-      treewalker.move_in()
-      assert.equal(4, #highlight_stub.calls)
-
-      highlight_stub = stub(ops, "highlight")
-      treewalker.setup({ highlight = false })
-      vim.fn.cursor(23, 5)
-      treewalker.move_out()
-      treewalker.move_down()
-      treewalker.move_up()
-      treewalker.move_in()
-      assert.equal(0, #highlight_stub.calls)
-
-      highlight_stub = stub(ops, "highlight")
-      treewalker.setup({ highlight = true })
-      vim.fn.cursor(23, 5)
-      treewalker.move_out()
-      treewalker.move_down()
-      treewalker.move_up()
-      treewalker.move_in()
-      assert.equal(4, #highlight_stub.calls)
     end)
   end)
 

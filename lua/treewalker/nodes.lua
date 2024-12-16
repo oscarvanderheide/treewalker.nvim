@@ -7,10 +7,14 @@ local TARGET_BLACKLIST_TYPE_MATCHERS = {
 }
 
 local HIGHLIGHT_BLACKLIST_TYPE_MATCHERS = {
-  "chunk",
-  "body",
-  "block",
-  "program",
+  "module", -- python
+  "chunk", -- lua
+  "body", -- ruby
+  "block", -- ruby
+  "program", -- ruby
+  "haskell", -- guess which language starts their module tree with this node
+  "translation_unit", -- c module
+  "source_file", -- rust
 }
 
 
@@ -50,6 +54,14 @@ function M.have_same_start(node1, node2)
   return
       srow1 == srow2 and
       scol1 == scol2
+end
+
+---Do the nodes have the same starting row
+---@param node1 TSNode
+---@param node2 TSNode
+---@return boolean
+function M.have_same_row(node1, node2)
+  return M.get_row(node1) == M.get_row(node2)
 end
 
 ---Do the nodes have the same level of indentation
@@ -109,12 +121,13 @@ function M.get_descendants(node)
   return descendants
 end
 
--- Get farthest ancestor (or self) at the same starting coordinates
+-- Get farthest ancestor (or self) at the same starting row
 ---@param node TSNode
 ---@return TSNode
-function M.get_farthest_ancestor_with_same_srow(node)
+function M.get_highest_coincident(node)
   local parent = node:parent()
-  while parent and M.have_same_start(node, parent) do
+  -- prefer row over start on account of lisps / S-expressions, which start with (identifier, ..)
+  while parent and M.have_same_row(node, parent) do
     if M.is_highlight_target(parent) then node = parent end
     parent = parent:parent()
   end
