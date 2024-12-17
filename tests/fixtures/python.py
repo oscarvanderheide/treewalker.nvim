@@ -1,3 +1,5 @@
+from functools import wraps
+
 class Person:
     def __init__(self, name):
         self.name = name
@@ -22,6 +24,17 @@ class Car:
     def display_info(self):
         print(f"Make: {self.make}, Model: {self.model}, Year: {self.year}")
 
+
+def random_annotation(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # Perform some task related to randomness
+        print("Random thing happening")
+        return func(*args, **kwargs)
+    return wrapper
+
+
+@random_annotation
 def main():
     """
     This function demonstrates a nested structure.

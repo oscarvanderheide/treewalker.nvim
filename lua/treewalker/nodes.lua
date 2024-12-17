@@ -7,14 +7,8 @@ local TARGET_BLACKLIST_TYPE_MATCHERS = {
 }
 
 local HIGHLIGHT_BLACKLIST_TYPE_MATCHERS = {
-  "module", -- python
-  "chunk", -- lua
-  "body", -- ruby
-  "block", -- ruby
-  "program", -- ruby
-  "haskell", -- guess which language starts their module tree with this node
-  "translation_unit", -- c module
-  "source_file", -- rust
+  "body",
+  "block",
 }
 
 
@@ -34,14 +28,26 @@ end
 
 ---@param node TSNode
 ---@return boolean
+local function is_root_node(node)
+  return node:parent() == nil
+end
+
+---@param node TSNode
+---@return boolean
 function M.is_jump_target(node)
-  return not is_matched_in(node, TARGET_BLACKLIST_TYPE_MATCHERS)
+  return
+      true
+      and not is_matched_in(node, TARGET_BLACKLIST_TYPE_MATCHERS)
+      and not is_root_node(node)
 end
 
 ---@param node TSNode
 ---@return boolean
 function M.is_highlight_target(node)
-  return not is_matched_in(node, HIGHLIGHT_BLACKLIST_TYPE_MATCHERS)
+  return
+      true
+      and not is_matched_in(node, HIGHLIGHT_BLACKLIST_TYPE_MATCHERS)
+      and not is_root_node(node)
 end
 
 ---Do the nodes have the same starting point
