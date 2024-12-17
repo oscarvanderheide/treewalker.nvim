@@ -134,24 +134,6 @@ function M.get_highest_coincident(node)
   return node
 end
 
---- Take a list of nodes and unique them based on line start
----@param nodes TSNode[]
----@return TSNode[]
-function M.unique_per_line(nodes)
-  local unique_nodes = {}
-  local seen_lines = {}
-
-  for _, node in ipairs(nodes) do
-    local line = node:start() -- Assuming node:start() returns the line number of the node
-    if not seen_lines[line] then
-      table.insert(unique_nodes, node)
-      seen_lines[line] = true
-    end
-  end
-
-  return unique_nodes
-end
-
 -- Easy conversion to table
 ---@param node TSNode
 ---@return [ integer, integer, integer, integer ]
@@ -165,12 +147,6 @@ end
 function M.get_row(node)
   local row = node:range()
   return row + 1
-end
-
-function M.get_root()
-  local parser = vim.treesitter.get_parser()
-  local tree = parser:trees()[1]
-  return tree:root()
 end
 
 ---Get current node under cursor

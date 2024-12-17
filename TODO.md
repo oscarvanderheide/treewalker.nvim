@@ -1,3 +1,7 @@
 # TODO
 
-* Could test that util.log isn't called anywhere, so tests are failing if it is, same for util.R
+* Check for errant util.log or util.R usages in CI/local
+* Use other means than node:type() for root node identification
+    * Duh just check to see it has no parents
+* Swapping
+* Jumplist

@@ -65,20 +65,19 @@ describe("Treewalker highlighting", function()
       assert_highlighted(133, 5, 133, 33, "table.insert call")
     end)
 
-    it("highlights whole lines starting assignments", function()
+    it("highlights whole lines starting with assignments", function()
       vim.fn.cursor(133, 5)
       treewalker.move_down()
       assert_highlighted(134, 5, 134, 18, "child = iter()")
     end)
 
-    -- Note this is highly language dependent, so this test is not so powerful
     it("doesn't highlight the whole file", function()
       vim.fn.cursor(3, 1)
       treewalker.move_up()
       assert_highlighted(1, 1, 1, 39, "first line")
     end)
 
-    -- Also very language dependent
+    -- Note this is highly language dependent, so this test is not so powerful
     it("highlights only the first item in a block", function()
       vim.fn.cursor(27, 3)
       treewalker.move_up()
