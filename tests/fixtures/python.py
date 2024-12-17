@@ -1,5 +1,14 @@
 from functools import wraps
 
+def random_annotation(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # Perform some task related to randomness
+        print("Random thing happening")
+        return func(*args, **kwargs)
+    return wrapper
+
+
 class Person:
     def __init__(self, name):
         self.name = name
@@ -15,6 +24,7 @@ class Book:
     def describe(self):
         print(f"{self.title} by {self.author}")
 
+@random_annotation
 class Car:
     def __init__(self, make, model, year):
         self.make = make
@@ -23,15 +33,6 @@ class Car:
 
     def display_info(self):
         print(f"Make: {self.make}, Model: {self.model}, Year: {self.year}")
-
-
-def random_annotation(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        # Perform some task related to randomness
-        print("Random thing happening")
-        return func(*args, **kwargs)
-    return wrapper
 
 
 @random_annotation

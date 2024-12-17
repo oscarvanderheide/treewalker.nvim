@@ -20,7 +20,7 @@ end
 
 describe("Treewalker movement", function()
   describe("regular lua file: ", function()
-    load_fixture("/lua.lua", "lua")
+    load_fixture("/lua.lua")
 
     it("moves up and down at the same pace", function()
       vim.fn.cursor(1, 1) -- Reset cursor
@@ -80,7 +80,7 @@ describe("Treewalker movement", function()
   end)
 
   describe("lua spec file: ", function()
-    load_fixture("/lua-spec.lua", "lua")
+    load_fixture("/lua-spec.lua")
 
     -- go to first describe
     local function go_to_describe()

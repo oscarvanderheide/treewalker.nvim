@@ -5,3 +5,5 @@
     * Duh just check to see it has no parents
 * Swapping
 * Jumplist
+* Get more languages into movement/highlight/swap specs
+    * :help treesitter-parsers

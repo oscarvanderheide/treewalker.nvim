@@ -18,7 +18,7 @@ describe("Treewalker highlighting", function()
   end
 
   describe("regular lua file: ", function()
-    load_fixture("/lua.lua", "lua")
+    load_fixture("/lua.lua")
 
     before_each(function()
       treewalker.setup({ highlight = true })
