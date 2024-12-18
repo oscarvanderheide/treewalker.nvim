@@ -1,4 +1,4 @@
-name: Run Tests
+name: Tests
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
         mkdir -p .local/share/nvim/lazy/
         mv plenary.nvim .local/share/nvim/lazy/
 
-    - name: Tests
+    - name: Run Tests
       env:
         XDG_CONFIG_HOME: ${{ github.workspace }}/.config
         XDG_DATA_HOME: ${{ github.workspace }}/.local/share
