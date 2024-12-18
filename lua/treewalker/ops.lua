@@ -53,8 +53,9 @@ end
 function M.jump(row, node)
   -- local line = lines.get_line(row)
   -- log(row, line, node)
+  vim.cmd("normal! m'") -- Add originating node to jump list
   vim.api.nvim_win_set_cursor(0, { row, 0 })
-  vim.cmd('normal! ^')
+  vim.cmd("normal! ^") -- Jump to start of line
   if require("treewalker").opts.highlight then
     node = nodes.get_highest_coincident(node)
     M.highlight(nodes.range(node))

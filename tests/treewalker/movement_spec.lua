@@ -18,6 +18,14 @@ local function assert_cursor_at(line, column, msg)
   assert.are.same({ line, column }, { current_line, current_column }, msg)
 end
 
+-- Feed keys to neovim; keys are pressed no matter what vim mode or state
+---@param keys string
+---@return nil
+local function feed_keys(keys)
+  local termcodes = vim.api.nvim_replace_termcodes(keys, true, true, true)
+  vim.api.nvim_feedkeys(termcodes, 'mtx', false)
+end
+
 describe("Movement in a regular lua file: ", function()
   load_fixture("/lua.lua")
 
@@ -74,6 +82,24 @@ describe("Movement in a regular lua file: ", function()
     assert_cursor_at(146, 3, "while")
     tw.move_out()
     assert_cursor_at(143, 1, "function")
+  end)
+
+  it("adds to jumplist", function()
+    vim.cmd('windo clearjumps')
+    vim.fn.cursor(1, 1)
+    tw.move_down()
+    assert_cursor_at(3, 1)
+    feed_keys('<C-o>')
+    assert_cursor_at(1, 1, "local M = {}")
+
+    vim.cmd('windo clearjumps')
+    vim.fn.cursor(21, 1)
+    tw.move_in(); tw.move_in()
+    assert_cursor_at(23, 5, "if node:type")
+    feed_keys('<C-o>')
+    assert_cursor_at(22, 3, "for _,")
+    feed_keys('<C-o>')
+    assert_cursor_at(21, 1, "local function is_jump_target")
   end)
 end)
 
