@@ -21,11 +21,10 @@ describe("Highlights in a regular lua file: ", function()
   load_fixture("/lua.lua")
 
   before_each(function()
-    tw.setup({ highlight = true })
     highlight_stub = stub(ops, "highlight")
   end)
 
-  it("respects highlight config option", function()
+  it("respects default highlight option", function()
     tw.setup() -- highlight defaults to true, doesn't blow up with empty setup
     vim.fn.cursor(23, 5)
     tw.move_out()
@@ -33,7 +32,9 @@ describe("Highlights in a regular lua file: ", function()
     tw.move_up()
     tw.move_in()
     assert.equal(4, #highlight_stub.calls)
+  end)
 
+  it("respects highlight config option", function()
     highlight_stub = stub(ops, "highlight")
     tw.setup({ highlight = false })
     vim.fn.cursor(23, 5)
@@ -53,17 +54,23 @@ describe("Highlights in a regular lua file: ", function()
     assert.equal(4, #highlight_stub.calls)
   end)
 
+  it("respects default highlight_duration", function()
+    tw.setup({ highlight = true })
+    tw.move_out()
+    local duration_arg = highlight_stub.calls[1].refs[2]
+    assert.equal(250, duration_arg)
+  end)
+
   it("respects highlight_duration config option", function()
     local duration = 50
     tw.setup({ highlight = true, highlight_duration = duration })
-    vim.fn.cursor(23, 5)
     tw.move_out()
     tw.move_down()
     tw.move_up()
     tw.move_in()
     assert.stub(highlight_stub).was.called(4)
-    local called_with_duration = highlight_stub.calls[1].refs[2]
-    assert.equal(duration, called_with_duration)
+    local duration_arg = highlight_stub.calls[1].refs[2]
+    assert.equal(duration, duration_arg)
   end)
 
   it("highlights whole functions", function()
