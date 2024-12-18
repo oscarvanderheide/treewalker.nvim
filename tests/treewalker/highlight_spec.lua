@@ -1,6 +1,7 @@
 local util = require "treewalker.util"
 local load_fixture = require "tests.load_fixture"
 local stub = require 'luassert.stub'
+local spy = require 'luassert.spy'
 local assert = require "luassert"
 local tw = require 'treewalker'
 local ops = require 'treewalker.ops'
@@ -25,7 +26,7 @@ describe("Highlights in a regular lua file: ", function()
   end)
 
   it("respects highlight config option", function()
-    tw.setup()   -- highlight defaults to true, doesn't blow up with empty setup
+    tw.setup() -- highlight defaults to true, doesn't blow up with empty setup
     vim.fn.cursor(23, 5)
     tw.move_out()
     tw.move_down()
@@ -50,6 +51,19 @@ describe("Highlights in a regular lua file: ", function()
     tw.move_up()
     tw.move_in()
     assert.equal(4, #highlight_stub.calls)
+  end)
+
+  it("respects highlight_duration config option", function()
+    local duration = 50
+    tw.setup({ highlight = true, highlight_duration = duration })
+    vim.fn.cursor(23, 5)
+    tw.move_out()
+    tw.move_down()
+    tw.move_up()
+    tw.move_in()
+    assert.stub(highlight_stub).was.called(4)
+    local called_with_duration = highlight_stub.calls[1].refs[2]
+    assert.equal(duration, called_with_duration)
   end)
 
   it("highlights whole functions", function()
