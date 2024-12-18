@@ -4,15 +4,18 @@ use strum_macros::{Display, EnumIter};
 use serde::{Serialize, Deserialize};
 
 // Define a trait that describes how to calculate the area of a shape
+#[derive(Debug, Clone, Copy)]
 trait Shape {
     fn area(&self) -> f64;
 }
 
 // Implement the Shape trait for a Circle
+#[derive(Debug, Clone, Copy)]
 struct Circle {
     radius: f64,
 }
 
+#[derive(Debug, Clone, Copy)]
 impl Shape for Circle {
     fn area(&self) -> f64 {
         std::f64::consts::PI * self.radius.powi(2)
@@ -20,11 +23,13 @@ impl Shape for Circle {
 }
 
 // Implement the Shape trait for a Rectangle
+#[derive(Debug, Clone, Copy)]
 struct Rectangle {
     width: f64,
     height: f64,
 }
 
+#[derive(Debug, Clone, Copy)]
 impl Shape for Rectangle {
     fn area(&self) -> f64 {
         self.width * self.height
