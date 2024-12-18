@@ -17,9 +17,7 @@ Treewalker.opts = {
 
 ---@param opts Opts | nil
 function Treewalker.setup(opts)
-  if opts then
-    Treewalker.opts = opts
-  end
+  Treewalker.opts = util.merge_tables(Treewalker.opts, opts)
 end
 
 ---@return nil

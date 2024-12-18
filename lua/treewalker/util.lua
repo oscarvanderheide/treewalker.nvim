@@ -71,6 +71,7 @@ end
 --- Merging multiple tables into one. Works on both map like and array like tables.
 --- This function accepts variadic arguments (multiple tables)
 --- It merges keys from the provided tables into a new table.
+--- Later tables get precedence
 --- @generic T
 --- @param ... T - Any number of tables to merge.
 --- @return T - A new merged table of the same type as the input tables.
