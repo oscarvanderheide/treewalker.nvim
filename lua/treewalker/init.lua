@@ -73,7 +73,7 @@ function Treewalker.move_up()
   end
 
   -- Ultimate failure
-  return --util.log("no up candidate")
+  -- return util.log("no up candidate")
 end
 
 ---@return nil
@@ -99,7 +99,7 @@ function Treewalker.move_down()
   end
 
   -- Ultimate failure
-  return --util.log("no down candidate")
+  -- return util.log("no down candidate")
 end
 
 return Treewalker
