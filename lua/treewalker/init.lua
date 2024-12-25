@@ -1,10 +1,9 @@
-local util = require('treewalker.util')
 local movement = require('treewalker.movement')
 local swap = require('treewalker.swap')
 
 local Treewalker = {}
 
----@alias Opts { highlight: boolean, highlight_duration: integer }
+---@alias Opts { highlight: boolean, highlight_duration: integer, highlight_group: string }
 
 -- Default setup() options
 ---@type Opts
@@ -14,6 +13,7 @@ Treewalker.opts = {
   highlight_group = "ColorColumn",
 }
 
+-- This does not need to be called for Treewalker to work. The defaults are preinitialized and aim to be sane.
 ---@param opts Opts | nil
 function Treewalker.setup(opts)
   if opts then

@@ -10,10 +10,10 @@ local M = {}
 ---Flash a highlight over the given range
 ---@param range Range4
 ---@param duration integer
-function M.highlight(range, duration)
+---@param hl_group string
+function M.highlight(range, duration, hl_group)
   local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
   local ns_id = vim.api.nvim_create_namespace("")
-  local hl_group = require("treewalker").opts.highlight_group
 
   for row = start_row, end_row do
     if row == start_row and row == end_row then
@@ -46,7 +46,8 @@ function M.jump(row, node)
   if require("treewalker").opts.highlight then
     local range = nodes.range(node)
     local duration = require("treewalker").opts.highlight_duration
-    M.highlight(range, duration)
+    local hl_group = require("treewalker").opts.highlight_group
+    M.highlight(range, duration, hl_group)
   end
 end
 

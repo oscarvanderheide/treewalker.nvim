@@ -71,6 +71,20 @@ describe("Highlights in a regular lua file: ", function()
     assert.equal(duration, duration_arg)
   end)
 
+  it("respects default highlight_group", function()
+    tw.setup({ highlight = true, highlight_duration = 250 })
+    tw.move_down()
+    local hl_group_arg = highlight_stub.calls[1].refs[3]
+    assert.equal("ColorColumn", hl_group_arg)
+  end)
+
+  it("respects highlight_group config option", function()
+    tw.setup({ highlight = true, highlight_duration = 50, highlight_group = "DiffAdd" })
+    tw.move_down()
+    local hl_group_arg = highlight_stub.calls[1].refs[3]
+    assert.equal("DiffAdd", hl_group_arg)
+  end)
+
   it("highlights whole functions", function()
     vim.fn.cursor(10, 1)
     tw.move_down()
