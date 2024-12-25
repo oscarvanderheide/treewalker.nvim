@@ -73,8 +73,7 @@ vim.keymap.set('n', '<C-S-k>', '<cmd>Treewalker SwapUp<cr>', { noremap = true, s
 
 I also utilize some
 [nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects?tab=readme-ov-file#text-objects-swap)
-commands to round out the swap commands - `<C-S-{j,k,l,h}>` just feel really good to me, so might as well get the
-lateral swapping as well. (This is not something that `Treewalker` needs to do as it already exists from other libraries)
+commands to get lateral swapping (that way I get all four `<C-S-{h,j,k,l}>` maps in a natural and intuitive feeling way):
 
 ```lua
 vim.keymap.set('n', "<C-S-l>", ":TSTextobjectSwapNext @parameter.inner<CR>", { noremap = true, silent = true })
