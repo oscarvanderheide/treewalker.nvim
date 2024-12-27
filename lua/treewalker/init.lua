@@ -21,16 +21,12 @@ function Treewalker.setup(opts)
   end
 end
 
--- TODO This is clever kinda, but it breaks autocomplete of `require('treewalker')`
+Treewalker.move_up = movement.move_up
+Treewalker.move_out = movement.move_out
+Treewalker.move_down = movement.move_down
+Treewalker.move_in = movement.move_in
 
--- Assign move_{in,out,up,down}
-for fn_name, fn in pairs(movement) do
-  Treewalker[fn_name] = fn
-end
-
--- Assign swap_{up,down}
-for fn_name, fn in pairs(swap) do
-  Treewalker[fn_name] = fn
-end
+Treewalker.swap_up = swap.swap_up
+Treewalker.swap_down = swap.swap_down
 
 return Treewalker
