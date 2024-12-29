@@ -2,9 +2,9 @@ local load_fixture = require "tests.load_fixture"
 local stub = require 'luassert.stub'
 local assert = require "luassert"
 local tw = require 'treewalker'
-local ops = require 'treewalker.ops'
+local operations = require 'treewalker.operations'
 
-local highlight_stub = stub(ops, "highlight")
+local highlight_stub = stub(operations, "highlight")
 
 -- use with rows as they're numbered in vim lines (1-indexed)
 local function assert_highlighted(srow, scol, erow, ecol, desc)
@@ -19,7 +19,7 @@ describe("Highlights in a regular lua file: ", function()
   load_fixture("/lua.lua")
 
   before_each(function()
-    highlight_stub = stub(ops, "highlight")
+    highlight_stub = stub(operations, "highlight")
   end)
 
   it("respects default highlight option", function()
@@ -33,7 +33,7 @@ describe("Highlights in a regular lua file: ", function()
   end)
 
   it("respects highlight config option", function()
-    highlight_stub = stub(ops, "highlight")
+    highlight_stub = stub(operations, "highlight")
     tw.setup({ highlight = false })
     vim.fn.cursor(23, 5)
     tw.move_out()
@@ -42,7 +42,7 @@ describe("Highlights in a regular lua file: ", function()
     tw.move_in()
     assert.equal(0, #highlight_stub.calls)
 
-    highlight_stub = stub(ops, "highlight")
+    highlight_stub = stub(operations, "highlight")
     tw.setup({ highlight = true })
     vim.fn.cursor(23, 5)
     tw.move_out()

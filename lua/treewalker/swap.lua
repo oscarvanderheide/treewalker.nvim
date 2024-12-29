@@ -1,5 +1,5 @@
 local nodes = require "treewalker.nodes"
-local ops = require "treewalker.ops"
+local operations = require "treewalker.operations"
 local targets = require "treewalker.targets"
 local augment = require "treewalker.augment"
 
@@ -49,7 +49,7 @@ function M.swap_down()
   local target_all = { target, unpack(target_augments) }
   local target_all_rows = nodes.row_range(target_all)
 
-  ops.swap(current_all_rows, target_all_rows)
+  operations.swap(current_all_rows, target_all_rows)
 
   -- Place cursor
   local node_length_diff = ((current_range[3] - current_range[1]) + 1) - ((target_range[3] - target_range[1]) + 1)
@@ -79,7 +79,7 @@ function M.swap_up()
   local target_all = { target, unpack(target_augments) }
   local target_all_rows = nodes.row_range(target_all)
 
-  ops.swap(target_all_rows, current_all_rows)
+  operations.swap(target_all_rows, current_all_rows)
 
   -- Place cursor
   local target_augment_rows = nodes.row_range(target_augments)

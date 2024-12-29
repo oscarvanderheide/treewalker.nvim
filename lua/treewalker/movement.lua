@@ -1,4 +1,4 @@
-local ops = require "treewalker.ops"
+local operations = require "treewalker.operations"
 local targets = require "treewalker.targets"
 
 local M = {}
@@ -8,7 +8,7 @@ function M.move_out()
   local target, row, line = targets.out()
   if target and row and line then
     --util.log("no out candidate")
-    ops.jump(row, target)
+    operations.jump(row, target)
     return
   end
 end
@@ -19,7 +19,7 @@ function M.move_in()
 
   if target and row and line then
     --util.log("no in candidate")
-    ops.jump(row, target)
+    operations.jump(row, target)
   end
 end
 
@@ -29,7 +29,7 @@ function M.move_up()
 
   if target and row and line then
     --util.log("no up candidate")
-    ops.jump(row, target)
+    operations.jump(row, target)
   end
 end
 
@@ -39,7 +39,7 @@ function M.move_down()
 
   if target and row and line then
     --util.log("no down candidate")
-    ops.jump(row, target)
+    operations.jump(row, target)
   end
 end
 
