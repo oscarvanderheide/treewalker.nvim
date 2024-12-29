@@ -26,7 +26,7 @@ end
 
 ---@return TSNode | nil, integer | nil, string | nil
 function M.inn()
-  local current_row, current_line, current_col = M.current()
+  local current_row, _, current_col = M.current()
 
   --- Go down and in
   local candidate, candidate_row, candidate_line =
