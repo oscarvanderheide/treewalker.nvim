@@ -21,12 +21,27 @@ function Treewalker.setup(opts)
   end
 end
 
-Treewalker.move_up = movement.move_up
-Treewalker.move_out = movement.move_out
-Treewalker.move_down = movement.move_down
-Treewalker.move_in = movement.move_in
+---@param fn function
+local function ensuring_parser(fn)
+  return function()
+    local ft = vim.bo.ft
+    if vim.treesitter.language.get_lang(ft) then
+      fn()
+    else
+      vim.notify_once(
+        string.format("Missing parser for %s files! Treewalker.nvim won't work until one is installed.", ft),
+        vim.log.levels.ERROR
+      )
+    end
+  end
+end
 
-Treewalker.swap_up = swap.swap_up
-Treewalker.swap_down = swap.swap_down
+Treewalker.move_up = ensuring_parser(movement.move_up)
+Treewalker.move_out = ensuring_parser(movement.move_out)
+Treewalker.move_down = ensuring_parser(movement.move_down)
+Treewalker.move_in = ensuring_parser(movement.move_in)
+
+Treewalker.swap_up = ensuring_parser(swap.swap_up)
+Treewalker.swap_down = ensuring_parser(swap.swap_down)
 
 return Treewalker

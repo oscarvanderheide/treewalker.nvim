@@ -1,6 +1,7 @@
 local fixtures_dir = vim.fn.expand 'tests/fixtures'
 
 ---@param filename string
+---@return string
 local function get_file_extension(filename)
   return filename:match(".+%.([^.]+)$")
 end
@@ -25,8 +26,8 @@ local function load_fixture(filename)
   -- Focus on the buffer
   vim.api.nvim_set_current_buf(buf)
 
-  -- create and attach the Tree-sitter parser for the specified language
-  vim.treesitter.get_parser(buf, lang)
+  -- Ensure the filetype is correctly set
+  vim.bo.filetype = lang
 
   return buf
 end
