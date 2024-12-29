@@ -15,3 +15,6 @@ test:
 
 test-watch:
 	nodemon -e lua -x "$(MAKE) test || exit 1"
+
+ensure-no-util-r:
+	! grep --exclude-dir=.git -r --exclude test.yml 'util.R' | grep -v '\-\-'

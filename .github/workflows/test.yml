@@ -37,3 +37,11 @@ jobs:
         XDG_STATE_HOME: ${{ github.workspace }}/.local/state
         XDG_CACHE_HOME: ${{ github.workspace }}/.cache
       run: make test
+
+    - name: Ensure No util.R in code
+      env:
+        XDG_CONFIG_HOME: ${{ github.workspace }}/.config
+        XDG_DATA_HOME: ${{ github.workspace }}/.local/share
+        XDG_STATE_HOME: ${{ github.workspace }}/.local/state
+        XDG_CACHE_HOME: ${{ github.workspace }}/.cache
+      run: make ensure-no-util-r
