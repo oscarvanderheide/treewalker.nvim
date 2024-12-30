@@ -1,8 +1,8 @@
-![build status](https://github.com/aaronik/treewalker.nvim/actions/workflows/test.yml/badge.svg)
+<a href="https://neovim.io/" style="vertical-align: middle;"><img src="https://img.shields.io/badge/NeoVim-%2357A143.svg?&amp;style=for-the-badge&amp;logo=neovim&amp;logoColor=white" alt="Neovim" style="height: 20px;"></a>
 <span style="height: 20px;">
   <img alt="Static Badge" src="https://img.shields.io/badge/100%25_lua-purple" style="height: 20px;">
 </span>
-<a href="https://neovim.io/" style="vertical-align: middle;"><img src="https://img.shields.io/badge/NeoVim-%2357A143.svg?&amp;style=for-the-badge&amp;logo=neovim&amp;logoColor=white" alt="Neovim" style="height: 20px;"></a>
+![build status](https://github.com/aaronik/treewalker.nvim/actions/workflows/test.yml/badge.svg)
 
 # Treewalker.nvim
 
@@ -36,7 +36,7 @@ The swap commands intelligently swap nodes, including comments and attributes/de
 
 ### Installation
 
-##### Lazy:
+#### [Lazy](https://github.com/folke/lazy.nvim):
 ```lua
 {
   "aaronik/treewalker.nvim",
@@ -57,6 +57,38 @@ The swap commands intelligently swap nodes, including comments and attributes/de
   }
 }
 ```
+
+#### [Packer](https://github.com/wbthomason/packer.nvim):
+```lua
+use {
+  "aaronik/treewalker.nvim",
+
+  -- The setup function is optional, defaults are meant to be sane
+  setup = function()
+      require('treewalker').setup({
+        -- Whether to briefly highlight the node after jumping to it
+        highlight = true,
+
+        -- How long should above highlight last (in ms)
+        highlight_duration = 250,
+
+        -- The color of the above highlight. Must be a valid vim highlight group.
+        -- (see :h highlight-group for options)
+        highlight_group = "ColorColumn",
+      })
+  end
+}
+```
+
+#### [Vim-plug](https://github.com/junegunn/vim-plug):
+```vimscript
+Plug "aaronik/treewalker.nvim"
+
+" The following is optional
+:lua require("treewalker").setup({ highlight = true, highlight_duration = 250, highlight_group = "ColorColumn" })
+```
+
+---
 
 #### Mapping
 
