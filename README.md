@@ -108,8 +108,8 @@ I also utilize some
 commands to get lateral swapping (that way I get all four `<C-S-{h,j,k,l}>` maps in a natural and intuitive feeling way):
 
 ```lua
-vim.keymap.set('n', "<C-S-l>", ":TSTextobjectSwapNext @parameter.inner<CR>", { noremap = true, silent = true })
-vim.keymap.set('n', "<C-S-h>", ":TSTextobjectSwapPrevious @parameter.inner<CR>", { noremap = true, silent = true })
+vim.keymap.set('n', "<C-S-l>", "<cmd>TSTextobjectSwapNext @parameter.inner<CR>", { noremap = true, silent = true })
+vim.keymap.set('n', "<C-S-h>", "<cmd>TSTextobjectSwapPrevious @parameter.inner<CR>", { noremap = true, silent = true })
 ```
 
 The above can also be accomplished with
