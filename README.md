@@ -22,6 +22,8 @@ The swap commands intelligently swap nodes, including comments and attributes/de
 
 ---
 
+### More Examples
+
 <details>
 <summary>Typing out the Move commands manually</summary>
 <img src="static/slow_move_demo.gif" alt="A demo of moving around some code slowly typing out each Treewalker move command">
@@ -36,14 +38,14 @@ The swap commands intelligently swap nodes, including comments and attributes/de
 
 ### Installation
 
-#### [Lazy](https://github.com/folke/lazy.nvim):
+#### [Lazy](https://github.com/folke/lazy.nvim)
 ```lua
 {
-  "aaronik/treewalker.nvim",
+  'aaronik/treewalker.nvim',
 
   -- The following options are the defaults.
   -- Treewalker aims for sane defaults, so these are each individually optional,
-  -- and the whole opts block is optional as well.
+  -- and setup() does not need to be called, so the whole opts block is optional as well.
   opts = {
     -- Whether to briefly highlight the node after jumping to it
     highlight = true,
@@ -53,17 +55,18 @@ The swap commands intelligently swap nodes, including comments and attributes/de
 
     -- The color of the above highlight. Must be a valid vim highlight group.
     -- (see :h highlight-group for options)
-    highlight_group = "ColorColumn",
+    highlight_group = 'ColorColumn',
   }
 }
 ```
 
-#### [Packer](https://github.com/wbthomason/packer.nvim):
+#### [Packer](https://github.com/wbthomason/packer.nvim)
 ```lua
 use {
-  "aaronik/treewalker.nvim",
+  'aaronik/treewalker.nvim',
 
   -- The setup function is optional, defaults are meant to be sane
+  -- and setup does not need to be called
   setup = function()
       require('treewalker').setup({
         -- Whether to briefly highlight the node after jumping to it
@@ -74,46 +77,53 @@ use {
 
         -- The color of the above highlight. Must be a valid vim highlight group.
         -- (see :h highlight-group for options)
-        highlight_group = "ColorColumn",
+        highlight_group = 'ColorColumn',
       })
   end
 }
 ```
 
-#### [Vim-plug](https://github.com/junegunn/vim-plug):
+#### [Vim-plug](https://github.com/junegunn/vim-plug)
 ```vimscript
-Plug "aaronik/treewalker.nvim"
+Plug 'aaronik/treewalker.nvim'
 
-" The following is optional
-:lua require("treewalker").setup({ highlight = true, highlight_duration = 250, highlight_group = "ColorColumn" })
+" This line is optional
+:lua require('treewalker').setup({ highlight = true, highlight_duration = 250, highlight_group = 'ColorColumn' })
 ```
 
 ---
 
-#### Mapping
+### Mapping
 
-This is how I have mine mapped; in `init.lua`:
+I've found Ctrl - h / j / k / l to be a really natural flow for this plugin, and adding
+Shift to that for swapping just felt so clean. So here are the mappings I use:
+
+In `init.lua`:
 
 ```lua
-vim.keymap.set({ 'n', 'v' }, '<C-k>', '<cmd>Treewalker Up<cr>', { noremap = true, silent = true })
-vim.keymap.set({ 'n', 'v' }, '<C-j>', '<cmd>Treewalker Down<cr>', { noremap = true, silent = true })
-vim.keymap.set({ 'n', 'v' }, '<C-l>', '<cmd>Treewalker Right<cr>', { noremap = true, silent = true })
-vim.keymap.set({ 'n', 'v' }, '<C-h>', '<cmd>Treewalker Left<cr>', { noremap = true, silent = true })
-vim.keymap.set('n', '<C-S-j>', '<cmd>Treewalker SwapDown<cr>', { noremap = true, silent = true })
-vim.keymap.set('n', '<C-S-k>', '<cmd>Treewalker SwapUp<cr>', { noremap = true, silent = true })
+-- movement
+vim.keymap.set({ 'n', 'v' }, '<C-k>', '<cmd>Treewalker Up<cr>', { silent = true })
+vim.keymap.set({ 'n', 'v' }, '<C-j>', '<cmd>Treewalker Down<cr>', { silent = true })
+vim.keymap.set({ 'n', 'v' }, '<C-l>', '<cmd>Treewalker Right<cr>', { silent = true })
+vim.keymap.set({ 'n', 'v' }, '<C-h>', '<cmd>Treewalker Left<cr>', { silent = true })
+
+-- swapping up/down
+vim.keymap.set('n', '<C-S-j>', '<cmd>Treewalker SwapDown<cr>', { silent = true })
+vim.keymap.set('n', '<C-S-k>', '<cmd>Treewalker SwapUp<cr>', { silent = true })
 ```
 
-I also utilize some
-[nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects?tab=readme-ov-file#text-objects-swap)
-commands to get lateral swapping (that way I get all four `<C-S-{h,j,k,l}>` maps in a natural and intuitive feeling way):
+Many other plugins do left/right swapping perfectly, so there's no need for Treewalker to implement those.
+I use [nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects?tab=readme-ov-file#text-objects-swap)
+to complete all four `Ctrl-Shift-*` maps:
 
 ```lua
-vim.keymap.set('n', '<C-S-l>', '<cmd>TSTextobjectSwapNext @parameter.inner<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', '<C-S-h>', '<cmd>TSTextobjectSwapPrevious @parameter.inner<CR>', { noremap = true, silent = true })
+-- swapping left/right
+vim.keymap.set('n', '<C-S-l>', '<cmd>TSTextobjectSwapNext @parameter.inner<CR>', { silent = true })
+vim.keymap.set('n', '<C-S-h>', '<cmd>TSTextobjectSwapPrevious @parameter.inner<CR>', { silent = true })
 ```
 
 The above can also be accomplished with
 [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) using
 [ts_utils](https://github.com/nvim-treesitter/nvim-treesitter?tab=readme-ov-file#utilities).
-See [this PR](https://github.com/aaronik/treewalker.nvim/pull/10/files) for
-an example of that!
+See [this PR](https://github.com/aaronik/treewalker.nvim/pull/10/files#diff-1cedf17af3ebbcfeee2dfb1071445dcabfdb30f8e9f83ff0da95ea7e6e7ccde5R107-R130)
+by @duqcyxwd for an example of how to implement that.
