@@ -3,6 +3,8 @@
   <img alt="Static Badge" src="https://img.shields.io/badge/100%25_lua-purple" style="height: 20px;">
 </span>
 ![build status](https://github.com/aaronik/treewalker.nvim/actions/workflows/test.yml/badge.svg)
+![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/aaronik/treewalker.nvim)
+![GitHub Issues or Pull Requests](https://img.shields.io/github/issues-pr/aaronik/treewalker.nvim)
 
 # Treewalker.nvim
 
