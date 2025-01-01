@@ -18,3 +18,6 @@ test-watch:
 
 ensure-no-util-r:
 	! grep --exclude-dir=.git -r --exclude test.yml 'util.R' | grep -v '\-\-'
+
+# Run this to be sure all's well
+pass: test ensure-no-util-r
