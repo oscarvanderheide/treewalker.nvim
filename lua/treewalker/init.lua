@@ -9,7 +9,7 @@ local Treewalker = {}
 Treewalker.opts = {
   highlight = true,
   highlight_duration = 250,
-  highlight_group = "ColorColumn",
+  highlight_group = "CursorLine",
 }
 
 -- This does not need to be called for Treewalker to work. The defaults are preinitialized and aim to be sane.

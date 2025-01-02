@@ -75,7 +75,7 @@ describe("Highlights in a regular lua file: ", function()
     tw.setup({ highlight = true, highlight_duration = 250 })
     tw.move_down()
     local hl_group_arg = highlight_stub.calls[1].refs[3]
-    assert.equal("ColorColumn", hl_group_arg)
+    assert.equal("CursorLine", hl_group_arg)
   end)
 
   it("respects highlight_group config option", function()

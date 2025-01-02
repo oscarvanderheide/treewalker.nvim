@@ -57,7 +57,7 @@ The swap commands intelligently swap nodes, including comments and attributes/de
 
     -- The color of the above highlight. Must be a valid vim highlight group.
     -- (see :h highlight-group for options)
-    highlight_group = 'ColorColumn',
+    highlight_group = 'CursorLine',
   }
 }
 ```
@@ -79,7 +79,7 @@ use {
 
         -- The color of the above highlight. Must be a valid vim highlight group.
         -- (see :h highlight-group for options)
-        highlight_group = 'ColorColumn',
+        highlight_group = 'CursorLine',
       })
   end
 }
@@ -90,7 +90,7 @@ use {
 Plug 'aaronik/treewalker.nvim'
 
 " This line is optional
-:lua require('treewalker').setup({ highlight = true, highlight_duration = 250, highlight_group = 'ColorColumn' })
+:lua require('treewalker').setup({ highlight = true, highlight_duration = 250, highlight_group = 'CursorLine' })
 ```
 
 ---
