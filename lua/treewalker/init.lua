@@ -30,7 +30,8 @@ end
 local function ensuring_parser(fn)
   return function()
     local ft = vim.bo.ft
-    if vim.treesitter.language.get_lang(ft) then
+    local ok = pcall(vim.treesitter.get_parser)
+    if ok then
       fn()
     else
       vim.notify_once(
