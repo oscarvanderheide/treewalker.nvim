@@ -125,17 +125,25 @@ describe("Swapping in a regular lua file:", function()
   end)
 end)
 
+-- doesn't work at all in md, doesn't need to
 describe("Swapping in a markdown file:", function()
   before_each(function()
-    -- TODO This is a hack, really should be able to load a md file. Fix this.
-    load_fixture("/lua.lua")
+    load_fixture("/markdown.md")
     vim.bo[0].filetype = "markdown"
   end)
 
-  it("turns off in md files (doesn't work at all there, doesn't need to)", function()
+  it("turns off for down in md files", function()
+    vim.fn.cursor(1, 1)
+    local lines_before = lines.get_lines(0, -1)
+    tw.swap_down()
+    local lines_after = lines.get_lines(0, -1)
+    assert.same(lines_after, lines_before)
+  end)
+
+  it("turns off for up in md files", function()
+    vim.fn.cursor(3, 1)
     local lines_before = lines.get_lines(0, -1)
     tw.swap_up()
-    tw.swap_down()
     local lines_after = lines.get_lines(0, -1)
     assert.same(lines_after, lines_before)
   end)
