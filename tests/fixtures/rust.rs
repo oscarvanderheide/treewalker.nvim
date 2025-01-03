@@ -42,10 +42,18 @@ fn calculate_area(shape: &dyn Shape) -> f64 {
 }
 
 // Define a function that uses the Shape trait to print the area of an object
-fn print_shape_area(shape: &dyn Shape) {
+fn print_shape_area(shape: &dyn Shape, blape: &Shape) {
     println!("The area of this shape is: {}", calculate_area(shape));
 }
 
+enum Color { Red, Green, Blue }
+
+impl IntoEnumIterator for Color {
+    type Item = Self;
+    fn into_enum_iterator(self) -> EnumIterator<Self> {
+        EnumIterator { current: self }
+    }
+}
 fn main() {
     let circle = Circle { radius: 5.0 };
     let rectangle = Rectangle {
