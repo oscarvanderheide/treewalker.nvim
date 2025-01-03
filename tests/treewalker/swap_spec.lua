@@ -123,6 +123,106 @@ describe("Swapping in a regular lua file:", function()
     }, lines.get_lines(49, 53))
     helpers.assert_cursor_at(37, 1)
   end)
+
+  it("swaps right same size parameters", function()
+    assert.same(
+      { "local function have_same_range(node1, node2)" },
+      lines.get_lines(38, 38)
+    )
+    vim.fn.cursor(38, 32)
+    tw.swap_right()
+    assert.same(
+      { "local function have_same_range(node2, node1)" },
+      lines.get_lines(38, 38)
+    )
+    helpers.assert_cursor_at(38, 39)
+  end)
+
+  it("swaps left same size parameters", function()
+    assert.same(
+      { "local function have_same_range(node1, node2)" },
+      lines.get_lines(38, 38)
+    )
+    vim.fn.cursor(38, 39)
+    tw.swap_left()
+    assert.same(
+      { "local function have_same_range(node2, node1)" },
+      lines.get_lines(38, 38)
+    )
+    helpers.assert_cursor_at(38, 32)
+  end)
+
+  it("swaps right diff size parameters", function()
+    assert.same(
+      { "  return util.contains(TARGET_DESCENDANT_TYPES, node:type())" },
+      lines.get_lines(31, 31)
+    )
+    vim.fn.cursor(31, 24)
+    tw.swap_right()
+    assert.same(
+      { "  return util.contains(node:type(), TARGET_DESCENDANT_TYPES)" },
+      lines.get_lines(31, 31)
+    )
+    helpers.assert_cursor_at(31, 37, "TARGET_DESCENDANT_TYPES")
+  end)
+
+  it("swaps left diff size parameters", function()
+    assert.same(
+      { "  return util.contains(TARGET_DESCENDANT_TYPES, node:type())" },
+      lines.get_lines(31, 31)
+    )
+    vim.fn.cursor(31, 49)
+    tw.swap_left()
+    assert.same(
+      { "  return util.contains(node:type(), TARGET_DESCENDANT_TYPES)" },
+      lines.get_lines(31, 31)
+    )
+    helpers.assert_cursor_at(31, 24, "node:type()")
+  end)
+
+  it("swaps right diff number of lines", function()
+    assert.same(
+      { "if true then" },
+      lines.get_lines(185, 185)
+    )
+    assert.same(
+      { "return M" },
+      lines.get_lines(193, 193)
+    )
+    vim.fn.cursor(185, 1)
+    tw.swap_right()
+    assert.same(
+      { "return M" },
+      lines.get_lines(185, 185)
+    )
+    assert.same(
+      { "if true then" },
+      lines.get_lines(187, 187)
+    )
+    helpers.assert_cursor_at(187, 1)
+  end)
+
+  it("swaps left diff number of lines", function()
+    assert.same(
+      { "if true then" },
+      lines.get_lines(185, 185)
+    )
+    assert.same(
+      { "return M" },
+      lines.get_lines(193, 193)
+    )
+    vim.fn.cursor(193, 1)
+    tw.swap_left()
+    assert.same(
+      { "return M" },
+      lines.get_lines(185, 185)
+    )
+    assert.same(
+      { "if true then" },
+      lines.get_lines(187, 187)
+    )
+    helpers.assert_cursor_at(185, 1)
+  end)
 end)
 
 -- doesn't work at all in md, doesn't need to
@@ -144,6 +244,22 @@ describe("Swapping in a markdown file:", function()
     vim.fn.cursor(3, 1)
     local lines_before = lines.get_lines(0, -1)
     tw.swap_up()
+    local lines_after = lines.get_lines(0, -1)
+    assert.same(lines_after, lines_before)
+  end)
+
+  it("turns off for left in md files", function()
+    vim.fn.cursor(52, 3) -- TODO
+    local lines_before = lines.get_lines(0, -1)
+    tw.swap_left()
+    local lines_after = lines.get_lines(0, -1)
+    assert.same(lines_after, lines_before)
+  end)
+
+  it("turns off for right in md files", function()
+    vim.fn.cursor(52, 3) -- TODO
+    local lines_before = lines.get_lines(0, -1)
+    tw.swap_right()
     local lines_after = lines.get_lines(0, -1)
     assert.same(lines_after, lines_before)
   end)

@@ -10,6 +10,8 @@ local commands = {
   move_in = tw.move_in,
   swap_up = tw.swap_up,
   swap_down = tw.swap_down,
+  swap_left = tw.swap_left,
+  swap_right = tw.swap_right,
 }
 
 describe("For a file in which there is a missing parser", function()

@@ -1,4 +1,5 @@
 local nodes = require('treewalker.nodes')
+local util = require('treewalker.util')
 local lines = require('treewalker.lines')
 
 local M = {}
@@ -51,9 +52,10 @@ function M.jump(row, node)
   end
 end
 
+-- Swap entire rows
 ---@param earlier_rows [integer, integer] -- [start row, end row]
 ---@param later_rows [integer, integer] -- [start row, end row]
-function M.swap(earlier_rows, later_rows)
+function M.swap_rows(earlier_rows, later_rows)
   local earlier_start, earlier_end = earlier_rows[1], earlier_rows[2]
   local earlier_lines = lines.get_lines(earlier_start + 1, earlier_end + 1)
   local later_start, later_end = later_rows[1], later_rows[2]
@@ -72,5 +74,20 @@ function M.swap(earlier_rows, later_rows)
   lines.insert_lines(earlier_start, later_lines)
 end
 
-return M
+-- Swap nodes. First goes to where second was, second goes to where first was.
+---@param left TSNode
+---@param right TSNode
+function M.swap_nodes(left, right)
+  local range1 = nodes.lsp_range(left)
+  local range2 = nodes.lsp_range(right)
 
+  local text1 = nodes.get_text(left)
+  local text2 = nodes.get_text(right)
+
+  local edit1 = { range = range1, newText = table.concat(text2, "\n") }
+  local edit2 = { range = range2, newText = table.concat(text1, "\n") }
+  local bufnr = vim.api.nvim_get_current_buf()
+  vim.lsp.util.apply_text_edits({ edit1, edit2 }, bufnr, "utf-8") -- TODO don't hardcode utf-8
+end
+
+return M

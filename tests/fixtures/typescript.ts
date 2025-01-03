@@ -33,11 +33,7 @@ class Database {
 }
 
 // Enums
-enum Color {
-  RED,
-  GREEN,
-  BLUE,
-}
+enum Color { RED, GREEN, BLUE }
 
 // Classes and interfaces with type annotations
 class Order implements User {

@@ -27,6 +27,14 @@ local subcommands = {
 
   SwapDown = function()
     tw().swap_down()
+  end,
+
+  SwapLeft = function()
+    tw().swap_left()
+  end,
+
+  SwapRight = function()
+    tw().swap_right()
   end
 }
 

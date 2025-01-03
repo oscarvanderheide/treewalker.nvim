@@ -135,8 +135,7 @@ function M.get_from_neighboring_line(current_row, dir)
   local max_row = vim.api.nvim_buf_line_count(0)
   if candidate_row > max_row or candidate_row <= 0 then return end
   local candidate_line = lines.get_line(candidate_row)
-  local candidate_col = lines.get_start_col(candidate_line)
-  local candidate = M.get_at_rowcol(candidate_row, candidate_col)
+  local candidate = M.get_at_row(candidate_row)
 
   -- For py decorators, when we examine the target-ness of a node, we
   -- want to be checking the highest coincident, rather than checking
@@ -144,19 +143,32 @@ function M.get_from_neighboring_line(current_row, dir)
   -- node kinda thing, rather than checking a child and then assuming
   -- its highest node will be good.
   if candidate then
-    candidate = M.get_highest_coincident(candidate)
+    candidate = M.get_highest_row_coincident(candidate)
   end
 
   return candidate, candidate_row, candidate_line
 end
 
 -- Get farthest ancestor (or self) at the same starting row
+-- This method prefers row over start on account of lisps / S-expressions,
+-- which start with (identifier, ..). This is used for all up/down movement/swapping
+---@param node TSNode
+---@return TSNode
+function M.get_highest_row_coincident(node)
+  local parent = node:parent()
+  while parent and M.have_same_row(node, parent) do
+    if M.is_highlight_target(parent) then node = parent end
+    parent = parent:parent()
+  end
+  return node
+end
+
+-- Get farthest ancestor (or self) at the same starting row/col
 ---@param node TSNode
 ---@return TSNode
 function M.get_highest_coincident(node)
   local parent = node:parent()
-  -- prefer row over start on account of lisps / S-expressions, which start with (identifier, ..)
-  while parent and M.have_same_row(node, parent) do
+  while parent and M.have_same_row(node, parent) and M.have_same_scol(node, parent) do
     if M.is_highlight_target(parent) then node = parent end
     parent = parent:parent()
   end
@@ -174,7 +186,7 @@ end
 -- gets the smallest line number range that contains all given nodes
 ---@param nodes TSNode[]
 ---@return [ integer, integer ]
-function M.row_range(nodes)
+function M.whole_range(nodes)
   local min_row = math.huge
   local max_row = -math.huge
 
@@ -188,6 +200,45 @@ function M.row_range(nodes)
   return { min_row, max_row }
 end
 
+-- Apparently the LSP speaks ranges in a different way from treesitter,
+-- and this is important for swapping nodes
+---@param node TSNode
+---@return { start: { line: integer, character: integer }, end: { line: integer, character: integer }  }
+function M.lsp_range(node)
+  local start_line, start_col, end_line, end_col = node:range()
+  return {
+    start = { line = start_line, character = start_col },
+    ["end"] = { line = end_line, character = end_col }
+  }
+end
+
+---Get the given node's text
+---@param node TSNode
+function M.get_text(node)
+  -- We have to remember that end_col is end-exclusive
+  local start_row, start_col, end_row, end_col = node:range()
+
+  if start_row ~= end_row then
+    local lins = vim.api.nvim_buf_get_lines(0, start_row, end_row + 1, false)
+    if next(lins) == nil then
+      return {}
+    end
+    lins[1] = string.sub(lins[1], start_col + 1)
+    -- end_row might be just after the last line. In this case the last line is not truncated.
+    if #lins == end_row - start_row + 1 then
+      lins[#lins] = string.sub(lins[#lins], 1, end_col)
+    end
+    return lins
+  else
+    local line = vim.api.nvim_buf_get_lines(0, start_row, start_row + 1, false)[1]
+    -- If line is nil then the line is empty
+    return line and { string.sub(line, start_col + 1, end_col) } or {}
+  end
+end
+
+-- get 1-indexed row of given node
+-- (so will work directly with vim.fn.cursor,
+-- and will reflect row as seen in the vim status line)
 ---@param node TSNode
 ---@return integer
 function M.get_row(node)
@@ -195,15 +246,17 @@ function M.get_row(node)
   return row + 1
 end
 
----Get current node under cursor
----@return TSNode
-function M.get_current()
-  local node = vim.treesitter.get_node()
-  assert(node)
-  return M.get_highest_coincident(node)
+-- get 1-indexed column of given node
+-- (so will work directly with vim.fn.cursor,
+-- and will reflect col as seen in the vim status line)
+---@param node TSNode
+---@return integer
+function M.get_col(node)
+  local _, col = node:range()
+  return col + 1
 end
 
----Get node at row/col
+---Get highest node at row/col
 ---@param row integer
 ---@param col integer
 ---@return TSNode|nil
@@ -222,8 +275,24 @@ function M.get_at_row(row)
   local col = lines.get_start_col(line)
   local node = vim.treesitter.get_node({ pos = { row - 1, col } })
   if node then
-    return M.get_highest_coincident(node)
+    return M.get_highest_row_coincident(node)
   end
+end
+
+---Get highest node on current row
+---@return TSNode
+function M.get_row_current()
+  local node = vim.treesitter.get_node()
+  assert(node)
+  return M.get_highest_row_coincident(node)
+end
+
+---Get highest node at same row/col
+---@return TSNode
+function M.get_current()
+  local node = vim.treesitter.get_node()
+  assert(node)
+  return M.get_highest_coincident(node)
 end
 
 ---@param node TSNode

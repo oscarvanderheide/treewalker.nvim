@@ -8,19 +8,48 @@
 
 # Treewalker.nvim
 
-![A demo of moving around some code quickly using the plugin](static/fast_demo.gif)
+![A fast paced demo of Treewalker.nvim](https://github.com/user-attachments/assets/4d23af49-bd94-412a-bc8c-d546df6775df)
 
-Treewalker is a plugin that gives you the ability to **move around your code in a syntax tree aware manner**.
-It uses [Treesitter](https://github.com/tree-sitter/tree-sitter) under the hood for syntax tree awareness.
-It offers six subcommands: Up, Down, Right, and Left for movement, and SwapUp and SwapDown for intelligent node swapping.
+Treewalker is a plugin that lets you **move around your code in a syntax tree aware manner**.
+It uses neovim's native [Treesitter](https://github.com/tree-sitter/tree-sitter) under the hood for syntax tree awareness.
+It has no dependencies, and is meant to "just work". It is "batteries included", with minimal configuration.
 
-Each movement command moves you through the syntax tree in an intuitive way.
+---
 
-* **Up/Down** - Moves up or down to the next neighbor node
-* **Right** - Finds the next good child node
-* **Left** - Finds the next good parent node
+### Movement
 
-The swap commands intelligently swap nodes, including comments and attributes/decorators.
+The movement commands move you through the syntax tree in an intuitive way:
+
+* **Up/Down** - Moves you up or down to the next neighbor node, skipping comments, annotations, and other unintuitive nodes
+* **Right** - Moves to the next node that's indented further than the current node
+* **Left** - Moves to the next ancestor node that's on a different line from the current node
+
+---
+
+### Swapping
+
+The swap commands swap nodes, but up/down bring along any comments, annotations, or decorators associated with that node:
+
+* **SwapUp/SwapDown** - Swaps nodes up or down in your document (so neighbor nodes), _bringing comments, annotations, and decorators._
+                        These swaps will only bring stuff up and down relative to the document itself, so it'll only change nodes
+                        _across different line numbers_. These are meant for swapping declarations and definitions.
+* **SwapLeft/SwapRight** - These also swap neighbor nodes, but are literal about the definition of a node, whereas the up/down swaps
+                           and movement take a lot of liberty to be "smart". Swap{Left/Right} are meant for swapping function arguments,
+                           enum members, list elements, etc.
+
+   _There are other plugins that do mostly this Left/Right swapping behavior:_
+
+   [nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) - This can move around [a subset
+   of nodes](https://github.com/nvim-treesitter/nvim-treesitter-textobjects?tab=readme-ov-file#built-in-textobjects), but misses some
+   types (ex. rust enums). `Treewalker` is not aware of node type names, only the structure of the AST, so left/right swaps will work
+   everywhere you want it to.
+
+   [nvim-treesitter.ts_utils](https://github.com/nvim-treesitter/nvim-treesitter/blob/master/lua/nvim-treesitter/ts_utils.lua) - This doesn't
+   suffer from node name awareness, and works mostly the same as `Treewalker`. Some of `Treewalker`'s left/right swapping code is even
+   inspired by `ts_utils`. However `Treewalker` offers one fundamental difference - when it picks the "current node", the first of the two
+   nodes to swap, it finds the _widest node with the same start point_. `ts_utils` finds the smallest node. This is a subtle difference,
+   but ends up having a big effect on the intuitiveness of swapping.
+
 
 ---
 
@@ -32,7 +61,7 @@ The swap commands intelligently swap nodes, including comments and attributes/de
 </details>
 
 <details>
-<summary>Typing out the Swap commands manually</summary>
+<summary>Typing out the SwapUp/SwapDown commands manually</summary>
 <img src="static/slow_swap_demo.gif" alt="A demo of swapping code slowly using Treewalker swap commands">
 </details>
 
@@ -109,23 +138,10 @@ vim.keymap.set({ 'n', 'v' }, '<C-j>', '<cmd>Treewalker Down<cr>', { silent = tru
 vim.keymap.set({ 'n', 'v' }, '<C-l>', '<cmd>Treewalker Right<cr>', { silent = true })
 vim.keymap.set({ 'n', 'v' }, '<C-h>', '<cmd>Treewalker Left<cr>', { silent = true })
 
--- swapping up/down
+-- swapping
 vim.keymap.set('n', '<C-S-j>', '<cmd>Treewalker SwapDown<cr>', { silent = true })
 vim.keymap.set('n', '<C-S-k>', '<cmd>Treewalker SwapUp<cr>', { silent = true })
+vim.keymap.set('n', '<C-S-l>', '<cmd>Treewalker SwapRight<CR>', { silent = true })
+vim.keymap.set('n', '<C-S-h>', '<cmd>Treewalker SwapLeft<CR>', { silent = true })
 ```
 
-Many other plugins do left/right swapping perfectly, so there's no need for Treewalker to implement those.
-I use [nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects?tab=readme-ov-file#text-objects-swap)
-to complete all four `Ctrl-Shift-*` maps:
-
-```lua
--- swapping left/right
-vim.keymap.set('n', '<C-S-l>', '<cmd>TSTextobjectSwapNext @parameter.inner<CR>', { silent = true })
-vim.keymap.set('n', '<C-S-h>', '<cmd>TSTextobjectSwapPrevious @parameter.inner<CR>', { silent = true })
-```
-
-The above can also be accomplished with
-[nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) using
-[ts_utils](https://github.com/nvim-treesitter/nvim-treesitter?tab=readme-ov-file#utilities).
-See [this PR](https://github.com/aaronik/treewalker.nvim/pull/10/files#diff-1cedf17af3ebbcfeee2dfb1071445dcabfdb30f8e9f83ff0da95ea7e6e7ccde5R107-R130)
-by @duqcyxwd for an example of how to implement that.
