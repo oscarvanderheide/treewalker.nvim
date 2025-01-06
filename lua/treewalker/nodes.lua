@@ -272,6 +272,7 @@ end
 ---@return TSNode|nil
 function M.get_at_row(row)
   local line = lines.get_line(row)
+  if not line then return end
   local col = lines.get_start_col(line)
   local node = vim.treesitter.get_node({ pos = { row - 1, col } })
   if node then
@@ -295,6 +296,7 @@ function M.get_current()
   return M.get_highest_coincident(node)
 end
 
+-- util.log some formatted version of the node's properties
 ---@param node TSNode
 ---@return nil
 function M.log(node)

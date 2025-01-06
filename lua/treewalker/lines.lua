@@ -23,6 +23,7 @@ function M.set_lines(start, lines)
 end
 
 ---@param row integer
+---@return string | nil
 function M.get_line(row)
   return vim.api.nvim_buf_get_lines(0, row - 1, row, false)[1]
 end
