@@ -3,15 +3,12 @@ TESTS_DIR=tests
 
 .PHONY: test
 
-test_nvim:
+test:
 	@nvim \
 		--headless \
 		--noplugin \
 		-u ${TESTS_INIT} \
-		-c "PlenaryBustedDirectory ${TESTS_DIR} { minimal_init = '${TESTS_INIT}' }"
-
-test:
-	$(MAKE) test_nvim
+		-c "PlenaryBustedDirectory ${TESTS_DIR} { minimal_init = '${TESTS_INIT}', sequential = false, keep_going = false }"
 
 test-watch:
 	nodemon -e lua -x "$(MAKE) test || exit 1"
