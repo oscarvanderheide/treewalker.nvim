@@ -87,7 +87,7 @@ describe("Movement in a regular lua file: ", function()
   end)
 
   it("is chill when down is invoked from empty last line", function()
-    vim.fn.cursor(197, 1)
+    helpers.feed_keys('G')
     tw.move_down()
   end)
 end)

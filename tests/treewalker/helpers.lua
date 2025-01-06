@@ -15,4 +15,12 @@ function M.assert_cursor_at(row, col, line)
   assert.same({ row, col }, { current_line, current_column }, line)
 end
 
+-- Feed keys to neovim; keys are pressed no matter what vim mode or state
+---@param keys string
+---@return nil
+M.feed_keys = function(keys)
+  local termcodes = vim.api.nvim_replace_termcodes(keys, true, true, true)
+  vim.api.nvim_feedkeys(termcodes, 'mtx', false)
+end
+
 return M
