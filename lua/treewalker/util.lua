@@ -18,12 +18,12 @@ M.P = function(v)
   return v
 end
 
--- Log to the file debug.log in the root. File can be watched for easier debugging.
+-- Log to the file debug.log in the plugin's data dir. File can be watched for easier debugging.
 M.log = function(...)
   local args = { ... }
 
   -- Canonical log dir
-  local data_path = vim.fn.stdpath("data") .. "/gptmodels"
+  local data_path = vim.fn.stdpath("data") .. "/treewalker"
 
   -- If no dir on fs, make it
   if vim.fn.isdirectory(data_path) == 0 then

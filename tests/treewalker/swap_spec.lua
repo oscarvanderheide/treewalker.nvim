@@ -223,6 +223,20 @@ describe("Swapping in a regular lua file:", function()
     )
     helpers.assert_cursor_at(185, 1)
   end)
+
+  it("swaps right from inside strings", function()
+    vim.fn.cursor(190, 10) -- somewhere inside "hi"
+    tw.swap_right()
+    assert.same("  print('bye', 'hi')", lines.get_line(190))
+    helpers.assert_cursor_at(190, 16, "hi") -- cursor stays put for feel
+  end)
+
+  it("swaps left from inside strings", function()
+    vim.fn.cursor(190, 17) -- somewhere inside "bye"
+    tw.swap_left()
+    assert.same("  print('bye', 'hi')", lines.get_line(190))
+    helpers.assert_cursor_at(190, 9, "block") -- cursor stays put for feel
+  end)
 end)
 
 -- doesn't work at all in md, doesn't need to

@@ -2,6 +2,8 @@ local nodes = require "treewalker.nodes"
 local operations = require "treewalker.operations"
 local targets = require "treewalker.targets"
 local augment = require "treewalker.augment"
+local strategies = require "treewalker.strategies"
+local util = require "treewalker.util"
 
 local M = {}
 
@@ -95,10 +97,8 @@ end
 function M.swap_right()
   if not is_supported_ft() then return end
 
-  local current = nodes.get_current()
-  if not current then return end
-  local next = current:next_named_sibling()
-  if not next then return end
+  local current, next = strategies.get_first_ancestor_with_next_named_sibling(nodes.get_current())
+  if not current or not next then return end
 
   local current_text = nodes.get_text(current)
   local next_text = nodes.get_text(next)
@@ -123,10 +123,8 @@ end
 function M.swap_left()
   if not is_supported_ft() then return end
 
-  local current = nodes.get_current()
-  if not current then return end
-  local prev = current:prev_named_sibling()
-  if not prev then return end
+  local current, prev = strategies.get_first_ancestor_with_previous_named_sibling(nodes.get_current())
+  if not current or not prev then return end
 
   operations.swap_nodes(prev, current)
 

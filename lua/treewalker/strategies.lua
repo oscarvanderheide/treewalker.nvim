@@ -131,4 +131,38 @@ function M.get_prev_if_on_empty_line(start_row, start_line)
   return current_node, current_row, current_line
 end
 
+-- Find the lowest ancestor node with a next sibling
+---@param node TSNode
+---@return TSNode | nil, TSNode | nil
+function M.get_first_ancestor_with_next_named_sibling(node)
+  local current = node
+
+  local next = current:next_named_sibling()
+  while not next do
+    local parent = current:parent()
+    if not parent then return end
+    current = parent
+    next = current:next_named_sibling()
+  end
+
+  return current, next
+end
+
+-- Find the lowest ancestor node with a previous sibling
+---@param node TSNode
+---@return TSNode | nil, TSNode | nil
+function M.get_first_ancestor_with_previous_named_sibling(node)
+  local current = node
+
+  local prev = current:prev_named_sibling()
+  while not prev do
+    local parent = current:parent()
+    if not parent then return end
+    current = parent
+    prev = current:prev_named_sibling()
+  end
+
+  return current, prev
+end
+
 return M

@@ -187,7 +187,7 @@ if true then
 elseif false then
   print('hi')
 else
-  print('hi')
+  print('hi', 'bye')
 end
 
 return M

@@ -28,6 +28,7 @@ function M.get_line(row)
   return vim.api.nvim_buf_get_lines(0, row - 1, row, false)[1]
 end
 
+-- TODO make fin optional, if it doesn't exist, set it to start
 ---@param start integer
 ---@param fin integer
 function M.get_lines(start, fin)
