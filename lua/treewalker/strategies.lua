@@ -40,6 +40,7 @@ function M.get_down_and_in(starting_row, starting_col)
 
   for candidate_row = starting_row + 1, last_row, 1 do
     local candidate_line = lines.get_line(candidate_row)
+    if not candidate_line then goto continue end
     local candidate_col = lines.get_start_col(candidate_line)
     local candidate = nodes.get_at_row(candidate_row)
     local is_empty = candidate_line == ""
@@ -82,9 +83,10 @@ end
 function M.get_next_if_on_empty_line(start_row, start_line)
   if start_line ~= "" then return end
 
+  ---@type string | nil
+  local current_line = start_line
   local max_row = vim.api.nvim_buf_line_count(0)
   local current_row = start_row
-  local current_line = start_line
   local current_node = nodes.get_at_row(current_row)
 
   while
@@ -111,8 +113,9 @@ end
 function M.get_prev_if_on_empty_line(start_row, start_line)
   if start_line ~= "" then return end
 
-  local current_row = start_row
+  ---@type string | nil
   local current_line = start_line
+  local current_row = start_row
   local current_node = nodes.get_at_row(current_row)
 
   while

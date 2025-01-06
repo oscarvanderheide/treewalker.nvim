@@ -302,6 +302,7 @@ end
 function M.log(node)
   local row = M.range(node)[1] + 1
   local line = lines.get_line(row)
+  assert(line, "log will only ever be called on valid nodes which will have valid line numbers")
   local col = lines.get_start_col(line)
   local log_string = ""
   log_string = log_string .. string.format(" [%s/%s]", row, col)

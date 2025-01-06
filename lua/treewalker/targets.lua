@@ -8,6 +8,7 @@ local M = {}
 function M.current()
   local current_row = vim.fn.line(".")
   local current_line = lines.get_line(current_row)
+  assert(current_line, "cursor cannot be on invalid line number")
   local current_col = lines.get_start_col(current_line)
 
   return current_row, current_line, current_col

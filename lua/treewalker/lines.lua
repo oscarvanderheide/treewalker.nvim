@@ -22,6 +22,8 @@ function M.set_lines(start, lines)
   vim.api.nvim_buf_set_lines(0, start - 1, fin, false, lines)
 end
 
+-- Gets the contents of the line at the given row. If the row is not in the document,
+-- returns nil.
 ---@param row integer
 ---@return string | nil
 function M.get_line(row)
