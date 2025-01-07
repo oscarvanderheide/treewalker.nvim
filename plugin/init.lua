@@ -40,14 +40,14 @@ local subcommands = {
 
 local command_opts = {
   nargs = 1,
-  complete = function(ArgLead, CmdLine, CursorPos)
+  complete = function(ArgLead)
     return vim.tbl_filter(function(cmd)
       return cmd:match("^" .. ArgLead)
     end, vim.tbl_keys(subcommands))
   end
 }
 
-function Treewalker(opts)
+local function treewalker(opts)
   local subcommand = opts.fargs[1]
   if subcommands[subcommand] then
     subcommands[subcommand](vim.list_slice(opts.fargs, 2))
@@ -56,4 +56,4 @@ function Treewalker(opts)
   end
 end
 
-vim.api.nvim_create_user_command("Treewalker", Treewalker, command_opts)
+vim.api.nvim_create_user_command("Treewalker", treewalker, command_opts)

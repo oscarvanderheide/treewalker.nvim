@@ -3,7 +3,6 @@ local operations = require "treewalker.operations"
 local targets = require "treewalker.targets"
 local augment = require "treewalker.augment"
 local strategies = require "treewalker.strategies"
-local util = require "treewalker.util"
 
 local M = {}
 
@@ -93,7 +92,6 @@ function M.swap_up()
   vim.fn.cursor(x, y)
 end
 
--- TODO oh snap should we just straight up disallow this op if we're on a jump target? That'd prevent the ability to do a lateral swap on nodes that should be vertically swapped. Oh nah that won't work for multiline argument lists
 function M.swap_right()
   if not is_supported_ft() then return end
 

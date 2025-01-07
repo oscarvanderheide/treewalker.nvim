@@ -6,7 +6,3 @@ vim.opt.rtp:append(lazypath .. "/plenary.nvim")
 vim.opt.swapfile = false
 
 vim.cmd("runtime! plugin/plenary.vim")
-
-P = function(...)
-  print(vim.inspect(...))
-end
