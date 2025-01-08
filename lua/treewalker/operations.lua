@@ -12,23 +12,11 @@ local M = {}
 ---@param duration integer
 ---@param hl_group string
 function M.highlight(range, duration, hl_group)
-  local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
+  local start_row, _, end_row, _ = range[1], range[2], range[3], range[4]
   local ns_id = vim.api.nvim_create_namespace("")
 
   for row = start_row, end_row do
-    if row == start_row and row == end_row then
-      -- Highlight within the same line
-      vim.api.nvim_buf_add_highlight(0, ns_id, hl_group, start_row, start_col, end_col)
-    elseif row == start_row then
-      -- Highlight from start_col to the end of the start_row
-      vim.api.nvim_buf_add_highlight(0, ns_id, hl_group, start_row, start_col, -1)
-    elseif row == end_row then
-      -- Highlight from the beginning of the end_row to end_col
-      vim.api.nvim_buf_add_highlight(0, ns_id, hl_group, end_row, 0, end_col)
-    else
-      -- Highlight the entire row for intermediate rows
-      vim.api.nvim_buf_add_highlight(0, ns_id, hl_group, row, 0, -1)
-    end
+    vim.api.nvim_buf_add_highlight(0, ns_id, hl_group, row, 0, -1)
   end
 
   -- Remove the highlight after delay
@@ -90,3 +78,4 @@ function M.swap_nodes(left, right)
 end
 
 return M
+
