@@ -29,38 +29,23 @@ jobs:
 
     - name: Install Plenary
       run: |
+        mkdir -p $HOME/.local/share/nvim/lazy/
         git clone https://github.com/nvim-lua/plenary.nvim.git
-        mkdir -p .local/share/nvim/lazy/
-        mv plenary.nvim .local/share/nvim/lazy/
+        mv plenary.nvim $HOME/.local/share/nvim/lazy/
 
     - name: Install luacheck
       run: |
         sudo apt-get install lua-check -y
 
     - name: Run Tests
-      env:
-        XDG_CONFIG_HOME: ${{ github.workspace }}/.config
-        XDG_DATA_HOME: ${{ github.workspace }}/.local/share
-        XDG_STATE_HOME: ${{ github.workspace }}/.local/state
-        XDG_CACHE_HOME: ${{ github.workspace }}/.cache
       run: |
         make test
 
     - name: Ensure No util.R in code
-      env:
-        XDG_CONFIG_HOME: ${{ github.workspace }}/.config
-        XDG_DATA_HOME: ${{ github.workspace }}/.local/share
-        XDG_STATE_HOME: ${{ github.workspace }}/.local/state
-        XDG_CACHE_HOME: ${{ github.workspace }}/.cache
       run: |
         make ensure-no-util-r
 
     - name: Run type check
-      env:
-        XDG_CONFIG_HOME: ${{ github.workspace }}/.config
-        XDG_DATA_HOME: ${{ github.workspace }}/.local/share
-        XDG_STATE_HOME: ${{ github.workspace }}/.local/state
-        XDG_CACHE_HOME: ${{ github.workspace }}/.cache
       run: |
         make typecheck
 
