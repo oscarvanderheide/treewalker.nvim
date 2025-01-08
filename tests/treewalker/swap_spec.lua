@@ -70,8 +70,8 @@ describe("Swapping in a regular lua file:", function()
   it("swaps down when one has comments", function()
     vim.fn.cursor(21, 1)
     tw.swap_down()
-    assert.same({ "local function is_descendant_jump_target(node)" }, lines.get_lines(19, 19))
-    assert.same({ "---@param node TSNode" }, lines.get_lines(23, 23))
+    assert.same("local function is_descendant_jump_target(node)", lines.get_line(19))
+    assert.same("---@param node TSNode", lines.get_line(23))
     helpers.assert_cursor_at(25, 1)
   end)
 
@@ -125,102 +125,55 @@ describe("Swapping in a regular lua file:", function()
   end)
 
   it("swaps right same size parameters", function()
-    assert.same(
-      { "local function have_same_range(node1, node2)" },
-      lines.get_lines(38, 38)
-    )
+    assert.same("local function have_same_range(node1, node2)", lines.get_line(38))
     vim.fn.cursor(38, 32)
     tw.swap_right()
-    assert.same(
-      { "local function have_same_range(node2, node1)" },
-      lines.get_lines(38, 38)
-    )
+    assert.same("local function have_same_range(node2, node1)", lines.get_line(38))
     helpers.assert_cursor_at(38, 39)
   end)
 
   it("swaps left same size parameters", function()
-    assert.same(
-      { "local function have_same_range(node1, node2)" },
-      lines.get_lines(38, 38)
-    )
+    assert.same("local function have_same_range(node1, node2)", lines.get_line(38))
     vim.fn.cursor(38, 39)
     tw.swap_left()
-    assert.same(
-      { "local function have_same_range(node2, node1)" },
-      lines.get_lines(38, 38)
-    )
+    assert.same("local function have_same_range(node2, node1)", lines.get_line(38))
     helpers.assert_cursor_at(38, 32)
   end)
 
   it("swaps right diff size parameters", function()
-    assert.same(
-      { "  return util.contains(TARGET_DESCENDANT_TYPES, node:type())" },
-      lines.get_lines(31, 31)
-    )
+    assert.same("  return util.contains(TARGET_DESCENDANT_TYPES, node:type())", lines.get_line(31))
     vim.fn.cursor(31, 24)
     tw.swap_right()
-    assert.same(
-      { "  return util.contains(node:type(), TARGET_DESCENDANT_TYPES)" },
-      lines.get_lines(31, 31)
-    )
+    assert.same("  return util.contains(node:type(), TARGET_DESCENDANT_TYPES)", lines.get_line(31))
     helpers.assert_cursor_at(31, 37, "TARGET_DESCENDANT_TYPES")
   end)
 
   it("swaps left diff size parameters", function()
-    assert.same(
-      { "  return util.contains(TARGET_DESCENDANT_TYPES, node:type())" },
-      lines.get_lines(31, 31)
-    )
+    assert.same("  return util.contains(TARGET_DESCENDANT_TYPES, node:type())", lines.get_line(31))
     vim.fn.cursor(31, 49)
     tw.swap_left()
-    assert.same(
-      { "  return util.contains(node:type(), TARGET_DESCENDANT_TYPES)" },
-      lines.get_lines(31, 31)
-    )
+    assert.same("  return util.contains(node:type(), TARGET_DESCENDANT_TYPES)", lines.get_line(31))
     helpers.assert_cursor_at(31, 24, "node:type()")
   end)
 
   it("swaps right diff number of lines", function()
-    assert.same(
-      { "if true then" },
-      lines.get_lines(185, 185)
+    assert.same("if true then", lines.get_line(185)
     )
-    assert.same(
-      { "return M" },
-      lines.get_lines(193, 193)
-    )
+    assert.same("return M", lines.get_line(193))
     vim.fn.cursor(185, 1)
     tw.swap_right()
-    assert.same(
-      { "return M" },
-      lines.get_lines(185, 185)
-    )
-    assert.same(
-      { "if true then" },
-      lines.get_lines(187, 187)
-    )
+    assert.same("return M", lines.get_line(185))
+    assert.same("if true then", lines.get_line(187))
     helpers.assert_cursor_at(187, 1)
   end)
 
   it("swaps left diff number of lines", function()
-    assert.same(
-      { "if true then" },
-      lines.get_lines(185, 185)
-    )
-    assert.same(
-      { "return M" },
-      lines.get_lines(193, 193)
-    )
+    assert.same("if true then", lines.get_line(185))
+    assert.same("return M", lines.get_line(193))
     vim.fn.cursor(193, 1)
     tw.swap_left()
-    assert.same(
-      { "return M" },
-      lines.get_lines(185, 185)
-    )
-    assert.same(
-      { "if true then" },
-      lines.get_lines(187, 187)
-    )
+    assert.same("return M", lines.get_line(185))
+    assert.same("if true then", lines.get_line(187))
     helpers.assert_cursor_at(185, 1)
   end)
 

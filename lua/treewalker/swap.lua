@@ -119,7 +119,7 @@ function M.swap_right()
   if not current or not target then return end
 
   local current_text = nodes.get_text(current)
-  local next_text = nodes.get_text(target)
+  local target_text = nodes.get_text(target)
 
   operations.swap_nodes(current, target)
 
@@ -128,11 +128,11 @@ function M.swap_right()
   if on_same_row then
     vim.fn.cursor(
       nodes.get_row(current),
-      nodes.get_col(current) + #next_text[1] + 2
+      nodes.get_col(current) + #target_text[1] + 2
     )
   else
     vim.fn.cursor(
-      nodes.get_row(target) - #current_text + #next_text,
+      nodes.get_row(target) - #current_text + #target_text,
       nodes.get_col(target)
     )
   end
