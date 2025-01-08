@@ -5,7 +5,7 @@ def random_annotation(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         # Perform some task related to randomness
-        print("Random thing happening")
+        print("one\n", "two\n")
         return func(*args, **kwargs)
     return wrapper
 

@@ -168,4 +168,24 @@ function M.get_first_ancestor_with_previous_named_sibling(node)
   return current, prev
 end
 
+-- Use this to get the whole string from inside of a string
+-- returns nils if the passed in node is not a string node
+---@param node TSNode
+---@return TSNode | nil, TSNode | nil
+function M.get_highest_string_node(node)
+  ---@type TSNode | nil
+  local highest = nil
+  ---@type TSNode | nil
+  local iter = node
+
+  while iter do
+    if string.match(iter:type(), "string") then
+      highest = iter
+    end
+    iter = iter:parent()
+  end
+
+  return highest
+end
+
 return M

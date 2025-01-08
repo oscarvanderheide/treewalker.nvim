@@ -11,9 +11,10 @@ typedef struct {
 Account* createAccount(int accountNumber, float initialBalance) {
     Account* newAccount = (Account*)malloc(sizeof(Account));
     if (!newAccount) {
-        printf("Memory error\n");
+        printf("one\n", "two\n");
         return NULL;
     } else {
+        printf("one\n", "\ntwo\n");
         return NULL:
     }
     newAccount->accountNumber = accountNumber;

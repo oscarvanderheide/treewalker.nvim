@@ -92,19 +92,39 @@ function M.swap_up()
   vim.fn.cursor(x, y)
 end
 
+---@param node TSNode | nil
+local function next_sib(node)
+  if not node then return nil end
+  return node:next_named_sibling()
+end
+
 function M.swap_right()
   if not is_supported_ft() then return end
 
-  local current, next = strategies.get_first_ancestor_with_next_named_sibling(nodes.get_current())
-  if not current or not next then return end
+  -- Least desirable strategies first
+
+  -- most naive next sibling
+  local current = nodes.get_current()
+  local target = next_sib(current)
+
+  -- strings
+  local candidate = strategies.get_highest_string_node(nodes.get_current())
+  local candidate_target = next_sib(candidate)
+  if candidate and candidate_target then
+    current = candidate
+    target = candidate_target
+  end
+
+  -- No candidates found
+  if not current or not target then return end
 
   local current_text = nodes.get_text(current)
-  local next_text = nodes.get_text(next)
+  local next_text = nodes.get_text(target)
 
-  operations.swap_nodes(current, next)
+  operations.swap_nodes(current, target)
 
   -- Place cursor
-  local on_same_row = nodes.get_row(current) == nodes.get_row(next)
+  local on_same_row = nodes.get_row(current) == nodes.get_row(target)
   if on_same_row then
     vim.fn.cursor(
       nodes.get_row(current),
@@ -112,24 +132,44 @@ function M.swap_right()
     )
   else
     vim.fn.cursor(
-      nodes.get_row(next) - #current_text + #next_text,
-      nodes.get_col(next)
+      nodes.get_row(target) - #current_text + #next_text,
+      nodes.get_col(target)
     )
   end
+end
+
+---@param node TSNode | nil
+local function prev_sib(node)
+  if not node then return nil end
+  return node:prev_named_sibling()
 end
 
 function M.swap_left()
   if not is_supported_ft() then return end
 
-  local current, prev = strategies.get_first_ancestor_with_previous_named_sibling(nodes.get_current())
-  if not current or not prev then return end
+  -- Least desirable strategies first
 
-  operations.swap_nodes(prev, current)
+  -- most naive next sibling
+  local current = nodes.get_current()
+  local target = prev_sib(current)
+
+  -- strings
+  local candidate = strategies.get_highest_string_node(nodes.get_current())
+  local candidate_target = prev_sib(candidate)
+  if candidate and candidate_target then
+    current = candidate
+    target = candidate_target
+  end
+
+  -- No candidates found
+  if not current or not target then return end
+
+  operations.swap_nodes(target, current)
 
   -- Place cursor
   vim.fn.cursor(
-    nodes.get_row(prev),
-    nodes.get_col(prev)
+    nodes.get_row(target),
+    nodes.get_col(target)
   )
 end
 
