@@ -6,6 +6,8 @@ vim.opt.rtp:append(lazypath .. "/nvim-treesitter")
 
 vim.opt.swapfile = false
 
+vim.cmd("runtime! plugin/treewalker.nvim")
 vim.cmd("runtime! plugin/plenary.vim")
 vim.cmd("runtime! plugin/nvim-treesitter")
 require('nvim-treesitter').setup()
+dofile("plugin/init.lua") -- get the Treewalker command present

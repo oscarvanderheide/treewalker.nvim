@@ -7,7 +7,7 @@ local M = {}
 function M.move_out()
   local target, row, line = targets.out()
   if target and row and line then
-    --util.log("no out candidate")
+    -- util.log("no out candidate")
     operations.jump(row, target)
     return
   end

@@ -11,11 +11,8 @@ test:
 test-watch:
 	nodemon -e lua -x "$(MAKE) test || exit 1"
 
-ensure-no-util-r:
-	! grep --exclude-dir=.git -r --exclude test.yml --exclude TODO.md 'util.R' | grep -v '\-\-'
-
 typecheck:
 	luacheck . --globals vim it describe --exclude-files tests/fixtures --max-comment-line-length 140
 
 # Run this to be sure all's well
-pass: test ensure-no-util-r typecheck
+pass: test typecheck

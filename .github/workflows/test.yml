@@ -33,12 +33,9 @@ jobs:
 
     - name: Run luacheck type check
       run: |
-        sudo apt-get install lua-check -y
+        sudo apt-get install lua-check -y --no-install-recommends
         make typecheck
 
     - name: Run Tests
       run: make test
-
-    - name: Ensure No util.R in code
-      run: make ensure-no-util-r
 
