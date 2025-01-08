@@ -23,4 +23,4 @@ no-utils:
 		-c "PlenaryBustedDirectory ${NO_UTIL_SPEC} { minimal_init = '${MINIMAL_INIT}' }"
 
 # Run this to be sure all's well
-pass: test typecheck no-utils
+check: test typecheck no-utils
