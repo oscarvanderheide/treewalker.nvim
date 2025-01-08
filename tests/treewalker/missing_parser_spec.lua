@@ -15,7 +15,7 @@ local commands = {
 }
 
 describe("For a file in which there is a missing parser", function()
-  load_fixture("/rust.rs")
+  load_fixture("/scheme.scm")
 
   for nam, command in pairs(commands) do
     it(string.format("notifies once when %s is called", nam), function()

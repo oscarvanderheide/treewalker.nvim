@@ -15,14 +15,6 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Prepare apt
-      run: |
-        sudo apt-get update
-
-    - name: Install Make Dependencies
-      run: |
-        sudo apt-get install libtool-bin autoconf automake cmake g++ pkg-config unzip gettext curl -y
-
     - name: Install Neovim
       run: |
         sudo snap install nvim --classic
@@ -32,6 +24,13 @@ jobs:
         mkdir -p $HOME/.local/share/nvim/lazy/
         git clone https://github.com/nvim-lua/plenary.nvim.git
         mv plenary.nvim $HOME/.local/share/nvim/lazy/
+
+    - name: Install nvim-treesitter and parsers
+      run: |
+        mkdir -p $HOME/.local/share/nvim/lazy/
+        git clone https://github.com/nvim-treesitter/nvim-treesitter.git
+        mv nvim-treesitter $HOME/.local/share/nvim/lazy/
+        nvim --headless --noplugin -u tests/minimal_init.lua -c "TSInstall! python rust" -c "quit"
 
     - name: Install luacheck
       run: |
@@ -48,4 +47,5 @@ jobs:
     - name: Run type check
       run: |
         make typecheck
+
 
