@@ -4,8 +4,9 @@ local strategies = require "treewalker.strategies"
 
 local M = {}
 
+-- Gets node at row start point
 ---@return integer, string, integer
-function M.current()
+local function current()
   local current_row = vim.fn.line(".")
   local current_line = lines.get_line(current_row)
   assert(current_line, "cursor cannot be on invalid line number")
@@ -25,11 +26,11 @@ function M.out()
   return target, row, line
 end
 
+--- Go down and in
 ---@return TSNode | nil, integer | nil, string | nil
 function M.inn()
-  local current_row, _, current_col = M.current()
+  local current_row, _, current_col = current()
 
-  --- Go down and in
   local candidate, candidate_row, candidate_line =
       strategies.get_down_and_in(current_row, current_col)
 
@@ -38,7 +39,7 @@ end
 
 ---@return TSNode | nil, integer | nil, string | nil
 function M.up()
-  local current_row, current_line, current_col = M.current()
+  local current_row, current_line, current_col = current()
 
   -- Get next target if we're on an empty line
   local candidate, candidate_row, candidate_line =
@@ -59,7 +60,7 @@ end
 
 ---@return TSNode | nil, integer | nil, string | nil
 function M.down()
-  local current_row, current_line, current_col = M.current()
+  local current_row, current_line, current_col = current()
 
   -- Get next target if we're on an empty line
   local candidate, candidate_row, candidate_line =
