@@ -16,8 +16,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Install Neovim
-      run: |
-        sudo snap install nvim --classic
+      run: sudo snap install nvim --classic
 
     - name: Install Plenary
       run: |
@@ -32,20 +31,14 @@ jobs:
         mv nvim-treesitter $HOME/.local/share/nvim/lazy/
         nvim --headless --noplugin -u tests/minimal_init.lua -c "TSInstall! python rust" -c "quit"
 
-    - name: Install luacheck
+    - name: Run luacheck type check
       run: |
         sudo apt-get install lua-check -y
-
-    - name: Run Tests
-      run: |
-        make test
-
-    - name: Ensure No util.R in code
-      run: |
-        make ensure-no-util-r
-
-    - name: Run type check
-      run: |
         make typecheck
 
+    - name: Run Tests
+      run: make test
+
+    - name: Ensure No util.R in code
+      run: make ensure-no-util-r
 
