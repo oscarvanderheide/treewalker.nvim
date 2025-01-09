@@ -1,6 +1,6 @@
 local nodes = require("treewalker.nodes")
 local lines = require("treewalker.lines")
-
+local augment = require("treewalker.augment")
 local M = {}
 
 -- For a potentially more nvim-y way to do it, see how treesitter-utils does it:
@@ -32,7 +32,7 @@ function M.highlight(range, duration, hl_group)
 	-- Remove the highlight after delay
 	vim.defer_fn(function()
 		vim.api.nvim_buf_clear_namespace(0, ns_id, 0, -1)
-	end, duration)
+	end, 1000)
 end
 
 ---@param row integer
@@ -56,32 +56,40 @@ function M.jump(row, node)
 end
 
 function M.select_node(row, node)
+	-- get current node rows
+	local current = nodes.get_row_current()
+	local current_range = nodes.range(current)
+	local current_augments = augment.get_node_augments(current)
+	local current_all = { current, unpack(current_augments) }
+	local current_all_rows = nodes.whole_range(current_all)
+
 	-- get current cursor position
-	local cursor = vim.api.nvim_win_get_cursor(0)
-	local current_row = cursor[1]
-
+	-- local cursor = vim.api.nvim_win_get_cursor(0)
+	-- local current_row = cursor[1]
+	-- vim.api.nvim_out_write(string.format("arg row: %d, current_row: %d\n", row, current_row))
 	-- vim.cmd("normal! m'") -- Add originating node to jump list
-	-- vim.api.nvim_win_set_cursor(0, { row, 0 })
+	local start_row = current_all_rows[1]
+	local end_row = current_all_rows[2]
+	vim.api.nvim_win_set_cursor(0, { start_row, 0 })
 	-- vim.cmd("normal! ^") -- Jump to start of line
-	local range = nodes.range(node)
-
-	local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
+	-- local range = nodes.range(node)
+	-- local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
 
 	-- vim.api.nvim_win_set_cursor(0, { start_row, 0 })
 	-- Move the cursor to the start row and column
 
 	-- print the start and end row and column
-	vim.api.nvim_out_write(
-		string.format(
-			"start_row: %d, start_col: %d, end_row: %d, end_col: %d\n",
-			start_row,
-			start_col,
-			end_row,
-			end_col
-		)
-	)
+	-- vim.api.nvim_out_write(
+	-- 	string.format(
+	-- 		"start_row: %d, start_col: %d, end_row: %d, end_col: %d\n",
+	-- 		start_row,
+	-- 		start_col,
+	-- 		end_row,
+	-- 		end_col
+	-- 	)
+	-- )
 	-- Move the cursor to the end row and column
-	vim.cmd("normal! V" .. (start_row - current_row) .. "j")
+	vim.cmd("normal! V" .. (end_row - start_row) .. "j")
 
 	-- M.highlight(range, duration, hl_group)
 end
