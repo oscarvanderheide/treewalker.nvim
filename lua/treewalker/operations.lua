@@ -44,18 +44,20 @@ function M.select_node(row, node)
 	vim.api.nvim_win_set_cursor(0, { row, 0 })
 	vim.cmd("normal! ^") -- Jump to start of line
 	local range = nodes.range(node)
-	-- i want to visually select the node
 
-	local start_row, _, end_row, _ = range[1], range[2], range[3], range[4]
-	-- Move the cursor to the start row
-	-- vim.api.nvim_win_set_cursor(0, {start_row, 0})
+	local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
 
-	-- Enter visual line mode
-	vim.api.nvim_input("V")
+	-- Move the cursor to the start row and column
+	vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
 
-	-- Move the cursor to the end row
-	vim.api.nvim_win_set_cursor(0, { end_row, 0 })
-	-- visually selec between start and end row
+	-- Enter visual mode
+	vim.api.nvim_input("v")
+
+	-- Move the cursor to the end row and column
+	vim.api.nvim_win_set_cursor(0, { end_row + 1, end_col })
+
+	-- Visually select between start and end row
+	vim.api.nvim_input("o")
 
 	-- M.highlight(range, duration, hl_group)
 end
