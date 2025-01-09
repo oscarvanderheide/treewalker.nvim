@@ -51,18 +51,17 @@ function M.jump(row, node)
 end
 
 function M.select_node(row, node)
-	vim.cmd("normal! m'") -- Add originating node to jump list
-	vim.api.nvim_win_set_cursor(0, { row, 0 })
+	-- vim.cmd("normal! m'") -- Add originating node to jump list
+	-- vim.api.nvim_win_set_cursor(0, { row, 0 })
 	vim.cmd("normal! ^") -- Jump to start of line
 	local range = nodes.range(node)
 
 	local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
 
+	vim.api.nvim_win_set_cursor(0, { start_row, 0 })
 	-- Move the cursor to the start row and column
 
 	-- print the start and end row and column
-	print(start_row, start_col, end_row, end_col)
-	-- make it appear in messages
 	vim.api.nvim_out_write(
 		string.format(
 			"start_row: %d, start_col: %d, end_row: %d, end_col: %d\n",
