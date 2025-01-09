@@ -38,12 +38,16 @@ end
 ---@param row integer
 ---@param node TSNode
 function M.jump(row, node)
+	local range = nodes.range(node)
+
+	vim.api.nvim_out_write(string.format("Node range[1]\n", range[1]))
 	vim.cmd("normal! m'") -- Add originating node to jump list
 	vim.api.nvim_win_set_cursor(0, { row, 0 })
 	vim.api.nvim_out_write(string.format("Jumping to row %d\n", row))
 	vim.cmd("normal! ^") -- Jump to start of line
 	if require("treewalker").opts.highlight then
 		local range = nodes.range(node)
+		vim.api.nvim_out_write(string.format("Node range[1]\n", range[1]))
 		local duration = require("treewalker").opts.highlight_duration
 		local hl_group = require("treewalker").opts.highlight_group
 
