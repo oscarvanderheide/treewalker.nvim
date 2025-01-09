@@ -56,14 +56,18 @@ function M.jump(row, node)
 end
 
 function M.select_node(row, node)
+	-- get current cursor position
+	local cursor = vim.api.nvim_win_get_cursor(0)
+	local current_row = cursor[1]
+
 	-- vim.cmd("normal! m'") -- Add originating node to jump list
 	-- vim.api.nvim_win_set_cursor(0, { row, 0 })
-	vim.cmd("normal! ^") -- Jump to start of line
+	-- vim.cmd("normal! ^") -- Jump to start of line
 	local range = nodes.range(node)
 
 	local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
 
-	vim.api.nvim_win_set_cursor(0, { start_row, 0 })
+	-- vim.api.nvim_win_set_cursor(0, { start_row, 0 })
 	-- Move the cursor to the start row and column
 
 	-- print the start and end row and column
@@ -77,7 +81,7 @@ function M.select_node(row, node)
 		)
 	)
 	-- Move the cursor to the end row and column
-	vim.cmd("normal! V" .. (end_row - start_row) .. "j")
+	vim.cmd("normal! V" .. (start_row - current_row) .. "j")
 
 	-- M.highlight(range, duration, hl_group)
 end
