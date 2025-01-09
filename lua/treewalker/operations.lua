@@ -51,8 +51,8 @@ function M.select_node(node)
 	-- vim.api.nvim_out_write(string.format("arg row: %d, current_row: %d\n", row, current_row))
 	-- vim.cmd("normal! m'") -- Add originating node to jump list
 
-	local start_row, _, end_row, _ = range[1], range[2], range[3], range[4]
-	vim.api.nvim_out_write(string.format("Start row end row: %d %d\n", start_row, end_row))
+	local start_row, end_row = range[1] + 1, range[3] + 1
+	-- vim.api.nvim_out_write(string.format("Start row end row: %d %d\n", start_row, end_row))
 
 	vim.api.nvim_win_set_cursor(0, { start_row, 0 })
 	-- vim.cmd("normal! ^") -- Jump to start of line
