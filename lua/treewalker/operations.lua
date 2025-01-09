@@ -35,6 +35,17 @@ function M.jump(row, node)
 		local range = nodes.range(node)
 		local duration = require("treewalker").opts.highlight_duration
 		local hl_group = require("treewalker").opts.highlight_group
+
+		local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
+		vim.api.nvim_out_write(
+			string.format(
+				"start_row: %d, start_col: %d, end_row: %d, end_col: %d\n",
+				start_row,
+				start_col,
+				end_row,
+				end_col
+			)
+		)
 		M.highlight(range, duration, hl_group)
 	end
 end
