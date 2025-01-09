@@ -12,9 +12,18 @@ local M = {}
 ---@param duration integer
 ---@param hl_group string
 function M.highlight(range, duration, hl_group)
-	local start_row, _, end_row, _ = range[1], range[2], range[3], range[4]
+	local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
 	local ns_id = vim.api.nvim_create_namespace("")
 
+	vim.api.nvim_out_write(
+		string.format(
+			"start_row: %d, start_col: %d, end_row: %d, end_col: %d\n",
+			start_row,
+			start_col,
+			end_row,
+			end_col
+		)
+	)
 	for row = start_row, end_row do
 		vim.api.nvim_buf_add_highlight(0, ns_id, hl_group, row, 0, -1)
 	end
@@ -30,22 +39,13 @@ end
 function M.jump(row, node)
 	vim.cmd("normal! m'") -- Add originating node to jump list
 	vim.api.nvim_win_set_cursor(0, { row, 0 })
+	vim.api.nvim_out_write(string.format("Jumping to row %d\n", row))
 	vim.cmd("normal! ^") -- Jump to start of line
 	if require("treewalker").opts.highlight then
 		local range = nodes.range(node)
 		local duration = require("treewalker").opts.highlight_duration
 		local hl_group = require("treewalker").opts.highlight_group
 
-		local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
-		vim.api.nvim_out_write(
-			string.format(
-				"start_row: %d, start_col: %d, end_row: %d, end_col: %d\n",
-				start_row,
-				start_col,
-				end_row,
-				end_col
-			)
-		)
 		M.highlight(range, duration, hl_group)
 	end
 end
