@@ -70,6 +70,9 @@ function M.select_node(row, node)
 	-- vim.cmd("normal! m'") -- Add originating node to jump list
 	local start_row = current_all_rows[1]
 	local end_row = current_all_rows[2]
+	print("start_row", start_row)
+	print("end_row", end_row)
+
 	vim.api.nvim_win_set_cursor(0, { start_row, 0 })
 	-- vim.cmd("normal! ^") -- Jump to start of line
 	-- local range = nodes.range(node)
