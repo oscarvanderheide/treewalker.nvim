@@ -1,6 +1,6 @@
 local operations = require("treewalker.operations")
 local targets = require("treewalker.targets")
-
+local nodes = require("treewalker.nodes")
 local M = {}
 
 ---@return nil
@@ -45,11 +45,9 @@ end
 
 ---@return nil
 function M.select_node()
-	local target, row, line = targets.down()
-
-	if target and row and line then
-		--util.log("no down candidate")
-		operations.select_node(row, target)
+	local current = nodes.get_row_current()
+	if current then
+		operations.select_node(current)
 	end
 end
 

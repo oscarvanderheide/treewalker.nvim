@@ -12,42 +12,27 @@ local M = {}
 ---@param duration integer
 ---@param hl_group string
 function M.highlight(range, duration, hl_group)
-	local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
+	local start_row, _, end_row, _ = range[1], range[2], range[3], range[4]
 	local ns_id = vim.api.nvim_create_namespace("")
 
-	vim.api.nvim_out_write(
-		string.format(
-			"start_row: %d, start_col: %d, end_row: %d, end_col: %d\n",
-			start_row,
-			start_col,
-			end_row,
-			end_col
-		)
-	)
 	for row = start_row, end_row do
-		print("Adding highlight:", ns_id, hl_group, row)
 		vim.api.nvim_buf_add_highlight(0, ns_id, hl_group, row, 0, -1)
 	end
 
 	-- Remove the highlight after delay
 	vim.defer_fn(function()
 		vim.api.nvim_buf_clear_namespace(0, ns_id, 0, -1)
-	end, 1000)
+	end, duration)
 end
 
 ---@param row integer
 ---@param node TSNode
 function M.jump(row, node)
-	local range = nodes.range(node)
-
-	vim.api.nvim_out_write(string.format("Node range[1]: %d\n", range[1]))
 	vim.cmd("normal! m'") -- Add originating node to jump list
 	vim.api.nvim_win_set_cursor(0, { row, 0 })
-	vim.api.nvim_out_write(string.format("Jumping to row %d\n", row))
 	vim.cmd("normal! ^") -- Jump to start of line
 	if require("treewalker").opts.highlight then
 		local range = nodes.range(node)
-		vim.api.nvim_out_write(string.format("Node range[1]: %d\n", range[1]))
 		local duration = require("treewalker").opts.highlight_duration
 		local hl_group = require("treewalker").opts.highlight_group
 
@@ -55,23 +40,19 @@ function M.jump(row, node)
 	end
 end
 
-function M.select_node(row, node)
+function M.select_node(node)
 	-- get current node rows
 	local current = nodes.get_row_current()
-	local current_range = nodes.range(current)
-	local current_augments = augment.get_node_augments(current)
-	local current_all = { current, unpack(current_augments) }
-	local current_all_rows = nodes.whole_range(current_all)
+	local range = nodes.range(current)
 
 	-- get current cursor position
 	-- local cursor = vim.api.nvim_win_get_cursor(0)
 	-- local current_row = cursor[1]
 	-- vim.api.nvim_out_write(string.format("arg row: %d, current_row: %d\n", row, current_row))
 	-- vim.cmd("normal! m'") -- Add originating node to jump list
-	local start_row = current_all_rows[1]
-	local end_row = current_all_rows[2]
-	print("start_row", start_row)
-	print("end_row", end_row)
+
+	local start_row, _, end_row, _ = range[1], range[2], range[3], range[4]
+	vim.api.nvim_out_write(string.format("Start row end row: %d %d\n", start_row, end_row))
 
 	vim.api.nvim_win_set_cursor(0, { start_row, 0 })
 	-- vim.cmd("normal! ^") -- Jump to start of line
