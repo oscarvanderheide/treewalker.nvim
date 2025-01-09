@@ -48,16 +48,21 @@ function M.select_node(row, node)
 	local start_row, start_col, end_row, end_col = range[1], range[2], range[3], range[4]
 
 	-- Move the cursor to the start row and column
-	vim.api.nvim_win_set_cursor(0, { start_row + 1, start_col })
 
-	-- Enter visual mode
-	vim.api.nvim_input("v")
-
+	-- print the start and end row and column
+	print(start_row, start_col, end_row, end_col)
+	-- make it appear in messages
+	vim.api.nvim_out_write(
+		string.format(
+			"start_row: %d, start_col: %d, end_row: %d, end_col: %d\n",
+			start_row,
+			start_col,
+			end_row,
+			end_col
+		)
+	)
 	-- Move the cursor to the end row and column
-	vim.api.nvim_win_set_cursor(0, { end_row + 1, end_col })
-
-	-- Visually select between start and end row
-	vim.api.nvim_input("o")
+	vim.cmd("normal! V" .. (end_row - start_row) .. "j")
 
 	-- M.highlight(range, duration, hl_group)
 end
