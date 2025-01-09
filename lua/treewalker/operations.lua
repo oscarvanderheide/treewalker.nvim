@@ -25,6 +25,7 @@ function M.highlight(range, duration, hl_group)
 		)
 	)
 	for row = start_row, end_row do
+		print("Adding highlight:", ns_id, hl_group, row)
 		vim.api.nvim_buf_add_highlight(0, ns_id, hl_group, row, 0, -1)
 	end
 
