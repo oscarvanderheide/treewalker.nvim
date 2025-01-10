@@ -40,7 +40,6 @@ function M.jump(row, node)
 	end
 end
 
----@param action string
 function M.node(action)
     -- get current node rows
     local current = nodes.get_row_current()
