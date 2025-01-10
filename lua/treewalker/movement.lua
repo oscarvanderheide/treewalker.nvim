@@ -47,7 +47,7 @@ end
 function M.select_node()
 	local current = nodes.get_row_current()
 	if current then
-		operations.node_action("v")
+		operations.node_action("normal! v")
 	end
 end
 
@@ -55,7 +55,7 @@ end
 function M.select_node_lines()
 	local current = nodes.get_row_current()
 	if current then
-		operations.node_action("V")
+		operations.node_action("normal! V")
 	end
 end
 
@@ -64,7 +64,7 @@ end
 function M.comment_node()
 	local current = nodes.get_row_current()
 	if current then
-		operations.node_action("gc")
+		operations.node_action("normal gc")
 	end
 end
 
@@ -72,7 +72,7 @@ end
 function M.yank_node()
 	local current = nodes.get_row_current()
 	if current then
-		operations.node_action("y")
+		operations.node_action("normal! y")
 	end
 end
 
@@ -80,7 +80,7 @@ end
 function M.delete_node()
 	local current = nodes.get_row_current()
 	if current then
-		operations.node_action("d")
+		operations.node_action("normal! d")
 	end
 end
 
