@@ -19,6 +19,18 @@ function M.highlight(range, duration, hl_group)
     vim.api.nvim_buf_add_highlight(0, ns_id, hl_group, row, 0, -1)
   end
 
+  -- -- This accomplishes the same thing, but filling the entire space with
+  -- -- highlight, _including empty lines_.
+  -- -- The only reason I don't want it now is because I can't figure out how
+  -- -- to get it to not extend the full width of the window.
+  -- -- Add ext marks for the range
+  -- local start_mark = vim.api.nvim_buf_set_extmark(0, ns_id, start_row, start_col, {
+  --   hl_group = hl_group,
+  --   end_row = end_row,
+  --   end_col = end_col,
+  --   hl_eol = true,
+  -- })
+
   -- Remove the highlight after delay
   vim.defer_fn(function()
     vim.api.nvim_buf_clear_namespace(0, ns_id, 0, -1)
