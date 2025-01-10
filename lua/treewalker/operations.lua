@@ -41,6 +41,8 @@ function M.jump(row, node)
 end
 
 function M.node_action(action)
+	  -- get current cursor position
+    local cursor_pos = vim.api.nvim_win_get_cursor(0)
     -- get current node rows
     local current = nodes.get_row_current()
     local range = nodes.range(current)
@@ -55,6 +57,8 @@ function M.node_action(action)
     print("Executing command: " .. cmd)
     -- perform action
     vim.cmd(cmd)
+	  -- set cursos back to original position
+    vim.api.nvim_win_set_cursor(0, cursor_pos)
 end
 
 
