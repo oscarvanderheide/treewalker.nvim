@@ -47,7 +47,7 @@ end
 function M.select_node()
 	local current = nodes.get_row_current()
 	if current then
-		operations.select_node(current)
+		operations.select_node(current, "V")
 	end
 end
 
