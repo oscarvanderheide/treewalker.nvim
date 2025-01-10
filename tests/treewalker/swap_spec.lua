@@ -190,6 +190,23 @@ describe("Swapping in a regular lua file:", function()
     assert.same("  print('bye', 'hi')", lines.get_line(190))
     helpers.assert_cursor_at(190, 9, "block") -- cursor stays put for feel
   end)
+
+  pending("swaps right and left equally in string concatenation", function()
+    vim.fn.cursor(188, 27) -- |'three'
+    assert.same("  print('one' .. 'two' .. 'three')", lines.get_line(188))
+    tw.swap_left()
+    helpers.assert_cursor_at(188, 18)
+    assert.same("  print('one' .. 'three' .. 'two')", lines.get_line(188))
+    tw.swap_left()
+    helpers.assert_cursor_at(188, 9)
+    assert.same("  print('one' .. 'three' .. 'two')", lines.get_line(188))
+    tw.swap_right()
+    helpers.assert_cursor_at(188, 18)
+    assert.same("  print('one' .. 'three' .. 'two')", lines.get_line(188))
+    tw.swap_right()
+    helpers.assert_cursor_at(188, 27)
+    assert.same("  print('one' .. 'two' .. 'three')", lines.get_line(188))
+  end)
 end)
 
 -- doesn't work at all in md, doesn't need to
@@ -293,6 +310,4 @@ describe("Swapping in a rust file:", function()
     tw.swap_left()
     assert.same('    println!(calculate_area(shape), "shape_area");', lines.get_line(46))
   end)
-
 end)
-

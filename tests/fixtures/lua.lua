@@ -185,7 +185,7 @@ end
 if true then
   print('hi')
 elseif false then
-  print('hi')
+  print('one' .. 'two' .. 'three')
 else
   print('hi', 'bye')
 end
