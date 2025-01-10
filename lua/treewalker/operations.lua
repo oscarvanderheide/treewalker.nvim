@@ -40,16 +40,24 @@ function M.jump(row, node)
 	end
 end
 
-function M.node_action(action)
-	-- get current node rows
-	local current = nodes.get_row_current()
-	local range = nodes.range(current)
-	local start_row, end_row = range[1] + 1, range[3] + 1
-	-- move cursor to start of node
-	vim.api.nvim_win_set_cursor(0, { start_row, 0 })
-	-- perform action
-	vim.cmd("normal! " .. action .. (end_row - start_row) .. "j")
+---@param action string
+function M.node(action)
+    -- get current node rows
+    local current = nodes.get_row_current()
+    local range = nodes.range(current)
+    local start_row, end_row = range[1] + 1, range[3] + 1
+    -- move cursor to start of node
+    vim.api.nvim_win_set_cursor(0, { start_row, 0 })
+    -- calculate the number of lines to move
+    local num_lines = end_row - start_row
+    -- construct the command
+    local cmd = "normal! " .. action .. num_lines .. "j"
+    -- print the command for debugging
+    print("Executing command: " .. cmd)
+    -- perform action
+    vim.cmd(cmd)
 end
+
 
 -- Swap entire rows
 ---@param earlier_rows [integer, integer] -- [start row, end row]
