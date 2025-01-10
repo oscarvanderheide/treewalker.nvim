@@ -16,6 +16,8 @@ class BankAccount
     end
   end
 
+  deposit(5, deposit(5))
+
   def withdraw(amount)
     return nil unless deposit?(amount)
     @balance -= amount

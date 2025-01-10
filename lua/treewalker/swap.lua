@@ -35,7 +35,6 @@ function M.swap_down()
   local target, row, line = targets.down()
 
   if not target or not row or not line then
-    --util.log("no down candidate")
     return
   end
 
@@ -66,7 +65,6 @@ function M.swap_up()
   local target, row, line = targets.up()
 
   if not target or not row or not line then
-    --util.log("no down candidate")
     return
   end
 

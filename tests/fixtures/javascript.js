@@ -52,3 +52,6 @@ fetchData((err, data) => {
   });
 });
 
+const otherFunc = () => {
+  myCallback1("hello", 100, fetchData('abc', 123))
+}

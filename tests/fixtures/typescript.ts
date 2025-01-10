@@ -73,8 +73,9 @@ function logTime(target: any, propertyKey: string, descriptor: PropertyDescripto
 
 class Calculator {
   calculateProduct(a: number, b: number): void {
+    const log = Logger
     // do something time-consuming...
-    Logger.log('Calculating product...');
+    Logger.log('Calculating product...', log('woooo'));
     setTimeout(() => {}, 1000);
   }
 }

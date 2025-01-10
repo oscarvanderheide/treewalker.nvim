@@ -70,7 +70,7 @@ end
 ---@param node1 TSNode
 ---@param node2 TSNode
 ---@return boolean
-function M.have_same_row(node1, node2)
+function M.have_same_srow(node1, node2)
   return M.get_row(node1) == M.get_row(node2)
 end
 
@@ -156,7 +156,7 @@ end
 ---@return TSNode
 function M.get_highest_row_coincident(node)
   local parent = node:parent()
-  while parent and M.have_same_row(node, parent) do
+  while parent and M.have_same_srow(node, parent) do
     if M.is_highlight_target(parent) then node = parent end
     parent = parent:parent()
   end
@@ -168,7 +168,7 @@ end
 ---@return TSNode
 function M.get_highest_coincident(node)
   local parent = node:parent()
-  while parent and M.have_same_row(node, parent) and M.have_same_scol(node, parent) do
+  while parent and M.have_same_srow(node, parent) and M.have_same_scol(node, parent) do
     if M.is_highlight_target(parent) then node = parent end
     parent = parent:parent()
   end
@@ -285,6 +285,7 @@ end
 function M.get_row_current()
   local node = vim.treesitter.get_node()
   assert(node)
+  -- TODO this practice is breaking moving out of haskell functions
   return M.get_highest_row_coincident(node)
 end
 

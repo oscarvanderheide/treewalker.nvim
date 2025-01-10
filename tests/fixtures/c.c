@@ -54,6 +54,8 @@ int main() {
     withdraw(account, 200.00f);
     printAccountInfo(account);
 
+    printAccountInfo(createAccount(12345, 1000.00f), "hi")
+
     free(account);
     return 0;
 }
