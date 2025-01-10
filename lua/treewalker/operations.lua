@@ -50,7 +50,7 @@ function M.node_action(action)
     -- calculate the number of lines to move
     local num_lines = end_row - start_row
     -- construct the command
-    local cmd = "normal! " .. action .. num_lines .. "j"
+    local cmd = "normal " .. action .. num_lines .. "j"
     -- print the command for debugging
     print("Executing command: " .. cmd)
     -- perform action
