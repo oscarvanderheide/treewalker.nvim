@@ -22,7 +22,7 @@ local subcommands = {
 	end,
 
 	Select = function()
-		tw().select_node("V")
+		tw().select_node()
 	end,
 
 	SwapUp = function()

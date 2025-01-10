@@ -44,10 +44,10 @@ function M.move_down()
 end
 
 ---@return nil
-function M.select_node(action)
+function M.select_node()
 	local current = nodes.get_row_current()
 	if current then
-		operations.select_node(current, action)
+		operations.select_node("V")
 	end
 end
 

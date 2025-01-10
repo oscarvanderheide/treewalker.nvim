@@ -40,7 +40,7 @@ function M.jump(row, node)
 	end
 end
 
-function M.select_node(node, action)
+function M.select_node(action)
 	-- get current node rows
 	local current = nodes.get_row_current()
 	local range = nodes.range(current)
