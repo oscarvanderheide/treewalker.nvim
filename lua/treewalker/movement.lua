@@ -47,8 +47,42 @@ end
 function M.select_node()
 	local current = nodes.get_row_current()
 	if current then
-		operations.select_node("V")
+		operations.node_action("v")
 	end
 end
+
+---@return nil
+function M.select_node_lines()
+	local current = nodes.get_row_current()
+	if current then
+		operations.node_action("V")
+	end
+end
+
+
+---@return nil
+function M.comment_node()
+	local current = nodes.get_row_current()
+	if current then
+		operations.node_action("gc")
+	end
+end
+
+---@return nil
+function M.yank_node()
+	local current = nodes.get_row_current()
+	if current then
+		operations.node_action("y")
+	end
+end
+
+---@return nil
+function M.delete_node()
+	local current = nodes.get_row_current()
+	if current then
+		operations.node_action("d")
+	end
+end
+
 
 return M
