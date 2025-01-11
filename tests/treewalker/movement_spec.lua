@@ -90,6 +90,18 @@ describe("Movement in a regular lua file: ", function()
     helpers.feed_keys('G')
     tw.move_down()
   end)
+
+  it("moves up from inside a function", function()
+    vim.fn.cursor(21, 16) -- |is_jump_target
+    tw.move_up()
+    helpers.assert_cursor_at(10, 1, "local TARGET_DESCENDANT_TYPES")
+  end)
+
+  it("moves down from inside a function", function()
+    vim.fn.cursor(21, 16) -- |is_jump_target
+    tw.move_down()
+    helpers.assert_cursor_at(30, 1, "local function is_descendant_jump_target")
+  end)
 end)
 
 describe("Movement in a lua spec file: ", function()
@@ -125,3 +137,4 @@ describe("Movement in a lua spec file: ", function()
     helpers.assert_cursor_at(21, 5, "it")
   end)
 end)
+
