@@ -96,3 +96,8 @@ describe("Treewalker", function()
   end)
 end)
 
+-- #18/#19 not really test related but a good test case. Here b/c there was no more room
+-- in lua.lua
+local heads = {
+  { "k", "<CMD>Treewalker SwapUp<CR>", { desc = "up" } },
+}

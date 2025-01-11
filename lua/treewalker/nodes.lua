@@ -303,13 +303,27 @@ end
 function M.log(node)
   local row = M.range(node)[1] + 1
   local line = lines.get_line(row)
-  assert(line, "log will only ever be called on valid nodes which will have valid line numbers")
+  assert(line, "log should only ever be called on valid nodes which will have valid line numbers")
   local col = lines.get_start_col(line)
   local log_string = ""
   log_string = log_string .. string.format(" [%s/%s]", row, col)
   log_string = log_string .. string.format(" (%s)", node:type())
   log_string = log_string .. string.format(" |%s|", line)
   log_string = log_string .. string.format(" {%s}", vim.inspect(M.range(node)))
+  util.log(log_string)
+end
+
+-- util.log some formatted version of the node's parent chain
+---@param node TSNode
+---@return nil
+function M.log_parents(node)
+  local log_string = node:type()
+  if node:parent() then
+    log_string = node:parent():type() .. "->" .. log_string
+  end
+  if node:parent():parent() then
+    log_string = node:parent():parent():type() .. "->" .. node:parent():type() .. "->" .. log_string
+  end
   util.log(log_string)
 end
 

@@ -209,11 +209,30 @@ describe("Swapping in a regular lua file:", function()
   end)
 end)
 
+describe("Swapping in a lua test file", function ()
+  before_each(function()
+    load_fixture("/lua-spec.lua")
+  end)
+
+  it("swaps strings right in a list", function ()
+    vim.fn.cursor(102, 6) -- "|k"
+    assert.same('  { "k", "<CMD>Treewalker SwapUp<CR>", { desc = "up" } },', lines.get_line(102))
+    tw.swap_right()
+    assert.same('  { "<CMD>Treewalker SwapUp<CR>", "k", { desc = "up" } },', lines.get_line(102))
+  end)
+
+  it("swaps strings left in a list", function ()
+    vim.fn.cursor(102, 12) -- "<|CMD>
+    assert.same('  { "k", "<CMD>Treewalker SwapUp<CR>", { desc = "up" } },', lines.get_line(102))
+    tw.swap_left()
+    assert.same('  { "<CMD>Treewalker SwapUp<CR>", "k", { desc = "up" } },', lines.get_line(102))
+  end)
+end)
+
 -- doesn't work at all in md, doesn't need to
 describe("Swapping in a markdown file:", function()
   before_each(function()
     load_fixture("/markdown.md")
-    vim.bo[0].filetype = "markdown"
   end)
 
   it("turns off for down in md files", function()

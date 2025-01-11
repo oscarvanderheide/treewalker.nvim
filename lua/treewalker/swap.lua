@@ -107,6 +107,7 @@ function M.swap_right()
 
   -- strings
   local candidate = strategies.get_highest_string_node(nodes.get_current())
+  if candidate then candidate = nodes.get_highest_coincident(candidate) end
   local candidate_target = next_sib(candidate)
   if candidate and candidate_target then
     current = candidate
@@ -153,6 +154,7 @@ function M.swap_left()
 
   -- strings
   local candidate = strategies.get_highest_string_node(nodes.get_current())
+  if candidate then candidate = nodes.get_highest_coincident(candidate) end
   local candidate_target = prev_sib(candidate)
   if candidate and candidate_target then
     current = candidate
