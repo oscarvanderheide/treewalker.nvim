@@ -15,3 +15,6 @@ Thank you for contributing to Treewalker!
 * use util.R in init.lua for the plugin to hot reload in your current dev environment
 * use `util.log` to print to the fs, and `tail -f ~/.local/share/nvim/treewalker/debug.log` to read from it
 * I often dev with a `make-test` in one small terminal pane, and `tail -f ...` in another
+* require("treewalker.nodes") has some logging utilities
+  - nodes.log(node) will print some info on the node
+  - nodes.log_parents(node) will print the parent hierarchy up a handful of parents

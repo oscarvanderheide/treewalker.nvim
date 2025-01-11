@@ -315,15 +315,23 @@ end
 
 -- util.log some formatted version of the node's parent chain
 ---@param node TSNode
+---@param depth number | nil
 ---@return nil
-function M.log_parents(node)
+function M.log_parents(node, depth)
+  if not depth then depth = 4 end
+  ---@type TSNode | nil
+  local current_node = node
   local log_string = node:type()
-  if node:parent() then
-    log_string = node:parent():type() .. "->" .. log_string
+  local current_depth = 1
+
+  -- Loop to traverse up to 3 parent nodes
+  while current_node and current_depth <= depth do
+    current_node = current_node:parent()
+    if not current_node then break end
+    log_string = current_node:type() .. "->" .. log_string
+    current_depth = current_depth + 1
   end
-  if node:parent():parent() then
-    log_string = node:parent():parent():type() .. "->" .. node:parent():type() .. "->" .. log_string
-  end
+
   util.log(log_string)
 end
 
