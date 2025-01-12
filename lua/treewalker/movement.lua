@@ -35,11 +35,31 @@ end
 
 ---@return nil
 function M.move_down()
+	local cursor_pos_before = vim.api.nvim_win_get_cursor(0)
+	vim.notify("Cursor position before: " .. vim.inspect(cursor_pos_before))
 	local target, row, line = targets.down()
 
 	if target and row and line then
 		--util.log("no down candidate")
 		operations.jump(row, target)
+	end
+
+	local cursor_pos_after = vim.api.nvim_win_get_cursor(0)
+	vim.notify("Cursor position after: " .. vim.inspect(cursor_pos_after))
+
+	if cursor_pos_before[1] == cursor_pos_after[1] then
+		-- If the cursor didn't move, we're at the last node in the file
+		-- So we need to move the cursor to the end of the node
+		vim.notify("Cursor did not move, jumping to end of node")
+
+		local current = nodes.get_row_current()
+		vim.notify("Current node: " .. vim.inspect(current))
+		local range = nodes.range(current)
+		vim.notify("Current node range: " .. vim.inspect(range))
+		local end_row = range[3] + 1
+		vim.notify("End row: " .. end_row)
+		vim.api.nvim_win_set_cursor(0, { end_row + 1, 0 })
+		vim.cmd("normal! ^") -- Jump to start of line
 	end
 end
 
@@ -58,7 +78,6 @@ function M.select_node_lines()
 		operations.node_action("normal! V")
 	end
 end
-
 
 ---@return nil
 function M.comment_node()
@@ -83,6 +102,5 @@ function M.delete_node()
 		operations.node_action("normal! d")
 	end
 end
-
 
 return M

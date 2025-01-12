@@ -28,35 +28,15 @@ end
 ---@param row integer
 ---@param node TSNode
 function M.jump(row, node)
-	local cursor_pos_before = vim.api.nvim_win_get_cursor(0)
-	vim.notify("Cursor position before: " .. vim.inspect(cursor_pos_before))
 	vim.cmd("normal! m'") -- Add originating node to jump list
 	vim.api.nvim_win_set_cursor(0, { row, 0 })
 	vim.cmd("normal! ^") -- Jump to start of line
 	if require("treewalker").opts.highlight then
 		local range = nodes.range(node)
-		vim.notify("Node range: " .. vim.inspect(range))
 		local duration = require("treewalker").opts.highlight_duration
 		local hl_group = require("treewalker").opts.highlight_group
 
 		M.highlight(range, duration, hl_group)
-	end
-	local cursor_pos_after = vim.api.nvim_win_get_cursor(0)
-	vim.notify("Cursor position after: " .. vim.inspect(cursor_pos_after))
-
-	if cursor_pos_before[1] == cursor_pos_after[1] then
-		-- If the cursor didn't move, we're at the last node in the file
-		-- So we need to move the cursor to the end of the node
-		vim.notify("Cursor did not move, jumping to end of node")
-
-		local current = nodes.get_row_current()
-		vim.notify("Current node: " .. vim.inspect(current))
-		local range = nodes.range(current)
-		vim.notify("Current node range: " .. vim.inspect(range))
-		local end_row = range[3] + 1
-		vim.notify("End row: " .. end_row)
-		vim.api.nvim_win_set_cursor(0, { end_row + 1, 0 })
-		vim.cmd("normal! ^") -- Jump to start of line
 	end
 end
 
