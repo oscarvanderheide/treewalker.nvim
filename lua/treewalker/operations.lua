@@ -45,8 +45,9 @@ function M.jump(row, node)
 		-- If the cursos didn't move, we're at the last node in the file
 		-- So we need to move the cursor to the end of the node
 
-		local range = nodes.range(node)
-		local _, _, end_row, _ = range[1], range[2], range[3], range[4]
+	local current = nodes.get_row_current()
+	local range = nodes.range(current)
+	local end_row =  range[3] + 1
 		vim.api.nvim_win_set_cursor(0, { end_row + 1, 0 })
 		vim.cmd("normal! ^") -- Jump to start of line
 	end
