@@ -1,6 +1,9 @@
+-- local function tw()
+--   local util = require "treewalker.util"
+--   return util.R('treewalker')
+-- end
+
 local function tw()
-  -- local util = require "treewalker.util"
-  -- return util.R('treewalker')
   return require('treewalker')
 end
 
