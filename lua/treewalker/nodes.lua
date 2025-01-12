@@ -298,6 +298,7 @@ function M.get_current()
 end
 
 -- util.log some formatted version of the node's properties
+-- TODO print the node itself rather than the line it starts on
 ---@param node TSNode
 ---@return nil
 function M.log(node)
