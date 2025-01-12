@@ -58,7 +58,7 @@ function M.move_down()
 		vim.notify("Current node range: " .. vim.inspect(range))
 		local end_row = range[3] + 1
 		vim.notify("End row: " .. end_row)
-		vim.api.nvim_win_set_cursor(0, { end_row + 1, 0 })
+		vim.api.nvim_win_set_cursor(0, { end_row, 0 })
 		vim.cmd("normal! ^") -- Jump to start of line
 	end
 end
