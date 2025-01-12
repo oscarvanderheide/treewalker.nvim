@@ -28,6 +28,7 @@ end
 ---@param row integer
 ---@param node TSNode
 function M.jump(row, node)
+	local cursor_pos_before = vim.api.nvim_win_get_cursor(0)
 	vim.cmd("normal! m'") -- Add originating node to jump list
 	vim.api.nvim_win_set_cursor(0, { row, 0 })
 	vim.cmd("normal! ^") -- Jump to start of line
@@ -38,29 +39,39 @@ function M.jump(row, node)
 
 		M.highlight(range, duration, hl_group)
 	end
+	local cursor_pos_after = vim.api.nvim_win_get_cursor(0)
+
+	if cursor_pos_before[1] == cursor_pos_after[1] then
+		-- If the cursos didn't move, we're at the last node in the file
+		-- So we need to move the cursor to the end of the node
+
+		local range = nodes.range(node)
+		local _, _, end_row, _ = range[1], range[2], range[3], range[4]
+		vim.api.nvim_win_set_cursor(0, { end_row + 1, 0 })
+		vim.cmd("normal! ^") -- Jump to start of line
+	end
 end
 
 function M.node_action(action)
-	  -- get current cursor position
-    local cursor_pos = vim.api.nvim_win_get_cursor(0)
-    -- get current node rows
-    local current = nodes.get_row_current()
-    local range = nodes.range(current)
-    local start_row, end_row = range[1] + 1, range[3] + 1
-    -- move cursor to start of node
-    -- vim.api.nvim_win_set_cursor(0, { start_row, 0 })
-    -- calculate the number of lines to move
-    local num_lines = end_row - start_row
-    -- construct the command
-    local cmd = action .. num_lines .. "j"
-    -- print the command for debugging
-    print("Executing command: " .. cmd)
-    -- perform action
-    vim.cmd(cmd)
-	  -- set cursos back to original position
-    vim.api.nvim_win_set_cursor(0, cursor_pos)
+	-- get current cursor position
+	local cursor_pos = vim.api.nvim_win_get_cursor(0)
+	-- get current node rows
+	local current = nodes.get_row_current()
+	local range = nodes.range(current)
+	local start_row, end_row = range[1] + 1, range[3] + 1
+	-- move cursor to start of node
+	-- vim.api.nvim_win_set_cursor(0, { start_row, 0 })
+	-- calculate the number of lines to move
+	local num_lines = end_row - start_row
+	-- construct the command
+	local cmd = action .. num_lines .. "j"
+	-- print the command for debugging
+	print("Executing command: " .. cmd)
+	-- perform action
+	vim.cmd(cmd)
+	-- set cursor back to original position
+	vim.api.nvim_win_set_cursor(0, cursor_pos)
 end
-
 
 -- Swap entire rows
 ---@param earlier_rows [integer, integer] -- [start row, end row]
