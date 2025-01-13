@@ -54,8 +54,8 @@ function M.node_action(action)
 		if current_augments then
 			local current_all = { current, unpack(current_augments) }
 			local current_all_rows = nodes.whole_range(current_all)
-			start_row = current_all_rows[1] + 1
-			end_row = current_all_rows[2] + 1
+			start_row = current_all_rows[1] - 1
+			end_row = current_all_rows[2] - 1
 		end
 	end
 	-- move cursor to start of node
