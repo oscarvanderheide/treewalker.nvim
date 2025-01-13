@@ -1,7 +1,7 @@
 local operations = require("treewalker.operations")
 local targets = require("treewalker.targets")
 local nodes = require("treewalker.nodes")
-local augment= require("treewalker.augment")
+local augment = require("treewalker.augment")
 local M = {}
 
 ---@return nil
@@ -40,7 +40,7 @@ function M.move_down()
 	-- I modified this s.t. it moves to the end of the node in that case
 	-- because that feels more natural to me
 
-	-- Extract current position to check whether 
+	-- Extract current position to check whether
 	local cursor_pos_before = vim.api.nvim_win_get_cursor(0)
 	vim.notify("Cursor position before: " .. vim.inspect(cursor_pos_before))
 	local target, row, line = targets.down()
@@ -83,8 +83,6 @@ end
 ---@return nil
 function M.comment_node()
 	local current = nodes.get_row_current()
-
-  local current_augments = augment.get_node_augments(current)
 	if current then
 		operations.node_action("normal gc")
 	end
