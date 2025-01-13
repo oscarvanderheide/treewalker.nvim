@@ -51,10 +51,12 @@ function M.node_action(action)
 	if action == "normal gc" then
 		local current_augments = augment.get_node_augments(current)
 
-		local current_all = { current, unpack(current_augments) }
-		local current_all_rows = nodes.whole_range(current_all)
-		start_row = current_all_rows[1]
-		end_row = current_all_rows[2]
+		if current_augments then
+			local current_all = { current, unpack(current_augments) }
+			local current_all_rows = nodes.whole_range(current_all)
+			start_row = current_all_rows[1] + 1
+			end_row = current_all_rows[2] + 1
+		end
 	end
 	-- move cursor to start of node
 	-- vim.api.nvim_win_set_cursor(0, { start_row, 0 })
