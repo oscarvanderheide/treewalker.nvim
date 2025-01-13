@@ -1,6 +1,7 @@
 local operations = require("treewalker.operations")
 local targets = require("treewalker.targets")
 local nodes = require("treewalker.nodes")
+local augment= require("treewalker.augment")
 local M = {}
 
 ---@return nil
@@ -35,6 +36,11 @@ end
 
 ---@return nil
 function M.move_down()
+	-- Before, when there is no next sibling, the function did nothing
+	-- I modified this s.t. it moves to the end of the node in that case
+	-- because that feels more natural to me
+
+	-- Extract current position to check whether 
 	local cursor_pos_before = vim.api.nvim_win_get_cursor(0)
 	vim.notify("Cursor position before: " .. vim.inspect(cursor_pos_before))
 	local target, row, line = targets.down()
@@ -47,17 +53,12 @@ function M.move_down()
 	local cursor_pos_after = vim.api.nvim_win_get_cursor(0)
 	vim.notify("Cursor position after: " .. vim.inspect(cursor_pos_after))
 
+	-- If the cursor didn't move, we're at the last node in the file
+	-- So we need to move the cursor to the end of the node
 	if cursor_pos_before[1] == cursor_pos_after[1] then
-		-- If the cursor didn't move, we're at the last node in the file
-		-- So we need to move the cursor to the end of the node
-		vim.notify("Cursor did not move, jumping to end of node")
-
 		local current = nodes.get_row_current()
-		vim.notify("Current node: " .. vim.inspect(current))
 		local range = nodes.range(current)
-		vim.notify("Current node range: " .. vim.inspect(range))
 		local end_row = range[3] + 1
-		vim.notify("End row: " .. end_row)
 		vim.api.nvim_win_set_cursor(0, { end_row, 0 })
 		vim.cmd("normal! ^") -- Jump to start of line
 	end
@@ -82,6 +83,8 @@ end
 ---@return nil
 function M.comment_node()
 	local current = nodes.get_row_current()
+
+  local current_augments = augment.get_node_augments(current)
 	if current then
 		operations.node_action("normal gc")
 	end
