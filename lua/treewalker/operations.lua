@@ -51,11 +51,17 @@ function M.node_action(action)
 	if action == "normal gc" then
 		local current_augments = augment.get_node_augments(current)
 
+		-- if there are augments, get the range of the whole node
+		-- print the range for debugging
+		print("Current node range: " .. start_row .. " - " .. end_row)
 		if current_augments then
 			local current_all = { current, unpack(current_augments) }
 			local current_all_rows = nodes.whole_range(current_all)
 			start_row = current_all_rows[1] - 1
 			end_row = current_all_rows[2] - 1
+
+			print("Current node has augments, expanding range to include them")
+			print("Current node range: " .. start_row .. " - " .. end_row)
 		end
 	end
 	-- move cursor to start of node
