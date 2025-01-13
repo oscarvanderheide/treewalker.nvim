@@ -71,7 +71,7 @@ end
 ---@param node2 TSNode
 ---@return boolean
 function M.have_same_srow(node1, node2)
-  return M.get_row(node1) == M.get_row(node2)
+  return M.get_srow(node1) == M.get_srow(node2)
 end
 
 ---Do the nodes have the same level of indentation
@@ -134,8 +134,8 @@ function M.get_from_neighboring_line(current_row, dir)
   end
   local max_row = vim.api.nvim_buf_line_count(0)
   if candidate_row > max_row or candidate_row <= 0 then return end
-  local candidate_line = lines.get_line(candidate_row)
   local candidate = M.get_at_row(candidate_row)
+  local candidate_line = lines.get_line(candidate_row)
 
   -- For py decorators, when we examine the target-ness of a node, we
   -- want to be checking the highest coincident, rather than checking
@@ -194,7 +194,6 @@ function M.whole_range(nodes)
     local srow, _, erow = node:range()
     if srow < min_row then min_row = srow end
     if erow > max_row then max_row = erow end
-    if srow > max_row then max_row = srow end
   end
 
   return { min_row, max_row }
@@ -241,7 +240,7 @@ end
 -- and will reflect row as seen in the vim status line)
 ---@param node TSNode
 ---@return integer
-function M.get_row(node)
+function M.get_srow(node)
   local row = node:range()
   return row + 1
 end
@@ -251,7 +250,7 @@ end
 -- and will reflect col as seen in the vim status line)
 ---@param node TSNode
 ---@return integer
-function M.get_col(node)
+function M.get_scol(node)
   local _, col = node:range()
   return col + 1
 end
@@ -298,19 +297,17 @@ function M.get_current()
 end
 
 -- util.log some formatted version of the node's properties
--- TODO print the node itself rather than the line it starts on
 ---@param node TSNode
 ---@return nil
 function M.log(node)
-  local row = M.range(node)[1] + 1
-  local line = lines.get_line(row)
-  assert(line, "log should only ever be called on valid nodes which will have valid line numbers")
-  local col = lines.get_start_col(line)
+  local row = M.get_srow(node)
+  local col = M.get_scol(node)
+  local text = table.concat(M.get_text(node), "\n")
   local log_string = ""
   log_string = log_string .. string.format(" [%s/%s]", row, col)
   log_string = log_string .. string.format(" (%s)", node:type())
-  log_string = log_string .. string.format(" |%s|", line)
-  log_string = log_string .. string.format(" {%s}", vim.inspect(M.range(node)))
+  log_string = log_string .. string.format(" |%s|", text)
+  log_string = log_string .. string.format(" %s", vim.inspect(M.range(node)))
   util.log(log_string)
 end
 

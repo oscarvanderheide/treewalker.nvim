@@ -78,13 +78,20 @@ function M.swap_up()
   local target_all = { target, unpack(target_augments) }
   local target_all_rows = nodes.whole_range(target_all)
 
+  local target_augment_rows = nodes.whole_range(target_augments)
+  local target_augment_srow = target_augment_rows[1]
+  local target_augment_scol = target_augment_rows[2]
+  local target_augment_length = #target_augments > 0 and (target_augment_scol + 1 - target_augment_srow) or 0
+
+  local current_augment_rows = nodes.whole_range(current_augments)
+  local current_augment_srow = current_augment_rows[1]
+  local current_augment_scol = current_augment_rows[2]
+  local current_augment_length = #current_augments > 0 and (current_augment_scol + 1 - current_augment_srow) or 0
+
+  -- Do the swap
   operations.swap_rows(target_all_rows, current_all_rows)
 
   -- Place cursor
-  local target_augment_rows = nodes.whole_range(target_augments)
-  local target_augment_length = #target_augments > 0 and (target_augment_rows[2] + 1 - target_augment_rows[1]) or 0
-  local current_augment_rows = nodes.whole_range(current_augments)
-  local current_augment_length = #current_augments > 0 and (current_augment_rows[2] + 1 - current_augment_rows[1]) or 0
   local x = target_range[1] + 1 + current_augment_length - target_augment_length
   local y = target_range[2] + 1
   vim.fn.cursor(x, y)
@@ -123,16 +130,16 @@ function M.swap_right()
   operations.swap_nodes(current, target)
 
   -- Place cursor
-  local on_same_row = nodes.get_row(current) == nodes.get_row(target)
+  local on_same_row = nodes.get_srow(current) == nodes.get_srow(target)
   if on_same_row then
     vim.fn.cursor(
-      nodes.get_row(current),
-      nodes.get_col(current) + #target_text[1] + 2
+      nodes.get_srow(current),
+      nodes.get_scol(current) + #target_text[1] + 2
     )
   else
     vim.fn.cursor(
-      nodes.get_row(target) - #current_text + #target_text,
-      nodes.get_col(target)
+      nodes.get_srow(target) - #current_text + #target_text,
+      nodes.get_scol(target)
     )
   end
 end
@@ -168,8 +175,8 @@ function M.swap_left()
 
   -- Place cursor
   vim.fn.cursor(
-    nodes.get_row(target),
-    nodes.get_col(target)
+    nodes.get_srow(target),
+    nodes.get_scol(target)
   )
 end
 

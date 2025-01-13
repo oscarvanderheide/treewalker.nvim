@@ -36,6 +36,7 @@ class Car:
         print(f"Make: {self.make}, Model: {self.model}, Year: {self.year}")
 
 
+# And with comment?
 @random_annotation
 class Task:
     def __init__(self, description):
@@ -116,3 +117,32 @@ if __name__ == "__main__":
 
 def other():
     print("what", random_annotation("hello"))
+
+
+
+# C1
+# top
+@random_annotation({
+    "top route": "top",
+    "top": "this is the top one",
+    "top": "this is the top one",
+    "top": "this is the top one"
+})
+def handler_top(
+    one,
+    two,
+    three
+):
+    print(one, two, three)
+
+# C2
+@random_annotation({
+    "bottom": "one",
+    "is_this": "bottom one"
+})
+def handler_bottom(
+    one,
+    two,
+    three
+):
+    print("do some stuff here", one, two, three)

@@ -191,6 +191,9 @@ describe("Swapping in a regular lua file:", function()
     helpers.assert_cursor_at(190, 9, "block") -- cursor stays put for feel
   end)
 
+  -- Actually I don't think this is supposed to work. It's ambiguous what
+  -- node we're on. We'd need to do the lowest coincident that is the highest string
+  -- or something.
   pending("swaps right and left equally in string concatenation", function()
     vim.fn.cursor(188, 27) -- |'three'
     assert.same("  print('one' .. 'two' .. 'three')", lines.get_line(188))
@@ -209,19 +212,19 @@ describe("Swapping in a regular lua file:", function()
   end)
 end)
 
-describe("Swapping in a lua test file", function ()
+describe("Swapping in a lua test file:", function()
   before_each(function()
     load_fixture("/lua-spec.lua")
   end)
 
-  it("swaps strings right in a list", function ()
+  it("swaps strings right in a list", function()
     vim.fn.cursor(102, 6) -- "|k"
     assert.same('  { "k", "<CMD>Treewalker SwapUp<CR>", { desc = "up" } },', lines.get_line(102))
     tw.swap_right()
     assert.same('  { "<CMD>Treewalker SwapUp<CR>", "k", { desc = "up" } },', lines.get_line(102))
   end)
 
-  it("swaps strings left in a list", function ()
+  it("swaps strings left in a list", function()
     vim.fn.cursor(102, 12) -- "<|CMD>
     assert.same('  { "k", "<CMD>Treewalker SwapUp<CR>", { desc = "up" } },', lines.get_line(102))
     tw.swap_left()
@@ -328,5 +331,37 @@ describe("Swapping in a rust file:", function()
     assert.same('    println!("shape_area", calculate_area(shape));', lines.get_line(46))
     tw.swap_left()
     assert.same('    println!(calculate_area(shape), "shape_area");', lines.get_line(46))
+  end)
+end)
+
+describe("Swapping in a python file:", function()
+  before_each(function()
+    load_fixture("/python.py")
+  end)
+
+  it("swaps up annotated functions of different length", function()
+    vim.fn.cursor(143, 1) -- |def handler_bottom
+    tw.swap_up()
+    helpers.assert_cursor_at(128, 1, "|def handler_bottom")
+    assert.same('# C2', lines.get_line(123))
+    assert.same('@random_annotation({', lines.get_line(124))
+    assert.same('def handler_bottom(', lines.get_line(128))
+
+    assert.same('# C1', lines.get_line(135))
+    assert.same('@random_annotation({', lines.get_line(137))
+    assert.same('def handler_top(', lines.get_line(143))
+  end)
+
+  it("swaps down annotated functions of different length", function()
+    vim.fn.cursor(131, 1) -- |def handler_top
+    tw.swap_down()
+    helpers.assert_cursor_at(143, 1, "|def handler_top")
+    assert.same('# C2', lines.get_line(123))
+    assert.same('@random_annotation({', lines.get_line(124))
+    assert.same('def handler_bottom(', lines.get_line(128))
+
+    assert.same('# C1', lines.get_line(135))
+    assert.same('@random_annotation({', lines.get_line(137))
+    assert.same('def handler_top(', lines.get_line(143))
   end)
 end)
