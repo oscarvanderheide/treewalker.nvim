@@ -57,8 +57,9 @@ function M.node_action(action)
 		if current_augments then
 			local current_all = { current, unpack(current_augments) }
 			local current_all_rows = nodes.whole_range(current_all)
-			start_row = current_all_rows[1] - 1
-			end_row = current_all_rows[2] - 1
+			start_row = current_all_rows[1] + 1
+			end_row = current_all_rows[2] + 1
+			vim.api.nvim_win_set_cursor(0, { start_row, 0 })
 
 			print("Current node has augments, expanding range to include them")
 			print("Current node range: " .. start_row .. " - " .. end_row)
