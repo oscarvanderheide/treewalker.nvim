@@ -253,6 +253,7 @@ describe("Swapping in a lua test file:", function()
     assert.same('  { "<CMD>Treewalker SwapUp<CR>", "k", { desc = "up" } },', lines.get_line(102))
   end)
 
+  -- TODO
   pending("follows lateral swaps across rows (like in these it args)", function()
     vim.fn.cursor(21, 13)
     tw.swap_right()
@@ -397,5 +398,30 @@ describe("Swapping in a python file:", function()
     assert.same('# C1', lines.get_line(135))
     assert.same('@random_annotation({', lines.get_line(137))
     assert.same('def handler_top(', lines.get_line(143))
+  end)
+
+  -- TODO
+  pending("swaps up from a decorated/commented node to a bare one", function()
+    vim.fn.cursor(131, 1) -- |def handler_top
+    tw.swap_up()
+    assert.same('# C1', lines.get_line(118))
+    assert.same('@random_annotation({', lines.get_line(120))
+    assert.same('def handler_top(', lines.get_line(126))
+
+    assert.same('def other():', lines.get_line(135))
+
+    helpers.assert_cursor_at(126, 1, "|def handler_top")
+  end)
+
+  it("swaps down from a bare node to a decorated/commented one", function()
+    vim.fn.cursor(118, 1) -- |def other
+    tw.swap_down()
+    assert.same('# C1', lines.get_line(118))
+    assert.same('@random_annotation({', lines.get_line(120))
+    assert.same('def handler_top(', lines.get_line(126))
+
+    assert.same('def other():', lines.get_line(135))
+
+    helpers.assert_cursor_at(135, 1, "|def other")
   end)
 end)
