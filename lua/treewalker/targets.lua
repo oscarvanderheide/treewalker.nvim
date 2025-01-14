@@ -2,7 +2,6 @@ local lines = require "treewalker.lines"
 local nodes = require "treewalker.nodes"
 local strategies = require "treewalker.strategies"
 
--- TODO This file has ambiguous since swapping started existing
 local M = {}
 
 -- Gets node at row start point

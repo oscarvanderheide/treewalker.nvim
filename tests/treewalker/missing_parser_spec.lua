@@ -15,7 +15,10 @@ local commands = {
 }
 
 describe("For a file in which there is a missing parser", function()
-  load_fixture("/scheme.scm")
+  before_each(function()
+    load_fixture("/scheme.scm")
+    vim.opt.fileencoding = 'utf-8'
+  end)
 
   for nam, command in pairs(commands) do
     it(string.format("notifies once when %s is called", nam), function()

@@ -1,5 +1,6 @@
 local load_fixture = require "tests.load_fixture"
 local assert = require "luassert"
+local stub = require "luassert.stub"
 local tw = require 'treewalker'
 local lines = require 'treewalker.lines'
 local helpers = require 'tests.treewalker.helpers'
@@ -7,6 +8,7 @@ local helpers = require 'tests.treewalker.helpers'
 describe("Swapping in a regular lua file:", function()
   before_each(function()
     load_fixture("/lua.lua")
+    vim.opt.fileencoding = 'utf-8'
   end)
 
   it("swap down bails early if user is on empty top level line", function()
@@ -189,6 +191,26 @@ describe("Swapping in a regular lua file:", function()
     tw.swap_left()
     assert.same("  print('bye', 'hi')", lines.get_line(190))
     helpers.assert_cursor_at(190, 9, "block") -- cursor stays put for feel
+  end)
+
+  it("passes along encoding to apply_text_edits", function()
+    vim.fn.cursor(38, 32) -- (|node1, node2)
+
+    local apply_text_edits_stub = stub(vim.lsp.util, "apply_text_edits")
+
+    -- Prep the file encoding
+    local expected_encoding = 'utf-16'
+    vim.opt.fileencoding = expected_encoding
+
+    tw.swap_right()
+
+    -- Ensure correct encoding was used
+    assert.stub(apply_text_edits_stub).was.called(1)
+    local actual_encoding = apply_text_edits_stub.calls[1].refs[3]
+    assert.same(expected_encoding, actual_encoding)
+
+    -- Don't pollute the other tests
+    apply_text_edits_stub:revert()
   end)
 
   -- Actually I don't think this is supposed to work. It's ambiguous what

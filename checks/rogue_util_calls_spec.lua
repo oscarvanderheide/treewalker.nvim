@@ -29,6 +29,7 @@ describe("Extent util calls:", function()
   for _, command in ipairs(commands) do
     before_each(function()
       load_fixture("/lua.lua")
+      vim.opt.fileencoding = 'utf-8'
       vim.fn.cursor(31, 26)
     end)
 
