@@ -230,6 +230,22 @@ describe("Swapping in a lua test file:", function()
     tw.swap_left()
     assert.same('  { "<CMD>Treewalker SwapUp<CR>", "k", { desc = "up" } },', lines.get_line(102))
   end)
+
+  pending("follows lateral swaps across rows (like in these it args)", function()
+    vim.fn.cursor(21, 13)
+    tw.swap_right()
+    assert.same('    it(function()', lines.get_line(21))
+    assert.same('    end, "moves up and down at the same pace")', lines.get_line(39))
+    helpers.assert_cursor_at(39, 10)
+  end)
+
+  pending("follows lateral swaps across rows (like in these it args)", function()
+    vim.fn.cursor(51, 19)
+    tw.swap_left()
+    assert.same('    it("goes into functions eagerly", function()', lines.get_line(42))
+    assert.same('    end)', lines.get_line(51))
+    helpers.assert_cursor_at(42, 8)
+  end)
 end)
 
 -- doesn't work at all in md, doesn't need to
@@ -255,7 +271,7 @@ describe("Swapping in a markdown file:", function()
   end)
 
   it("turns off for left in md files", function()
-    vim.fn.cursor(52, 3) -- TODO
+    vim.fn.cursor(45, 1)
     local lines_before = lines.get_lines(0, -1)
     tw.swap_left()
     local lines_after = lines.get_lines(0, -1)
@@ -263,15 +279,11 @@ describe("Swapping in a markdown file:", function()
   end)
 
   it("turns off for right in md files", function()
-    vim.fn.cursor(52, 3) -- TODO
+    vim.fn.cursor(45, 1)
     local lines_before = lines.get_lines(0, -1)
     tw.swap_right()
     local lines_after = lines.get_lines(0, -1)
     assert.same(lines_after, lines_before)
-  end)
-
-  it("follows lateral swaps across rows (like in these it args)", function()
-    print("TODO")
   end)
 end)
 

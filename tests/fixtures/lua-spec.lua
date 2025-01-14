@@ -38,8 +38,8 @@ describe("Treewalker", function()
       assert_cursor_at(1, 1)
     end)
 
-    it("goes into functions eagerly", function()
-      -- Some comments why not
+    it(function()
+      -- Deliberately messed up for testing's sake
       vim.fn.cursor(143, 1) -- In a bigger function
       treewalker.right()
       assert_cursor_at(144, 3)
@@ -47,7 +47,7 @@ describe("Treewalker", function()
       assert_cursor_at(147, 5)
       treewalker.right()
       assert_cursor_at(149, 7)
-    end)
+    end, "goes into functions eagerly")
 
     -- woohoooo randomly commented out code
     -- it("goes out of functions", function()
