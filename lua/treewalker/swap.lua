@@ -38,7 +38,7 @@ function M.swap_down()
     return
   end
 
-  local current = nodes.get_row_current()
+  local current = nodes.get_current()
   local current_range = nodes.range(current)
   local current_augments = augment.get_node_augments(current)
   local current_all = { current, unpack(current_augments) }
@@ -68,7 +68,7 @@ function M.swap_up()
     return
   end
 
-  local current = nodes.get_row_current()
+  local current = nodes.get_current()
   local current_augments = augment.get_node_augments(current)
   local current_all = { current, unpack(current_augments) }
   local current_all_rows = nodes.whole_range(current_all)
@@ -110,6 +110,7 @@ function M.swap_right()
 
   -- most naive next sibling
   local current = nodes.get_current()
+  current = nodes.get_highest_coincident(current)
   local target = next_sib(current)
 
   -- strings
@@ -157,6 +158,7 @@ function M.swap_left()
 
   -- most naive next sibling
   local current = nodes.get_current()
+  current = nodes.get_highest_coincident(current)
   local target = prev_sib(current)
 
   -- strings

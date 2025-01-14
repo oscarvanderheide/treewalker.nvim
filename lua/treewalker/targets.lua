@@ -18,7 +18,7 @@ end
 
 ---@return TSNode | nil, integer | nil, string | nil
 function M.out()
-  local node = nodes.get_row_current()
+  local node = nodes.get_current()
   local target = strategies.get_first_ancestor_with_diff_scol(node)
   if not target then return end
   local row = target:range()

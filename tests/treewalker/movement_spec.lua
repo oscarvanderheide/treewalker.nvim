@@ -138,3 +138,12 @@ describe("Movement in a lua spec file: ", function()
   end)
 end)
 
+describe("Movement in a haskell file: ", function()
+  load_fixture("/haskell.hs")
+
+  it("moves out of a nested node", function()
+    vim.fn.cursor(22, 3)
+    tw.move_out()
+    helpers.assert_cursor_at(19, 1, "|randomList")
+  end)
+end)

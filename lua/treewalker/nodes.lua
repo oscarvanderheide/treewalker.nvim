@@ -262,7 +262,7 @@ end
 function M.get_at_rowcol(row, col)
   local node = vim.treesitter.get_node({ pos = { row - 1, col } })
   if node then
-    return M.get_highest_coincident(node)
+    return node
   end
 end
 
@@ -275,25 +275,14 @@ function M.get_at_row(row)
   local col = lines.get_start_col(line)
   local node = vim.treesitter.get_node({ pos = { row - 1, col } })
   if node then
-    return M.get_highest_row_coincident(node)
+    return node
   end
-end
-
----Get highest node on current row
----@return TSNode
-function M.get_row_current()
-  local node = vim.treesitter.get_node()
-  assert(node)
-  -- TODO this practice is breaking moving out of haskell functions
-  return M.get_highest_row_coincident(node)
 end
 
 ---Get highest node at same row/col
 ---@return TSNode
 function M.get_current()
-  local node = vim.treesitter.get_node()
-  assert(node)
-  return M.get_highest_coincident(node)
+  return assert(vim.treesitter.get_node())
 end
 
 -- util.log some formatted version of the node's properties
