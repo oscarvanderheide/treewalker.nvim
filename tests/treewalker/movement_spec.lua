@@ -11,7 +11,9 @@ local function feed_keys(keys)
 end
 
 describe("Movement in a regular lua file: ", function()
-  load_fixture("/lua.lua")
+  before_each(function()
+    load_fixture("/lua.lua")
+  end)
 
   it("moves up and down at the same pace", function()
     vim.fn.cursor(1, 1) -- Reset cursor
@@ -105,7 +107,9 @@ describe("Movement in a regular lua file: ", function()
 end)
 
 describe("Movement in a lua spec file: ", function()
-  load_fixture("/lua-spec.lua")
+  before_each(function()
+    load_fixture("/lua-spec.lua")
+  end)
 
   -- go to first describe
   local function go_to_describe()
@@ -139,11 +143,31 @@ describe("Movement in a lua spec file: ", function()
 end)
 
 describe("Movement in a haskell file: ", function()
-  load_fixture("/haskell.hs")
+  before_each(function()
+    load_fixture("/haskell.hs")
+  end)
 
   it("moves out of a nested node", function()
     vim.fn.cursor(22, 3)
     tw.move_out()
     helpers.assert_cursor_at(19, 1, "|randomList")
+  end)
+end)
+
+describe("Movement in a python file: ", function()
+  before_each(function()
+    load_fixture("/python.py")
+  end)
+
+  it("You can get into the body of a function with multiline signature", function()
+    vim.fn.cursor(131, 3) -- de|f
+    tw.move_in()
+    helpers.assert_cursor_at(132, 5)
+    tw.move_down()
+    helpers.assert_cursor_at(133, 5)
+    tw.move_down()
+    helpers.assert_cursor_at(134, 5)
+    tw.move_down()
+    helpers.assert_cursor_at(136, 5, "|print")
   end)
 end)
