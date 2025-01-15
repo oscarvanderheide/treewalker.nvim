@@ -1,6 +1,5 @@
-
 <div align="center">
-    <h1>Treewalker.nvim</h1>
+    <h1>Treewalker.nvim<br><br>🌳🌲🌴🌲🌴🌳</h1>
     <h4 align="center">
         <a href="#Installation">Installation</a>
         ·
@@ -34,6 +33,9 @@ The movement commands move you through the syntax tree in an intuitive way:
 * **`:Treewalker Down`** - Moves down to the next neighbor node, skipping comments, annotations, and other unintuitive nodes
 * **`:Treewalker Left`** - Moves to the first ancestor node that's on a different line from the current node
 * **`:Treewalker Right`** - Moves to the next node down that's indented further than the current node
+
+All movement commands add to the [`jumplist`](https://neovim.io/doc/user/motion.html#jumplist), so if you use a movement command
+and then feel lost, you always have `Ctrl-o` available to bring you back to where you last were.
 
 ---
 
@@ -178,4 +180,5 @@ of `Treewalker`'s left/right swapping code is inspired by `ts_utils`.
 `Treewalker` operates a little differently under the hood, picking the highest
 startwise coinciding node over the lowest. But mostly it does the work of
 finding the next relevant node and packaging it all up into a nice interface.
+
 
