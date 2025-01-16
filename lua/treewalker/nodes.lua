@@ -245,6 +245,16 @@ function M.get_srow(node)
   return row + 1
 end
 
+-- get 1-indexed end row of given node
+-- (so will work directly with vim.fn.cursor,
+-- and will reflect row as seen in the vim status line)
+---@param node TSNode
+---@return integer
+function M.get_erow(node)
+  local _, _, row = node:range()
+  return row + 1
+end
+
 -- get 1-indexed column of given node
 -- (so will work directly with vim.fn.cursor,
 -- and will reflect col as seen in the vim status line)

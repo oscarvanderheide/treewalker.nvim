@@ -3,7 +3,6 @@ local operations = require "treewalker.operations"
 local targets = require "treewalker.targets"
 local augment = require "treewalker.augment"
 local strategies = require "treewalker.strategies"
-local util = require "treewalker.util"
 
 local M = {}
 
@@ -40,22 +39,25 @@ function M.swap_down()
   end
 
   local current = nodes.get_current()
-  local current_range = nodes.range(current)
   local current_augments = augment.get_node_augments(current)
   local current_all = { current, unpack(current_augments) }
   local current_all_rows = nodes.whole_range(current_all)
+  local current_srow = nodes.get_srow(current)
+  local current_erow = nodes.get_erow(current)
 
-  local target_range = nodes.range(target)
   local target_augments = augment.get_node_augments(target)
   local target_all = { target, unpack(target_augments) }
   local target_all_rows = nodes.whole_range(target_all)
+  local target_srow = nodes.get_srow(target)
+  local target_erow = nodes.get_erow(target)
+  local target_scol = nodes.get_scol(target)
 
   operations.swap_rows(current_all_rows, target_all_rows)
 
   -- Place cursor
-  local node_length_diff = ((current_range[3] - current_range[1]) + 1) - ((target_range[3] - target_range[1]) + 1)
-  local x = target_range[1] - node_length_diff + 1
-  local y = target_range[2] + 1
+  local node_length_diff = (current_erow - current_srow) - (target_erow - target_srow)
+  local x = target_srow - node_length_diff
+  local y = target_scol
   vim.fn.cursor(x, y)
 end
 
