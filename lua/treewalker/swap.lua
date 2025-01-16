@@ -128,24 +128,19 @@ function M.swap_right()
   -- No candidates found
   if not current or not target then return end
 
-  local current_text = nodes.get_text(current)
-  local target_text = nodes.get_text(target)
-
   operations.swap_nodes(current, target)
 
   -- Place cursor
-  local on_same_row = nodes.get_srow(current) == nodes.get_srow(target)
-  if on_same_row then
-    vim.fn.cursor(
-      nodes.get_srow(current),
-      nodes.get_scol(current) + #target_text[1] + 2
-    )
-  else
-    vim.fn.cursor(
-      nodes.get_srow(target) - #current_text + #target_text,
-      nodes.get_scol(target)
-    )
-  end
+  local next = next_sib(current)
+
+  -- Now next will be the same node as current is,
+  -- but with an updated range
+  if not next then return end
+
+  vim.fn.cursor(
+    nodes.get_srow(next),
+    nodes.get_scol(next)
+  )
 end
 
 ---@param node TSNode | nil
