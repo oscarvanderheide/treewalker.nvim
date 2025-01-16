@@ -149,6 +149,20 @@ function M.get_from_neighboring_line(current_row, dir)
   return candidate, candidate_row, candidate_line
 end
 
+-- Convenience for give me back next sibling of a potentially nil node
+---@param node TSNode | nil
+function M.next_sib(node)
+  if not node then return nil end
+  return node:next_named_sibling()
+end
+
+-- Convenience for give me back prev sibling of a potentially nil node
+---@param node TSNode | nil
+function M.prev_sib(node)
+  if not node then return nil end
+  return node:prev_named_sibling()
+end
+
 -- Get farthest ancestor (or self) at the same starting row
 -- This method prefers row over start on account of lisps / S-expressions,
 -- which start with (identifier, ..). This is used for all up/down movement/swapping

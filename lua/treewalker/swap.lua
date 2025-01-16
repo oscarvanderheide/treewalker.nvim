@@ -100,12 +100,6 @@ function M.swap_up()
   vim.fn.cursor(x, y)
 end
 
----@param node TSNode | nil
-local function next_sib(node)
-  if not node then return nil end
-  return node:next_named_sibling()
-end
-
 function M.swap_right()
   if not is_supported_ft() then return end
 
@@ -114,12 +108,12 @@ function M.swap_right()
   -- most naive next sibling
   local current = nodes.get_current()
   current = nodes.get_highest_coincident(current)
-  local target = next_sib(current)
+  local target = nodes.next_sib(current)
 
   -- strings
   local candidate = strategies.get_highest_string_node(nodes.get_current())
   if candidate then candidate = nodes.get_highest_coincident(candidate) end
-  local candidate_target = next_sib(candidate)
+  local candidate_target = nodes.next_sib(candidate)
   if candidate and candidate_target then
     current = candidate
     target = candidate_target
@@ -131,7 +125,7 @@ function M.swap_right()
   operations.swap_nodes(current, target)
 
   -- Place cursor
-  local next = next_sib(current)
+  local next = nodes.next_sib(current)
 
   -- Now next will be the same node as current is,
   -- but with an updated range
@@ -143,12 +137,6 @@ function M.swap_right()
   )
 end
 
----@param node TSNode | nil
-local function prev_sib(node)
-  if not node then return nil end
-  return node:prev_named_sibling()
-end
-
 function M.swap_left()
   if not is_supported_ft() then return end
 
@@ -157,12 +145,12 @@ function M.swap_left()
   -- most naive next sibling
   local current = nodes.get_current()
   current = nodes.get_highest_coincident(current)
-  local target = prev_sib(current)
+  local target = nodes.prev_sib(current)
 
   -- strings
   local candidate = strategies.get_highest_string_node(nodes.get_current())
   if candidate then candidate = nodes.get_highest_coincident(candidate) end
-  local candidate_target = prev_sib(candidate)
+  local candidate_target = nodes.prev_sib(candidate)
   if candidate and candidate_target then
     current = candidate
     target = candidate_target
