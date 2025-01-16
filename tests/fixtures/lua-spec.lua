@@ -64,7 +64,7 @@ describe("Treewalker", function()
   describe("lua spec file", function()
     load_buf(fixtures_dir .. "/lua.lua", "lua")
 
-    it("moves up and down at the same pace", function()
+    it("one", function()
       vim.fn.cursor(1, 1) -- Reset cursor
       treewalker.down()
       assert_cursor_at(3, 1)
@@ -84,7 +84,7 @@ describe("Treewalker", function()
       assert_cursor_at(1, 1)
     end)
 
-    it("goes into functions eagerly", function()
+    it("two", function()
       vim.fn.cursor(143, 1) -- In a bigger function
       treewalker.right()
       assert_cursor_at(144, 3)

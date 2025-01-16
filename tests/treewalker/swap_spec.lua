@@ -253,7 +253,7 @@ describe("Swapping in a lua test file:", function()
     assert.same('  { "<CMD>Treewalker SwapUp<CR>", "k", { desc = "up" } },', lines.get_line(102))
   end)
 
-  it("follows lateral swaps across rows (like in these it args)", function()
+  it("follows right swaps across rows (like in these it args)", function()
     vim.fn.cursor(21, 13)
     tw.swap_right()
     assert.same('    it(function()', lines.get_line(21))
@@ -261,13 +261,34 @@ describe("Swapping in a lua test file:", function()
     helpers.assert_cursor_at(39, 10)
   end)
 
-  it("follows lateral swaps across rows (like in these it args)", function()
+  it("follows left swaps across rows (like in these it args)", function()
     vim.fn.cursor(50, 13) -- go|es
     tw.swap_left()
     assert.same('    it("goes into functions eagerly", function()', lines.get_line(41))
     assert.same('    end)', lines.get_line(50))
     helpers.assert_cursor_at(41, 8)
   end)
+
+  it("swaps it blocks down", function()
+    assert.same('    it("one", function()', lines.get_line(67))
+    assert.same('    it("two", function()', lines.get_line(87))
+    vim.fn.cursor(67, 5) -- |it "one"
+    tw.swap_down()
+    assert.same('    it("two", function()', lines.get_line(67))
+    assert.same('    it("one", function()', lines.get_line(77))
+    helpers.assert_cursor_at(77, 5)
+  end)
+
+  it("swaps it blocks up", function()
+    assert.same('    it("one", function()', lines.get_line(67))
+    assert.same('    it("two", function()', lines.get_line(87))
+    vim.fn.cursor(87, 5) --|it "two"
+    tw.swap_up()
+    assert.same('    it("two", function()', lines.get_line(67))
+    assert.same('    it("one", function()', lines.get_line(77))
+    helpers.assert_cursor_at(67, 5)
+  end)
+
 end)
 
 -- doesn't work at all in md, doesn't need to

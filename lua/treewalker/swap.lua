@@ -39,6 +39,7 @@ function M.swap_down()
   end
 
   local current = nodes.get_current()
+  current = nodes.get_highest_coincident(current)
   local current_augments = augment.get_node_augments(current)
   local current_all = { current, unpack(current_augments) }
   local current_all_rows = nodes.whole_range(current_all)
@@ -72,6 +73,7 @@ function M.swap_up()
   end
 
   local current = nodes.get_current()
+  current = nodes.get_highest_coincident(current)
   local current_augments = augment.get_node_augments(current)
   local current_all = { current, unpack(current_augments) }
   local current_all_rows = nodes.whole_range(current_all)
