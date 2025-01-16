@@ -400,8 +400,7 @@ describe("Swapping in a python file:", function()
     assert.same('def handler_top(', lines.get_line(143))
   end)
 
-  -- TODO
-  pending("swaps up from a decorated/commented node to a bare one", function()
+  it("swaps up from a decorated/commented node to a bare one", function()
     vim.fn.cursor(131, 1) -- |def handler_top
     tw.swap_up()
     assert.same('# C1', lines.get_line(118))
