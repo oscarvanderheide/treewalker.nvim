@@ -28,6 +28,8 @@ local function is_supported_ft()
   return not unsupported_filetypes[ft]
 end
 
+-- pipes follow a specific pattern of taking a node and always returning a
+-- node: either the hopeful that it found, or the passed in original
 ---@param node TSNode
 ---@return TSNode
 local function get_highest_coincident_pipe(node)
@@ -35,6 +37,8 @@ local function get_highest_coincident_pipe(node)
   return candidate or node
 end
 
+-- pipes follow a specific pattern of taking a node and always returning a
+-- node: either the hopeful that it found, or the passed in original
 ---@param node TSNode
 ---@return TSNode
 local function get_highest_string_node_pipe(node)
@@ -46,11 +50,8 @@ function M.swap_down()
   if not is_on_target_node() then return end
   if not is_supported_ft() then return end
 
-  local target, row, line = targets.down()
-
-  if not target or not row or not line then
-    return
-  end
+  local target = targets.down()
+  if not target then return end
 
   local current = nodes.get_current()
   current = get_highest_coincident_pipe(current)
@@ -80,11 +81,8 @@ function M.swap_up()
   if not is_on_target_node() then return end
   if not is_supported_ft() then return end
 
-  local target, row, line = targets.up()
-
-  if not target or not row or not line then
-    return
-  end
+  local target = targets.up()
+  if not target then return end
 
   local current = nodes.get_current()
   current = get_highest_coincident_pipe(current)
