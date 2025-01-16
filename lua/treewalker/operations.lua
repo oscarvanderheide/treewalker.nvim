@@ -108,8 +108,8 @@ function M.swap_nodes(left, right)
   local range1 = nodes.lsp_range(left)
   local range2 = nodes.lsp_range(right)
 
-  local text1 = nodes.get_text(left)
-  local text2 = nodes.get_text(right)
+  local text1 = nodes.get_lines(left)
+  local text2 = nodes.get_lines(right)
 
   local edit1 = { range = range1, newText = table.concat(text2, "\n") }
   local edit2 = { range = range2, newText = table.concat(text1, "\n") }

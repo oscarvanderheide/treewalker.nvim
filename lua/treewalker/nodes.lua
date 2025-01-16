@@ -213,26 +213,10 @@ end
 
 ---Get the given node's text
 ---@param node TSNode
-function M.get_text(node)
-  -- We have to remember that end_col is end-exclusive
-  local start_row, start_col, end_row, end_col = node:range()
-
-  if start_row ~= end_row then
-    local lins = vim.api.nvim_buf_get_lines(0, start_row, end_row + 1, false)
-    if next(lins) == nil then
-      return {}
-    end
-    lins[1] = string.sub(lins[1], start_col + 1)
-    -- end_row might be just after the last line. In this case the last line is not truncated.
-    if #lins == end_row - start_row + 1 then
-      lins[#lins] = string.sub(lins[#lins], 1, end_col)
-    end
-    return lins
-  else
-    local line = vim.api.nvim_buf_get_lines(0, start_row, start_row + 1, false)[1]
-    -- If line is nil then the line is empty
-    return line and { string.sub(line, start_col + 1, end_col) } or {}
-  end
+---@return string[]
+function M.get_lines(node)
+  local text = vim.treesitter.get_node_text(node, 0, {})
+  return vim.split(text, "\n")
 end
 
 -- get 1-indexed row of given node
@@ -301,7 +285,7 @@ end
 function M.log(node)
   local row = M.get_srow(node)
   local col = M.get_scol(node)
-  local text = table.concat(M.get_text(node), "\n")
+  local text = table.concat(M.get_lines(node), "\n")
   local log_string = ""
   log_string = log_string .. string.format(" [%s/%s]", row, col)
   log_string = log_string .. string.format(" (%s)", node:type())
