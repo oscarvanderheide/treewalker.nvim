@@ -155,10 +155,10 @@ end
 ---@param node TSNode
 ---@return TSNode
 function M.get_highest_row_coincident(node)
-  local parent = node:parent()
-  while parent and M.have_same_srow(node, parent) do
-    if M.is_highlight_target(parent) then node = parent end
-    parent = parent:parent()
+  local iter = node:parent()
+  while iter and M.have_same_srow(node, iter) do
+    if M.is_highlight_target(iter) then node = iter end
+    iter = iter:parent()
   end
   return node
 end
@@ -167,10 +167,10 @@ end
 ---@param node TSNode
 ---@return TSNode
 function M.get_highest_coincident(node)
-  local parent = node:parent()
-  while parent and M.have_same_srow(node, parent) and M.have_same_scol(node, parent) do
-    if M.is_highlight_target(parent) then node = parent end
-    parent = parent:parent()
+  local iter = node:parent()
+  while iter and M.have_same_srow(node, iter) and M.have_same_scol(node, iter) do
+    if M.is_highlight_target(iter) then node = iter end
+    iter = iter:parent()
   end
   return node
 end
