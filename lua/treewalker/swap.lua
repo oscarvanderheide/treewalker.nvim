@@ -28,6 +28,20 @@ local function is_supported_ft()
   return not unsupported_filetypes[ft]
 end
 
+---@param node TSNode
+---@return TSNode
+local function get_highest_coincident_pipe(node)
+  local candidate = nodes.get_highest_coincident(node)
+  return candidate or node
+end
+
+---@param node TSNode
+---@return TSNode
+local function get_highest_string_node_pipe(node)
+  local candidate = strategies.get_highest_string_node(node)
+  return candidate or node
+end
+
 function M.swap_down()
   if not is_on_target_node() then return end
   if not is_supported_ft() then return end
@@ -39,7 +53,7 @@ function M.swap_down()
   end
 
   local current = nodes.get_current()
-  current = nodes.get_highest_coincident(current)
+  current = get_highest_coincident_pipe(current)
   local current_augments = augment.get_node_augments(current)
   local current_all = { current, unpack(current_augments) }
   local current_all_rows = nodes.whole_range(current_all)
@@ -73,7 +87,7 @@ function M.swap_up()
   end
 
   local current = nodes.get_current()
-  current = nodes.get_highest_coincident(current)
+  current = get_highest_coincident_pipe(current)
   local current_augments = augment.get_node_augments(current)
   local current_all = { current, unpack(current_augments) }
   local current_all_rows = nodes.whole_range(current_all)
@@ -105,60 +119,40 @@ end
 function M.swap_right()
   if not is_supported_ft() then return end
 
-  -- Least desirable strategies first
-
-  -- most naive next sibling
+  -- Iteratively more desirable
   local current = nodes.get_current()
-  current = nodes.get_highest_coincident(current)
+  current = get_highest_string_node_pipe(current)
+  current = get_highest_coincident_pipe(current)
+
   local target = nodes.next_sib(current)
 
-  -- strings
-  local candidate = strategies.get_highest_string_node(nodes.get_current())
-  if candidate then candidate = nodes.get_highest_coincident(candidate) end
-  local candidate_target = nodes.next_sib(candidate)
-  if candidate and candidate_target then
-    current = candidate
-    target = candidate_target
-  end
-
-  -- No candidates found
   if not current or not target then return end
 
   operations.swap_nodes(current, target)
 
   -- Place cursor
-  local next = nodes.next_sib(current)
+  local new_current = nodes.next_sib(current)
 
   -- Now next will be the same node as current is,
   -- but with an updated range
-  if not next then return end
+  if not new_current then return end
 
   vim.fn.cursor(
-    nodes.get_srow(next),
-    nodes.get_scol(next)
+    nodes.get_srow(new_current),
+    nodes.get_scol(new_current)
   )
 end
 
 function M.swap_left()
   if not is_supported_ft() then return end
 
-  -- Least desirable strategies first
-
-  -- most naive next sibling
+  -- Iteratively more desirable
   local current = nodes.get_current()
-  current = nodes.get_highest_coincident(current)
+  current = get_highest_string_node_pipe(current)
+  current = get_highest_coincident_pipe(current)
+
   local target = nodes.prev_sib(current)
 
-  -- strings
-  local candidate = strategies.get_highest_string_node(nodes.get_current())
-  if candidate then candidate = nodes.get_highest_coincident(candidate) end
-  local candidate_target = nodes.prev_sib(candidate)
-  if candidate and candidate_target then
-    current = candidate
-    target = candidate_target
-  end
-
-  -- No candidates found
   if not current or not target then return end
 
   operations.swap_nodes(target, current)

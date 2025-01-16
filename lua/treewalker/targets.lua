@@ -20,8 +20,7 @@ function M.out()
   local node = nodes.get_current()
   local target = strategies.get_first_ancestor_with_diff_scol(node)
   if not target then return end
-  local row = target:range()
-  row = row + 1
+  local row = nodes.get_srow(target)
   local line = lines.get_line(row)
   return target, row, line
 end

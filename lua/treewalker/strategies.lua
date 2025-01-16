@@ -171,7 +171,7 @@ end
 -- Use this to get the whole string from inside of a string
 -- returns nils if the passed in node is not a string node
 ---@param node TSNode
----@return TSNode | nil, TSNode | nil
+---@return TSNode | nil
 function M.get_highest_string_node(node)
   ---@type TSNode | nil
   local highest = nil
