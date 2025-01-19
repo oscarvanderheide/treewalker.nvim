@@ -18,10 +18,13 @@
 
 ![A fast paced demo of Treewalker.nvim](https://github.com/user-attachments/assets/4d23af49-bd94-412a-bc8c-d546df6775df)
 
-### Move around your code in a syntax tree aware manner.
-
-Treewalker uses neovim's native [Treesitter](https://github.com/tree-sitter/tree-sitter) under the hood for syntax tree awareness.
-It has no dependencies, and is meant to "just work". It's "batteries included", with minimal configuration.
+<div align="center">
+    <h2>Move around your code in a syntax tree aware manner.</h2>
+    <p>
+        Treewalker uses neovim's native <a href="https://github.com/tree-sitter/tree-sitter">Treesitter</a> under the hood for syntax tree awareness.
+        Design goals include stability, ergonomics, and simplicity.
+    </p>
+</div>
 
 ---
 
