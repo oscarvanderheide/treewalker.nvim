@@ -41,17 +41,16 @@ and then feel lost, you always have `Ctrl-o` available to bring you back to wher
 
 ## Swapping
 
-The swap commands swap nodes, with up/down **bringing along attached comments, annotations, and decorators**:
-
-* **`:Treewalker SwapUp`** - Swaps nodes upwards in your code with the previous line wise node
-* **`:Treewalker SwapDown`** - Swaps nodes downward in your code with the next line wise node
-
-`Swap{Up,Down}` are meant for swapping declarations and definitions. Things that take up a whole line.
-
-* **`:Treewalker SwapLeft`** - Swap the node under the cursor with its previous neighbor
-* **`:Treewalker SwapRight`** - Swap the node under the cursor with its next neighbor
+`Swap{Up,Down}` operate on a linewise basis, and **bring along their comments, decorators, and annotations**.
+These are meant for swapping declarations and definitions - things that take up whole lines.
 
 `Swap{Left,Right}` are meant for swapping function arguments, enum members, list elements, etc. Things that are many per line.
+In some cases these will operate on the same nodes as Up/Down, but won't take the accoutrements.
+
+* **`:Treewalker SwapUp`** - Swaps the highest node on the line upwards in the document
+* **`:Treewalker SwapDown`** - Swaps the biggest node on the line downward in the document
+* **`:Treewalker SwapLeft`** - Swap the node under the cursor with its previous neighbor
+* **`:Treewalker SwapRight`** - Swap the node under the cursor with its next neighbor
 
 ---
 
