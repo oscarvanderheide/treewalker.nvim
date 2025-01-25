@@ -10,7 +10,7 @@ Thank you for contributing to Treewalker!
 ## Things to know
 
 * See the Makefile for tasks
-* `make check` will run everything you need to be sure things are healthy
+* `make pass` will run everything you need to be sure things are healthy
 * in your lazy config, set dir = "<the plugin's dir>"
 * use util.R in init.lua for the plugin to hot reload in your current dev environment
 * use `util.log` to print to the fs, and `tail -f ~/.local/share/nvim/treewalker/debug.log` to read from it
