@@ -8,7 +8,7 @@ local helpers = require 'tests.treewalker.helpers'
 describe("Swapping in a regular lua file:", function()
   before_each(function()
     load_fixture("/lua.lua")
-    vim.opt.fileencoding = 'utf-8'
+    vim.o.fileencoding = 'utf-8'
   end)
 
   it("swap down bails early if user is on empty top level line", function()
@@ -200,7 +200,27 @@ describe("Swapping in a regular lua file:", function()
 
     -- Prep the file encoding
     local expected_encoding = 'utf-16'
-    vim.opt.fileencoding = expected_encoding
+    vim.o.fileencoding = expected_encoding
+
+    tw.swap_right()
+
+    -- Ensure correct encoding was used
+    assert.stub(apply_text_edits_stub).was.called(1)
+    local actual_encoding = apply_text_edits_stub.calls[1].refs[3]
+    assert.same(expected_encoding, actual_encoding)
+
+    -- Don't pollute the other tests
+    apply_text_edits_stub:revert()
+  end)
+
+  it("defaults apply_text_edits to utf-8", function()
+    vim.fn.cursor(38, 32) -- (|node1, node2)
+
+    local apply_text_edits_stub = stub(vim.lsp.util, "apply_text_edits")
+
+    -- Prep the file encoding
+    local expected_encoding = 'utf-8'
+    vim.o.fileencoding = ''
 
     tw.swap_right()
 

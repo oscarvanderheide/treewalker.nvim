@@ -103,6 +103,7 @@ function M.swap_nodes(left, right)
   local edit2 = { range = range2, newText = table.concat(text1, "\n") }
   local bufnr = vim.api.nvim_get_current_buf()
   local encoding = vim.api.nvim_get_option_value('fileencoding', {})
+  if not encoding or encoding == "" then encoding = "utf-8" end -- #23
   vim.lsp.util.apply_text_edits({ edit1, edit2 }, bufnr, encoding)
 end
 
