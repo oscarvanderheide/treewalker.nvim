@@ -47,6 +47,7 @@ local function get_highest_string_node_pipe(node)
 end
 
 function M.swap_down()
+  vim.cmd("normal! ^")
   if not is_on_target_node() then return end
   if not is_supported_ft() then return end
 
@@ -78,6 +79,7 @@ function M.swap_down()
 end
 
 function M.swap_up()
+  vim.cmd("normal! ^")
   if not is_on_target_node() then return end
   if not is_supported_ft() then return end
 

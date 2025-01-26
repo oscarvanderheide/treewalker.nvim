@@ -98,3 +98,15 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// Courtesy of pkenway-figma in #22
+const x = 1
+const y = 2
+
+function doThings(b: number ) {
+  const i = 1
+  const j = 2
+
+  for (let a = i;a < j;a++) {
+    console.log(a)
+  }
+}
