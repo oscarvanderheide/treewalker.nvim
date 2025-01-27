@@ -41,18 +41,17 @@ function M.up(node)
   local current_row, _, current_col = current()
 
   -- Get next target if we're on an empty line
-  local candidate, candidate_row, candidate_line =
+  local candidate, candidate_row =
       strategies.get_prev_if_on_empty_line(current_row)
 
-  if candidate_row and candidate_line and candidate then
+  if candidate and candidate_row then
     return candidate, candidate_row
   end
 
   --- Get next target at the same column
-  candidate, candidate_row, candidate_line =
-      strategies.get_neighbor_at_same_col("up", current_row, current_col)
+  candidate, candidate_row = strategies.get_neighbor_at_same_col("up", current_row, current_col)
 
-  if candidate_row and candidate_line and candidate then
+  if candidate and candidate_row then
     return candidate, candidate_row
   end
 end
@@ -63,18 +62,17 @@ function M.down(node)
   local current_row, _, current_col = current()
 
   -- Get next target if we're on an empty line
-  local candidate, candidate_row, candidate_line =
+  local candidate, candidate_row =
       strategies.get_next_if_on_empty_line(current_row)
 
-  if candidate_row and candidate_line and candidate then
+  if candidate and candidate_row then
     return candidate, candidate_row
   end
 
   --- Get next target, if one is found
-  candidate, candidate_row, candidate_line =
-      strategies.get_neighbor_at_same_col("down", current_row, current_col)
+  candidate, candidate_row = strategies.get_neighbor_at_same_col("down", current_row, current_col)
 
-  if candidate_row and candidate_line and candidate then
+  if candidate and candidate_row then
     return candidate, candidate_row
   end
 end

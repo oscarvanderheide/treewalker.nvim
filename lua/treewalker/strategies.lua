@@ -11,7 +11,7 @@ local M = {}
 function M.get_neighbor_at_same_col(dir, starting_row, starting_col)
   local candidate, candidate_row, candidate_line = nodes.get_from_neighboring_line(starting_row, dir)
 
-  while candidate_row and candidate_line and candidate do
+  while candidate and candidate_row and candidate_line do
     local candidate_col = lines.get_start_col(candidate_line)
     local srow = candidate:range()
     if
@@ -26,7 +26,7 @@ function M.get_neighbor_at_same_col(dir, starting_row, starting_col)
     end
   end
 
-  return candidate, candidate_row, candidate_line
+  return candidate, candidate_row
 end
 
 -- Go down until there is a valid jump target to the right
