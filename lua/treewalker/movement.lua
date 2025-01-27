@@ -16,8 +16,7 @@ end
 
 ---@return nil
 function M.move_in()
-  local node = nodes.get_current()
-  local target, row = targets.inn(node)
+  local target, row = targets.inn()
   if not target or not row then return end
   vim.cmd("normal! m'")
   operations.jump(target, row)
@@ -27,7 +26,7 @@ end
 ---@return nil
 function M.move_up()
   local node = nodes.get_current()
-  local target, row = targets.up(node)
+  local target, row = targets.up()
   if not target or not row then return end
 
   -- No neighbor jumps in up
@@ -42,7 +41,7 @@ end
 ---@return nil
 function M.move_down()
   local node = nodes.get_current()
-  local target, row = targets.down(node)
+  local target, row = targets.down()
   if not target or not row then return end
 
   -- down needs neighbor before and after jump

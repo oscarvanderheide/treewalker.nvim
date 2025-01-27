@@ -24,9 +24,8 @@ function M.out(node)
   return target, row
 end
 
----@param node TSNode
 ---@return TSNode | nil, integer | nil
-function M.inn(node)
+function M.inn()
   local current_row, _, current_col = current()
 
   local candidate, candidate_row =
@@ -35,9 +34,8 @@ function M.inn(node)
   return candidate, candidate_row
 end
 
----@param node TSNode
 ---@return TSNode | nil, integer | nil
-function M.up(node)
+function M.up()
   local current_row, _, current_col = current()
 
   -- Get next target if we're on an empty line
@@ -56,9 +54,8 @@ function M.up(node)
   end
 end
 
----@param node TSNode
 ---@return TSNode | nil, integer | nil
-function M.down(node)
+function M.down()
   local current_row, _, current_col = current()
 
   -- Get next target if we're on an empty line
