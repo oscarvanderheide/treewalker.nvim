@@ -192,7 +192,7 @@ end
 
 return M
 
--- This is a lua fixture. I thought I was being smart when I got it
+-- This is a lua fixture. I thought I was being cute when I got it
 -- from this plugin. But actually I was being dumb, and this is very confusing, l0lz
 
 -- Last line intentionally left blank

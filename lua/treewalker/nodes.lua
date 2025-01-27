@@ -74,6 +74,17 @@ function M.have_same_srow(node1, node2)
   return M.get_srow(node1) == M.get_srow(node2)
 end
 
+---Are the nodes on neighboring rows
+---@param node1 TSNode
+---@param node2 TSNode
+---@return boolean
+function M.have_neighbor_srow(node1, node2)
+  return
+    false
+    or M.get_srow(node1) == M.get_srow(node2) + 1
+    or M.get_srow(node1) == M.get_srow(node2) - 1
+end
+
 ---Do the nodes have the same level of indentation
 ---@param node1 TSNode
 ---@param node2 TSNode

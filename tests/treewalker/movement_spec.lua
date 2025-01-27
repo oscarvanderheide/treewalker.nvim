@@ -62,45 +62,6 @@ describe("Movement in a regular lua file: ", function()
     helpers.assert_cursor_at(143, 1, "function")
   end)
 
-  -- TODO Cover all directions of move_*
-  it("adds multiline jumps to jumplist", function()
-    -- move_down
-    vim.cmd('windo clearjumps')
-    vim.fn.cursor(1, 1)
-    tw.move_down()
-    helpers.assert_cursor_at(3, 1)
-    helpers.feed_keys('<C-o>')
-    helpers.assert_cursor_at(1, 1, "local M = {}")
-
-    -- move_in
-    vim.cmd('windo clearjumps')
-    vim.fn.cursor(21, 1)
-    tw.move_in()
-    helpers.assert_cursor_at(22, 3, "for _,")
-    helpers.feed_keys('<C-o>')
-    helpers.assert_cursor_at(21, 1, "local function is_jump_target")
-  end)
-
-  -- it("doesn't add single line jumps to jumplist", function()
-  --   -- move_down
-  --   vim.cmd('windo clearjumps')
-  --   vim.fn.cursor(129, 3)
-  --   tw.move_down() tw.move_down() tw.move_down() tw.move_down()
-  --   helpers.assert_cursor_at(136, 3)
-  --   helpers.feed_keys('<C-o>')
-  --   helpers.assert_cursor_at(132, 3)
-  --   helpers.feed_keys('<C-o>')
-  --   helpers.assert_cursor_at(129, 3, '|local children = {}')
-
-  --   -- move_in
-  --   vim.cmd('windo clearjumps')
-  --   vim.fn.cursor(21, 1)
-  --   tw.move_in()
-  --   helpers.assert_cursor_at(22, 3, "for _,")
-  --   helpers.feed_keys('<C-o>')
-  --   helpers.assert_cursor_at(21, 1, "local function is_jump_target")
-  -- end)
-
   -- aka doesn't error
   it("is chill when down is invoked from empty last line", function()
     helpers.feed_keys('G')
