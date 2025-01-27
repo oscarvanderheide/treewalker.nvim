@@ -51,10 +51,11 @@ function M.swap_down()
   if not is_on_target_node() then return end
   if not is_supported_ft() then return end
 
-  local target = targets.down()
+  local current = nodes.get_current()
+
+  local target = targets.down(current)
   if not target then return end
 
-  local current = nodes.get_current()
   current = get_highest_coincident_pipe(current)
   local current_augments = augment.get_node_augments(current)
   local current_all = { current, unpack(current_augments) }
@@ -83,10 +84,10 @@ function M.swap_up()
   if not is_on_target_node() then return end
   if not is_supported_ft() then return end
 
-  local target = targets.up()
+  local current = nodes.get_current()
+  local target = targets.up(current)
   if not target then return end
 
-  local current = nodes.get_current()
   current = get_highest_coincident_pipe(current)
   local current_augments = augment.get_node_augments(current)
   local current_all = { current, unpack(current_augments) }

@@ -1,42 +1,47 @@
 local operations = require "treewalker.operations"
 local targets = require "treewalker.targets"
+local nodes = require "treewalker.nodes"
 
 local M = {}
 
 ---@return nil
 function M.move_out()
-  local target, row, line = targets.out()
+  local node = nodes.get_current()
+  local target, row = targets.out(node)
 
-  if target and row and line then
-    operations.jump(row, target)
+  if target and row then
+    operations.jump(target, row)
     return
   end
 end
 
 ---@return nil
 function M.move_in()
-  local target, row, line = targets.inn()
+  local node = nodes.get_current()
+  local target, row = targets.inn(node)
 
-  if target and row and line then
-    operations.jump(row, target)
+  if target and row then
+    operations.jump(target, row)
   end
 end
 
 ---@return nil
 function M.move_up()
-  local target, row, line = targets.up()
+  local node = nodes.get_current()
+  local target, row = targets.up(node)
 
-  if target and row and line then
-    operations.jump(row, target)
+  if target and row  then
+    operations.jump(target, row)
   end
 end
 
 ---@return nil
 function M.move_down()
-  local target, row, line = targets.down()
+  local node = nodes.get_current()
+  local target, row = targets.down(node)
 
-  if target and row and line then
-    operations.jump(row, target)
+  if target and row then
+    operations.jump(target, row)
   end
 end
 

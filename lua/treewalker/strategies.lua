@@ -78,9 +78,9 @@ end
 -- Special case for when starting on empty line. In that case, find the next
 -- line with stuff on it, and go to that.
 ---@param start_row integer
----@param start_line string
 ---@return TSNode | nil, integer | nil, string | nil
-function M.get_next_if_on_empty_line(start_row, start_line)
+function M.get_next_if_on_empty_line(start_row)
+  local start_line = lines.get_line(start_row)
   if start_line ~= "" then return end
 
   ---@type string | nil
@@ -108,9 +108,9 @@ end
 -- Special case for when starting on empty line. In that case, find the prev
 -- line with stuff on it, and go to that.
 ---@param start_row integer
----@param start_line string
 ---@return TSNode | nil, integer | nil, string | nil
-function M.get_prev_if_on_empty_line(start_row, start_line)
+function M.get_prev_if_on_empty_line(start_row)
+  local start_line = lines.get_line(start_row)
   if start_line ~= "" then return end
 
   ---@type string | nil

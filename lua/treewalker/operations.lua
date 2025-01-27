@@ -53,9 +53,9 @@ function M.highlight_full(range, duration, hl_group)
   end, duration)
 end
 
----@param row integer
 ---@param node TSNode
-function M.jump(row, node)
+---@param row integer
+function M.jump(node, row)
   vim.cmd("normal! m'") -- Add originating node to jump list
   vim.api.nvim_win_set_cursor(0, { row, 0 })
   vim.cmd("normal! ^")  -- Jump to start of line
