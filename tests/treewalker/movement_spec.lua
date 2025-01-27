@@ -2,14 +2,6 @@ local load_fixture = require "tests.load_fixture"
 local tw = require 'treewalker'
 local helpers = require 'tests.treewalker.helpers'
 
--- Feed keys to neovim; keys are pressed no matter what vim mode or state
----@param keys string
----@return nil
-local function feed_keys(keys)
-  local termcodes = vim.api.nvim_replace_termcodes(keys, true, true, true)
-  vim.api.nvim_feedkeys(termcodes, 'mtx', false)
-end
-
 describe("Movement in a regular lua file: ", function()
   before_each(function()
     load_fixture("/lua.lua")
@@ -75,16 +67,16 @@ describe("Movement in a regular lua file: ", function()
     vim.fn.cursor(1, 1)
     tw.move_down()
     helpers.assert_cursor_at(3, 1)
-    feed_keys('<C-o>')
+    helpers.feed_keys('<C-o>')
     helpers.assert_cursor_at(1, 1, "local M = {}")
 
     vim.cmd('windo clearjumps')
     vim.fn.cursor(21, 1)
     tw.move_in(); tw.move_in()
     helpers.assert_cursor_at(23, 5, "if node:type")
-    feed_keys('<C-o>')
+    helpers.feed_keys('<C-o>')
     helpers.assert_cursor_at(22, 3, "for _,")
-    feed_keys('<C-o>')
+    helpers.feed_keys('<C-o>')
     helpers.assert_cursor_at(21, 1, "local function is_jump_target")
   end)
 
