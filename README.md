@@ -32,7 +32,7 @@
 
 ## Movement
 
-The movement commands move you through the syntax tree in an intuitive way:
+The movement commands move you through your code in an intuitive way:
 
 * **`:Treewalker Up`** - Moves up to the previous neighbor node, skipping comments, annotations, and other unintuitive nodes
 * **`:Treewalker Down`** - Moves down to the next neighbor node, skipping comments, annotations, and other unintuitive nodes
@@ -156,13 +156,12 @@ vim.keymap.set('n', '<C-S-l>', '<cmd>Treewalker SwapRight<cr>', { silent = true 
 ## Alternatives
 
 * [syntax-tree-surfer](https://github.com/ziontee113/syntax-tree-surfer)
-is the closest thing to Treewalker. I only created Treewalker because I
-couldn't get syntax-tree-surfer to work :/. Treewalker has a robust test suite,
-makes use of the type system, has CI (automated testing), and has organized
-code (so the plugin should be pretty stable). I believe Treewalker usage is a
-little bit simpler and more intuitive. Treewalker is missing the visual
-selection swap feature that syntax-tree-surfer has, though. syntax-tree-surfer
-is also publicly archived.
+is publicly archived and I could not get it to work :/
+`Treewalker` has a robust test suite, makes use of the type system, has CI
+(automated testing), and has organized code. So the plugin should be pretty
+stable. I believe `Treewalker` usage is a little bit simpler and more intuitive.
+`Treewalker` is missing the visual selection swap feature that syntax-tree-surfer
+has, though.
 
 * [nvim-treehopper](https://github.com/mfussenegger/nvim-treehopper)
 is similar in that it uses the AST to navigate, but it takes more of a
@@ -184,5 +183,16 @@ of `Treewalker`'s left/right swapping code is inspired by `ts_utils`.
 `Treewalker` operates a little differently under the hood, picking the highest
 startwise coinciding node over the lowest. But mostly it does the work of
 finding the next relevant node and packaging it all up into a nice interface.
+
+* [tree-climber.nvim](https://github.com/drybalka/tree-climber.nvim)
+i discovered long after having made `Treewalker`. It seems to be the most
+similar of all of these. It works mostly the same, but with a little bit less
+refinement, including getting stuck on certain nodes, and navigating to nodes
+that don't necessarily seem helpful to go to. In my usage, it seems like
+`tree-climber` gives you more fine grained access to each individual node,
+whereas `Treewalker` takes a more linewise approach which allows you to make
+larger movements more easily. For movement inside of a single line, `Treewalker`
+doesn't help much, whereas `tree-climber` does.
+
 
 
