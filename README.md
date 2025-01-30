@@ -16,7 +16,9 @@
 
 <br>
 
-![A fast paced demo of Treewalker.nvim](https://github.com/user-attachments/assets/4d23af49-bd94-412a-bc8c-d546df6775df)
+<div align="center">
+    <img src="https://github.com/user-attachments/assets/4d23af49-bd94-412a-bc8c-d546df6775df" alt="A fast paced demo of Treewalker.nvim">
+</div>
 
 <div align="center">
     <h2>Move around your code in a syntax tree aware manner.</h2>
