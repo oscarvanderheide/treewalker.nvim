@@ -24,23 +24,23 @@ randomList = do
 -- Define a function to calculate the median of a list of numbers
 median :: [Double] -> Double
 median xs = median' (sort xs)
-    where
-        median' []     = error "Empty list"
-        median' [_]    = error "List contains single element"
-        median' xs
-            | odd  len  = fromIntegral $ xs !! (len `div` 2)
-            | otherwise = mean
-                where
-                    len = length xs
-                    mean = (sum xs) / fromIntegral len
+  where
+    median' []   = error "Empty list"
+    median' [_]  = error "List contains single element"
+    median' xs
+      | odd  len  = fromIntegral $ xs !! (len `div` 2)
+      | otherwise = mean
+        where
+          len = length xs
+          mean = (sum xs) / fromIntegral len
 
 -- Main function to run the program
 main :: IO ()
 main = do
-    printEvens [1, 3, 5, 7, 9]
-    print $ sumNumbers [-2, -4, 0, 10]
-    randomList >>= mapM_ putStrLn . map show
-    let xs = [-3.0, -1.0, 0.0, 1.0, 3.0]
-        ys = [5.5, 6.6]
-    print $ median xs
-    print $ sumNumbers ys
+  printEvens [1, 3, 5, 7, 9]
+  print $ sumNumbers [-2, -4, 0, 10]
+  randomList >>= mapM_ putStrLn . map show
+  let xs = [-3.0, -1.0, 0.0, 1.0, 3.0]
+    ys = [5.5, 6.6]
+  print $ median xs
+  print $ sumNumbers ys
